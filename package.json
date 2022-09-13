@@ -1,8 +1,8 @@
 {
-  "name": "viz-ukraine-humanitarian-operations",
+  "name": "viz-horn-of-africa-humanitarian-operations",
   "version": "1.0.0",
   "description": "",
-  "homepage": "https://github.com/ocha-dap/viz-ukraine-humanitarian-operations",
+  "homepage": "https://github.com/baripembo/viz-horn-of-africa-humanitarian-operations",
   "main": " ",
   "scripts": {
     "start": "http-server ./dist -c-1 -p 3000",
