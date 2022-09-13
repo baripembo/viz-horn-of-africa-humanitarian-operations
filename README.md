@@ -1,4 +1,4 @@
-# Ukraine Data Explorer
+# Horn of Africa Data Explorer
 
 ### Set up
 * Check out the repository
