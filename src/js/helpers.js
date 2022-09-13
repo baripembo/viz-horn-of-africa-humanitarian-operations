@@ -1,44 +1,28 @@
-function getMonth(m) {
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return months[m];
+function vizTrack(view, content) {
+  mpTrack(view, content);
+  gaTrack('viz interaction hdx', 'switch viz', 'ukr data explorer', content);
 }
 
-function compare(a, b) {
-  const keyA = a.key.toLowerCase();
-  const keyB = b.key.toLowerCase();
-
-  let comparison = 0;
-  if (keyA > keyB) {
-    comparison = 1;
-  } else if (keyA < keyB) {
-    comparison = -1;
-  }
-  return comparison;
-}
-
-function wrap(text, width) {
-  text.each(function() {
-    var text = d3.select(this),
-        words = text.text().split(/\s+/).reverse(),
-        word,
-        line = [],
-        lineNumber = 0,
-        lineHeight = 0.9, // ems
-        y = text.attr("y"),
-        dy = parseFloat(text.attr("dy")),
-        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y);
-    while (word = words.pop()) {
-      line.push(word);
-      tspan.text(line.join(" "));
-      if (tspan.node().getComputedTextLength() > width) {
-        line.pop();
-        tspan.text(line.join(" "));
-        line = [word];
-        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", + lineHeight + "em").text(word);
-      }
-    }
+function mpTrack(view, content) {
+  //mixpanel event
+  mixpanel.track('viz interaction', {
+    'page title': document.title,
+    'embedded in': window.location.href,
+    'action': 'switch viz',
+    'viz type': 'ukr data explorer',
+    'current view': view,
+    'content': content
   });
 }
+
+function gaTrack(eventCategory, eventAction, eventLabel, type) {
+  dataLayer.push({
+    'event': eventCategory,
+    'label': eventAction,
+    'type': eventLabel
+  });
+}
+
 
 function truncateString(str, num) {
   if (str.length <= num) {
@@ -47,32 +31,71 @@ function truncateString(str, num) {
   return str.slice(0, num) + '...';
 }
 
+
 function formatValue(val) {
-  var n = (isNaN(val) || val==0) ? val : d3.format('$.2s')(val).replace(/G/, 'B');
-  return n;
+  var format = d3.format('$.3s');
+  var value;
+  if (!isVal(val)) {
+    value = 'NA';
+  }
+  else {
+    value = (isNaN(val) || val==0) ? val : format(val).replace(/G/, 'B');
+  }
+  return value;
 }
+
 
 function roundUp(x, limit) {
   return Math.ceil(x/limit)*limit;
 }
 
-function setSelect(id, valueToSelect) {    
-  let element = document.getElementById(id);
-  element.value = valueToSelect;
+
+function isVal(value) {
+  return (value===undefined || value===null || value==='') ? false : true;
 }
 
-function getAccessLabels(data) {
-  var accessData = Object.entries(data);
-  var accessLabels = {};
-  accessData.forEach(function(item) {
-    if (item[1].indexOf('access')>-1)
-      accessLabels[item[1]] = item[0];
+function randomNumber(min, max) { 
+  return Math.random() * (max - min) + min;
+}
+
+function createFootnote(target, indicator, text) {
+  var indicatorName = (indicator==undefined) ? '' : indicator;
+  var className = (indicatorName=='') ? 'footnote' : 'footnote footnote-indicator';
+  var footnote = $(`<p class='${className}' data-indicator='${indicatorName}'>${truncateString(text, 65)}<a href='#' class='expand'>MORE</a></p>`);
+  $(target).append(footnote);
+  footnote.click(function() {
+    if ($(this).find('a').hasClass('collapse')) {
+      $(this).html(`${truncateString(text, 65)}<a href='#' class='expand'>MORE</a>`);
+    }
+    else {
+      $(this).html(`${text}<a href='#' class='collapse'>LESS</a>`);
+    }
   });
-  return accessLabels;
 }
 
-function createKeyFigure(target, title, className, value) {
-  var targetDiv = $(target);
-  //<p class='date small'><span>"+ date +"</span></p>
-  return targetDiv.append("<div class='key-figure'><div class='inner'><h3>"+ title +"</h3><div class='num " + className + "'>"+ numFormat(value) +"</div></div></div></div>");
+
+function getCurvedLine(start, end) {
+  const radius = turf.rhumbDistance(start, end);
+  const midpoint = turf.midpoint(start, end);
+  const bearing = turf.rhumbBearing(start, end) - 89; // <-- not 90˚
+  const origin = turf.rhumbDestination(midpoint, radius, bearing);
+
+  const curvedLine = turf.lineArc(
+    origin,
+    turf.distance(origin, start),
+    turf.bearing(origin, end),
+    turf.bearing(origin, start),
+    { steps: 128 }
+  );
+
+  return { line: curvedLine, bearing: bearing };
 }
+
+
+//country codes and raster ids
+const countryCodeList = {
+  ETH: '8l382re2',
+  KEN: '2e1m7o07',
+  SOM: '3s7xeitz'
+};
+

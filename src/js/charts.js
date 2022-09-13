@@ -1,259 +1,234 @@
-function createBarChart(data, type) {
-  data.forEach(function(item, index) {
-    if (item.min=='' || item.max=='')
-      data.splice(index, 1);
+/******************/
+/*** SPARKLINES ***/
+/******************/
+function createSparkline(data, div, size) {
+  var width = (isMobile) ? 30 : 60;
+  var height = 20;
+  var x = d3.scaleLinear().range([0, width]);
+  var y = d3.scaleLinear().range([height, 0]);
+  var parseDate = d3.timeParse("%Y-%m-%d");
+  var line = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.value); })
+    .curve(d3.curveBasis);
+
+  data.forEach(function(d) {
+    d.date = parseDate(d.date);
+    d.value = +d.value;
   });
 
-  var barColor = (type=='Cases') ? '#007CE1' : '#000';
-  var maxVal = d3.max(data, function(d) { return +d.max; })
-  var barHeight = 25;
-  var barPadding = 20;
-  var margin = {top: 0, right: 40, bottom: 30, left: 50},
-      width = 300,
-      height = (barHeight + barPadding) * data.length;
-  
-  x = d3.scaleLinear()
-    .domain([0, maxVal])
-    .range([0, width - margin.left - margin.right]);
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain(d3.extent(data, function(d) { return d.value; }));
 
-  // set the ranges
-  y = d3.scaleBand().range([0, height]);
-  y.domain(data.map(function(d) { return d.model; }));
-            
-  var div = '.projections-'+ type.toLowerCase();
-  var svg = d3.select(div).append('svg')
-      .attr('width', width)
-      .attr('height', height + margin.top + margin.bottom)
+  var svg = d3.select(div)
+    .append('svg')
+    .attr('class', 'sparkline')
+    .attr('width', width)
+    .attr('height', height+5)
     .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-  // add the y axis
-  svg.append('g')
-    .attr('transform', 'translate(0, 0)')
-    .call(d3.axisLeft(y)
-      .tickSizeOuter(0))
-
-  // add the x axis
-  svg.append('g')
-    .attr('transform', 'translate(0, '+height+')')
-    .call(d3.axisBottom(x)
-      .tickSizeOuter(0)
-      .ticks(5, 's'));
-
-  // append bars
-  bars = svg.selectAll('.bar')
-      .data(data)
-    .enter().append('g')
-      .attr('class', 'bar-container')
-      .attr('transform', function(d, i) { return 'translate(' + x(d.min) + ', ' + (y(d.model)+10) + ')'; });
-
-  bars.append('rect')
-    .attr('class', 'bar')
-    .attr('fill', barColor)
-    .attr('height', barHeight)
-    .attr('width', function(d) {
-      var w = x(d.max) - x(d.min);
-      if (w<0) w = 0;
-      return w;
-    });
-
-  // add min/max labels
-  bars.append('text')
-    .attr('class', 'label-num')
-    .attr('x', function(d) {
-      return x(d.max) - x(d.min) + 4;
-    })
-    .attr('y', function(d) { return barHeight/2 + 4; })
-    .text(function (d) {
-      return d3.format('.3s')(d.max);
-    });
-
-  bars.append('text')
-    .attr('class', 'label-num')
-    .attr('text-anchor', 'end')
-    .attr('x', -4)
-    .attr('y', function(d) { return barHeight/2 + 4; })
-    .text(function (d) {
-      return d3.format('.3s')(d.min);
-    });
-
-  //source
-  if (type=='Deaths') {
-    var projectionsDiv = $('.projections .panel-inner');
-    var date = new Date();
-    projectionsDiv.append('<p class="small source"></p>');
-    data.forEach(function(d) {
-      var source = getSource('#affected+deaths+'+ d.model.toLowerCase() +'+min');
-      var sourceDate = new Date(source['#date']);
-      if (sourceDate.getTime()!=date.getTime()) {
-        date = sourceDate;
-        projectionsDiv.find('.source').append(' <span class="date">'+ dateFormat(date) +'</span>');
-      }
-      projectionsDiv.find('.source').append(' | '+ d.model +': <a href="'+ source['#meta+url'] +'" class="dataURL" target="_blank">DATA</a>');
-    });
-  }
-
+      .attr('transform', 'translate(0,4)');
+    
+  svg.append('path')
+   .datum(data)
+   .attr('class', 'sparkline')
+   .attr('d', line);
 }
 
+
+/****************************************/
+/*** TIMESERIES CHART FUNCTIONS ***/
+/****************************************/
 function initTimeseries(data, div) {
-  var timeseriesArray = formatTimeseriesData(data);
-  createTimeSeries(timeseriesArray, div);
+  let formattedData = formatData(data);
+  $('.trendseries-title').html('<h6>Total Number of Conflict Events</h6><div class="num">'+numFormat(data.length)+'</div>');
+  createTimeSeries(formattedData, div);
 }
 
-function formatTimeseriesData(data) {
-  //group the data by country
-  var groupByCountry = d3.nest()
-    .key(function(d){ return d['Country']; })
-    .key(function(d) { return d['Date']; })
+let eventsArray;
+function formatData(data) {
+  let events = d3.nest()
+    .key(function(d) { return d['#event+type']; })
+    .key(function(d) { return d['#date+occurred']; })
+    .rollup(function(leaves) { return leaves.length; })
     .entries(data);
-  groupByCountry.sort(compare);
+  events.sort((a, b) => (a.key > b.key) ? 1 : -1);
 
-  //group the data by date
-  var groupByDate = d3.nest()
-    .key(function(d){ return d['Date']; })
-    .entries(data);
+  let dates = [... new Set(acledData.map((d) => d['#date+occurred']))];
+  let totals = [];
 
-  var dateArray = ['x'];
-  groupByDate.forEach(function(d) {
-    var date = new Date(d.key);
-    var utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-    dateArray.push(utcDate);
-  });
-
-  var timeseriesArray = [];
-  timeseriesArray.push(dateArray);
-
-  groupByCountry.forEach(function(country, index) {
-    var arr = [country.key];
-    var val = 0;
-    groupByDate.forEach(function(d) {
-      country.values.forEach(function(e) {
-        if (d.key == e.key) {
-          val = e.values[0]['confirmed cases'];
-        }
+  eventsArray = [];
+  events.forEach(function(event) {
+    let array = [];
+    dates.forEach(function(date, index) {
+      let val = 0;
+      event.values.forEach(function(e) {
+        if (e.key==date)
+          val = e.value;
       });
-      arr.push(val);
+      totals[index] = (totals[index]==undefined) ? val : totals[index]+val; //save aggregate of all events per day
+      array.push(val); //save each event per day
     });
-    timeseriesArray.push(arr);
+    array.reverse();
+    array.unshift(event.key);
+    eventsArray.push(array);
   });
 
-  return timeseriesArray;
+  //format for c3
+  dates.unshift('x');
+  totals.unshift('All');
+  return {series: [dates, totals], events: eventsArray};
 }
 
-var countryTimeseriesChart;
-function createTimeSeries(array , div) {
-	var chart = c3.generate({
+
+function createTimeSeries(data, div) {
+  const chartWidth = viewportWidth - $('.country-panel').width() - 100;
+  const chartHeight = 280;
+  let colorArray = ['#F8B1AD'];
+
+  var chart = c3.generate({
     size: {
-      height: 240
+      width: chartWidth,
+      height: chartHeight
     },
     padding: {
-      bottom: 0,
+      bottom: (isMobile) ? 60 : 0,
       top: 10,
-      left: 30,
-      right: 16
+      left: (isMobile) ? 30 : 35,
+      right: (isMobile) ? 200 : 200
     },
     bindto: div,
-    title: {
-  		text: 'Number of Confirmed Cases Over Time',
-  		position: 'upper-left',
-		},
-		data: {
-			x: 'x',
-			columns: array,
-      type: 'spline'
-		},
-    color: {
-        pattern: ['#1ebfb3', '#f2645a', '#007ce1', '#9c27b0', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    data: {
+      x: 'x',
+      columns: data.series,
+      type: 'bar'
     },
-    spline: {
-      interpolation: {
-        type: 'basis'
-      }
+    bar: {
+        width: {
+            ratio: 0.5
+        }
+    },
+    color: {
+      pattern: colorArray
     },
     point: { show: false },
-		axis: {
-			x: {
-				type: 'timeseries',
-				tick: {
-          count: 8,
-				  format: '%-m/%-d/%y',
-          outer: false
-				}
-			},
-			y: {
-				min: 0,
-				padding: { top:0, bottom:0 },
-        tick: { 
-          outer: false,
-          format: shortenNumFormat
-        }
-			}
-		},
-    legend: {
-      show: false,
-      position: 'inset',
-      inset: {
-          anchor: 'top-left',
-          x: 10,
-          y: 0,
-          step: 8
+    grid: {
+      y: {
+        show: true
       }
     },
-		tooltip: { grouped: false },
-    transition: { duration: 300 }
-	});
-
-  var lastUpdated = new Date(Math.max.apply(null, timeseriesData.map(function(e) {
-    return new Date(e.Date);
-  })));
-
-  if (div=='.country-timeseries-chart') {
-    countryTimeseriesChart = chart;
-    $('.cases-timeseries').append('<p class="small"><span class="date">'+ dateFormat(lastUpdated) +'</span> | <span class="source-name">WHO</span> | <a href="https://data.humdata.org/dataset/coronavirus-covid-19-cases-and-deaths" class="dataURL" target="_blank">DATA</a></p>');
-  }
-  createTimeseriesLegend(chart, div);
-}
-
-
-function createTimeseriesLegend(chart, div) {
-  var names = [];
-  chart.data.shown().forEach(function(d) {
-    names.push(d.id)
-  });
-
-  //custom legend
-  d3.select(div).insert('div').attr('class', 'timeseries-legend').selectAll('div')
-    .data(names)
-    .enter().append('div')
-    .attr('data-id', function(id) {
-      return id;
-    })
-    .html(function(id) {
-      return '<span></span>'+id;
-    })
-    .each(function(id) {
-      d3.select(this).select('span').style('background-color', chart.color(id));
-    })
-    .on('mouseover', function(id) {
-      chart.focus(id);
-    })
-    .on('mouseout', function(id) {
-      chart.revert();
-    });
-}
-
-function updateTimeseries(data, selected) {
-  var updatedData = (selected != undefined) ? data.filter((country) => selected.includes(country['Country Code'])) : data;
-  var timeseriesArray = formatTimeseriesData(updatedData);
-
-  //load new data
-  countryTimeseriesChart.load({
-    columns: timeseriesArray,
-    unload: true,
-    done: function() {
-      $('.country-timeseries-chart .timeseries-legend').remove();
-      createTimeseriesLegend(countryTimeseriesChart, '.country-timeseries-chart');
+    axis: {
+      x: {
+        type: 'timeseries',
+        tick: { 
+          outer: false
+        }
+      },
+      y: {
+        min: 0,
+        padding: { 
+          top: (isMobile) ? 20 : 50, 
+          bottom: 0 
+        },
+        tick: { 
+          outer: false,
+          //format: d3.format('d')
+          format: function(d) {
+            if (Math.floor(d) != d){
+              return;
+            }
+            return d;
+          }
+        }
+      }
+    },
+    legend: {
+      show: false
+    },
+    transition: { duration: 500 },
+    tooltip: {
+      contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+        let events = eventsArray;
+        let id = d[0].index + 1;
+        let date = new Date(d[0].x);
+        let total = 0;
+        let html = `<table><thead><tr><th colspan="2">${moment(date).format('MMM D, YYYY')}</th></tr><thead>`;
+        for (var i=0; i<=events.length-1; i++) {
+          if (events[i][id]>0) {
+            html += `<tr><td>${events[i][0]}</td><td>${events[i][id]}</td></tr>`;
+            total += events[i][id];
+          }
+        };
+        html += `<tr><td><b>Total</b></td><td><b>${total}</b></td></tr></table>`;
+        return html;
+      }
     }
   });
+
+  countryTimeseriesChart = chart;
+  createSource($('#chart-view .source-container'), '#date+latest+acled');
 }
+
+
+function updateTimeseries(selected) {
+  let filteredData = (selected!='All') ? acledData.filter((d) => d['#adm1+code'] == selected) : acledData;
+  let data = formatData(filteredData);
+  eventsArray = data.events;
+  $('.trendseries-title').find('.num').html(numFormat(filteredData.length));
+
+  if (filteredData.length<=0)
+    $('.trendseries-chart').hide();
+  else 
+    $('.trendseries-chart').show();
+
+  countryTimeseriesChart.load({
+    columns: data.series
+  });
+}
+
+
+/***************************/
+/*** PIE CHART FUNCTIONS ***/
+/***************************/
+function createPieChart(data, div) {
+  let requirement = data[0];
+  let funded = data[1];
+  let fundedPercent = funded/requirement;
+
+  let width = (isMobile) ? 25 : 30
+      height = width
+      margin = 1
+
+  let radius = Math.min(width, height)/2 - margin
+
+  let svg = d3.select(div)
+    .append('svg')
+      .attr('class', 'pie-chart')
+      .attr('width', width)
+      .attr('height', height)
+    .append('g')
+      .attr('transform', `translate(${width/2}, ${height/2})`);
+
+  let dataArray = {a: fundedPercent, b: 1-fundedPercent};
+
+  let color = d3.scaleOrdinal()
+    .domain(data)
+    .range(['#418FDE', '#DFDFDF'])
+
+  let pie = d3.pie()
+    .value(function(d) { return d.value; }).sort(null);
+  let formatData = pie(d3.entries(dataArray));
+
+  svg
+    .selectAll('g')
+    .data(formatData)
+    .enter()
+    .append('path')
+    .attr('d', d3.arc()
+      .innerRadius(0)
+      .outerRadius(radius)
+    )
+    .attr('fill', function(d){ return( color(d.data.key)) })
+    .style('stroke-width', 0)
+}
+
 
