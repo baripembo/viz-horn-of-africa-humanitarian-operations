@@ -49,7 +49,7 @@ $( document ).ready(function() {
     $('.content').width(viewportWidth);
     $('.content').height(viewportHeight);
     $('.content-right').width(viewportWidth);
-    $('.country-panel .panel-content').height(viewportHeight - $('.country-panel .panel-content').position().top);
+    $('.key-figure-panel .panel-content').height(viewportHeight - $('.key-figure-panel .panel-content').position().top);
     $('.map-legend.country').css('max-height', viewportHeight - 200);
     if (viewportHeight<696) {
       zoomLevel = 1.4;
@@ -164,11 +164,11 @@ $( document ).ready(function() {
 
   // function initCountryView() {
   //   $('.content').addClass('country-view');
-  //   $('.country-panel').scrollTop(0);
+  //   $('.key-figure-panel').scrollTop(0);
   //   $('#population').prop('checked', true);
   //   currentCountryIndicator = {id: $('input[name="countryIndicators"]:checked').val(), name: $('input[name="countryIndicators"]:checked').parent().text()};
 
-  //   initCountryPanel();
+  //   initKeyFigures();
   // }
 
 

@@ -55,6 +55,34 @@ function createMapTooltip(country_code, country_name, point) {
   }
 }
 
+
+function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
+  var adm1 = subnationalData.filter(function(c) {
+    if (c['#adm1+code']==adm1_pcode && c['#country+code']==currentCountry.code)
+      return c;
+  });
+
+  if (adm1[0]!=undefined) {
+    var val = adm1[0][currentIndicator.id];
+    var label = currentIndicator.name;
+
+    //format content for tooltip
+    if (val!=undefined && val!='' && !isNaN(val)) {
+      val = shortenNumFormat(val);
+    }
+    else {
+      val = 'No Data';
+    }
+
+    let content = '';
+    content = `<h2>${adm1_name}</h2>${label}:<div class="stat">${val}</div>`;
+
+    tooltip.setHTML(content);
+    //if (!isMobile) setTooltipPosition(point)
+  }
+}
+
+
 function setTooltipPosition(point) {
   var tooltipWidth = $('.map-tooltip').width();
   var tooltipHeight = $('.map-tooltip').height();

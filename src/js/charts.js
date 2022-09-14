@@ -81,7 +81,7 @@ function formatData(data) {
 
 
 function createTimeSeries(data, div) {
-  const chartWidth = viewportWidth - $('.country-panel').width() - 100;
+  const chartWidth = viewportWidth - $('.key-figure-panel').width() - 100;
   const chartHeight = 280;
   let colorArray = ['#F8B1AD'];
 

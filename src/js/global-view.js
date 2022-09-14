@@ -7,8 +7,8 @@ function handleGlobalEvents(layer) {
     tooltip.addTo(map);
   });
 
-  map.on('mousemove', function(e) {
-    var features = map.queryRenderedFeatures(e.point, { layers: [globalLayer, globalLabelLayer] });
+  map.on('mousemove', globalLayer, function(e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: [globalLayer] });
     var target;
     features.forEach(function(feature) {
       if (feature.sourceLayer==adm1SourceLayer)
@@ -28,7 +28,7 @@ function handleGlobalEvents(layer) {
 
 
 function initGlobalLayer() {
-  initCountryPanel();
+  initKeyFigures();
 
   //color scale
   colorScale = getGlobalLegendScale();
@@ -36,7 +36,6 @@ function initGlobalLayer() {
 
   //data join
   var expression = ['match', ['get', 'ISO_3']];
-  var expressionMarkers = ['match', ['get', 'ISO_3']];
   nationalData.forEach(function(d) {
     var val = d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
@@ -45,7 +44,6 @@ function initGlobalLayer() {
 
   //default value for no data
   expression.push(colorDefault);
-  expressionMarkers.push(0);
   
   //set properties
   map.setPaintProperty(globalLayer, 'fill-color', expression);
@@ -56,28 +54,45 @@ function initGlobalLayer() {
 
 
 function updateGlobalLayer(country_code) {
-  //color scales
+  //color scale
   colorScale = getGlobalLegendScale();
-  colorNoData = '#FFF';
 
   //data join
-  var countryList = [];
   var expression = ['match', ['get', 'ISO_3']];
   nationalData.forEach(function(d) {
-    if (country_code==='' || d['#country+code']===country_code) {    
-      var val = d[currentIndicator.id];
-      var color = colorDefault;
-      
-      color = (val<0 || isNaN(val) || !isVal(val)) ? colorNoData : colorScale(val);
-      if (currentIndicator.id=='#population') color = colorDefault;
-      expression.push(d['#country+code'], color);
-    }
+    var val = d[currentIndicator.id];
+    var color = (val==null) ? colorNoData : colorScale(val);
+    expression.push(d['#country+code'], color);
   });
 
   //default value for no data
   expression.push(colorDefault);
-
+  
+  //set properties
   map.setPaintProperty(globalLayer, 'fill-color', expression);
+
+
+//   //color scales
+//   colorScale = getGlobalLegendScale();
+//   colorNoData = '#FFF';
+
+//   //data join
+//   var expression = ['match', ['get', 'ISO_3']];
+//   nationalData.forEach(function(d) {
+//     if (country_code==='' || d['#country+code']===country_code) {    
+//       var val = d[currentIndicator.id];
+//       var color = (val==null) ? colorNoData : colorScale(val);
+//       if (currentIndicator.id=='#population') color = colorDefault;
+//       console.log('updateGlobalLayer',currentIndicator.id, color);
+//       expression.push(d['#country+code'], color);
+//     }
+//   });
+
+//   //default value for no data
+//   expression.push(colorDefault);
+
+//   //map.setPaintProperty(globalLayer, 'fill-color', expression);
+//   map.setPaintProperty(globalLayer, 'fill-color', expression);
   updateMapLegend(colorScale);
 
   //toggle pop density rasters
@@ -92,6 +107,10 @@ function updateGlobalLayer(country_code) {
 
 
 function createMapLegend(scale) {
+  //set legend title
+  let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
+  $('.map-legend .legend-title').html(legendTitle);
+
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
   createSource($('.map-legend .population-source'), '#population');
