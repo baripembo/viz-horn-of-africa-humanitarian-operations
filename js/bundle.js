@@ -290,8 +290,8 @@ function updateCountryLayer() {
   }
 
   //update legend
-  var countryColorScale = d3.scaleQuantize().domain([0, max]).range(clrRange);
-  updateMapLegend(countryColorScale);
+  var colorScale = getGlobalLegendScale();
+  updateMapLegend(colorScale);
 
   //data join
   var expression = ['match', ['get', 'ADM1_PCODE']];
@@ -302,21 +302,23 @@ function updateCountryLayer() {
     if (d['#country+code']==currentCountry.code) {
       var val = +d[currentIndicator.id];
       layerOpacity = 1;
+      boundaryColor = '#E0E0E0';
       color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : countryColorScale(val);
 
-      //turn off choropleth for population layer
-      if (currentIndicator.id=='#population') {
+      //turn off choropleth for raster layers
+      if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
         color = colorDefault;
+        boundaryColor = '#FFF';
       }
     }
     else {
       color = colorDefault;
-      // boundaryColor = '#E0E0E0';
+      boundaryColor = '#E0E0E0';
       layerOpacity = 0;
     }
     
     expression.push(d['#adm1+code'], color);
-    //expressionBoundary.push(d['#adm1+code'], boundaryColor);
+    expressionBoundary.push(d['#adm1+code'], boundaryColor);
     expressionOpacity.push(d['#adm1+code'], layerOpacity);
   });
   //set expression defaults
@@ -325,40 +327,33 @@ function updateCountryLayer() {
   expressionOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
-  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population') ? 0 : 1);
+  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') ? 0 : 1);
+  map.setPaintProperty(subnationalBoundaryLayer, 'line-color', expressionBoundary);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-opacity', expressionOpacity);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionOpacity);
 
-  //hide all pop density rasters
+  //hide all rasters
   var countryList = Object.keys(countryCodeList);
   countryList.forEach(function(country_code) {
     var id = country_code.toLowerCase();
     if (map.getLayer(id+'-popdensity'))
       map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
+
+    if (map.getLayer(id+'-chirps'))
+      map.setLayoutProperty(id+'-chirps', 'visibility', 'none');
   });
 
-  //set properties
+  //set pop raster properties
   if (currentIndicator.id=='#population') {
     var id = currentCountry.code.toLowerCase();
     map.setLayoutProperty(id+'-popdensity', 'visibility', 'visible');
   }
 
-
-  //toggle layers
-  // if (currentCountryIndicator.id=='#acled+events') {
-  //   resetLayers();
-  //   map.setLayoutProperty('acled-dots', 'visibility', 'visible');
-  //   map.setLayoutProperty('border-crossings-layer', 'visibility', 'none');
-  //   map.setLayoutProperty('hostilities-layer', 'visibility', 'none');
-  // }
-  // else if (currentCountryIndicator.id=='#affected+idps') {
-  //   resetLayers();
-  //   map.setLayoutProperty(countryLayer, 'visibility', 'none');
-  //   map.setLayoutProperty('macro-regions', 'visibility', 'visible');
-  // }
-  // else {
-  //   resetLayers();
-  // }
+  //set chirps raster properties
+  if (currentIndicator.id=='#chirps') {
+    var id = currentCountry.code.toLowerCase();
+    map.setLayoutProperty(id+'-chirps', 'visibility', 'visible');
+  }
 }
 
 function getCountryIndicatorMax() {
@@ -370,14 +365,6 @@ function getCountryIndicatorMax() {
   return max;
 }
 
-
-function resetLayers() {
-  // map.setLayoutProperty(countryLayer, 'visibility', 'visible')
-  // map.setLayoutProperty('acled-dots', 'visibility', 'none');
-  // map.setLayoutProperty('border-crossings-layer', 'visibility', 'visible');
-  // map.setLayoutProperty('hostilities-layer', 'visibility', 'visible');
-  // map.setLayoutProperty('macro-regions', 'visibility', 'none');
-}
 
 
 // function createCountryLegend(scale) {
@@ -520,27 +507,41 @@ function updateGlobalLayer() {
 
   //data join
   var expression = ['match', ['get', 'ISO_3']];
+  var expressionBoundary = ['match', ['get', 'ISO_3']];
   nationalData.forEach(function(d) {
-    var val = d[currentIndicator.id];
+    var val = +d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
+    var boundaryColor = '#E0E0E0';
+
+    //turn off choropleth for raster layers
+    if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
+      color = colorDefault;
+      boundaryColor = '#FFF';
+    }
+
     expression.push(d['#country+code'], color);
+    expressionBoundary.push(d['#country+code'], boundaryColor);
   });
 
   //default value for no data
   expression.push(colorDefault);
+  expressionBoundary.push('#E0E0E0');
   
   //update map and legend
   map.setPaintProperty(globalLayer, 'fill-color', expression);
+  map.setPaintProperty(globalBoundaryLayer, 'line-color', expressionBoundary);
   updateMapLegend(colorScale);
 
-  //toggle pop density rasters
+  //toggle rasters
   var countryList = Object.keys(countryCodeList);
-  let state = (currentIndicator.id=='#population') ? 'visible' : 'none';
   countryList.forEach(function(country_code) {
     if (currentCountry.code=='' || country_code==currentCountry.code) {
       var id = country_code.toLowerCase();
       if (map.getLayer(id+'-popdensity'))
-        map.setLayoutProperty(id+'-popdensity', 'visibility', state);
+        map.setLayoutProperty(id+'-popdensity', 'visibility', (currentIndicator.id=='#population') ? 'visible' : 'none');
+
+      if (map.getLayer(id+'-chirps'))
+        map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#chirps') ? 'visible' : 'none');
     }
   });
 }
@@ -596,6 +597,9 @@ function updateMapLegend(scale) {
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
   $('.map-legend .legend-title').html(legendTitle);
 
+  var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
+  $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
+
   //update legend
   var legend = d3.legendColor()
     .labelFormat(shortenNumFormat)
@@ -622,14 +626,24 @@ function getGlobalLegendScale() {
     case '#population':
       clrRange = populationColorRange;
       break;
+    case '#chirps':
+      clrRange = chirpsColorRange;
+      break;
     default:
       clrRange = colorRange;
   }
 
   //set scale
-  var scale = d3.scaleQuantize().domain([0, max]).range(clrRange);
+  var scale;
+  if (currentIndicator.id=='#chirps') {
+    scale = d3.scaleOrdinal().domain(['-750', '-400', '-150', '0', '150', '400', '750']).range(clrRange);
+  }
+  else {
+    scale = d3.scaleQuantize().domain([0, max]).range(clrRange);
+  }
 
-  return (max==undefined) ? null : scale;
+  return scale;
+  //return (max==undefined) ? null : scale;
 }
 
 function setGlobalLegend(scale) {
@@ -668,6 +682,7 @@ function setGlobalLegend(scale) {
     $('.map-legend .legend-container').show();
     var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
     $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
+
 
     var legendFormat = (currentIndicator.id.indexOf('pct')>-1 || currentIndicator.id.indexOf('ratio')>-1) ? d3.format('.0%') : shortenNumFormat;
     var legend = d3.legendColor()
@@ -780,13 +795,13 @@ function getCurvedLine(start, end) {
 
 //country codes and raster ids
 const countryCodeList = {
-  ETH: '8l382re2',
-  KEN: '2e1m7o07',
-  SOM: '3s7xeitz'
+  ETH: {pop: '8l382re2', chirps: '9f35wnzq'},
+  KEN: {pop: '2e1m7o07', chirps: '0zdu5z45'},
+  SOM: {pop: '3s7xeitz', chirps: '1bl7k2zs'}
 };
 
 
-var map, mapFeatures, globalLayer, globalBoundaryLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
+var map, mapFeatures, labelLayer, globalLayer, globalBoundaryLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
 var adm0SourceLayer = 'wrl_polbnda_1m_ungis';
 var adm1SourceLayer = 'hornafrica_polbnda_int_uncs-9e96cy';
 var hoveredStateId = null;
@@ -830,7 +845,6 @@ function displayMap() {
 
   //get layers
   const layers = map.getStyle().layers;
-  let labelLayer;
   for (const layer of layers) {
     if (layer.id==='Countries 2-4') {
       labelLayer = layer.id;
@@ -850,11 +864,12 @@ function displayMap() {
     'source': 'country-polygons',
     'source-layer': 'hornafrica_polbnda_int_uncs-9e96cy',
     'paint': {
-      'fill-color': '#f1f1ee',
+      'fill-color': '#F1F1EE',
       'fill-opacity': 1
     }
   }, labelLayer);
   globalLayer = 'country-fills';
+  map.setLayoutProperty(globalLayer, 'visibility', 'visible');
 
   //country boundaries
   map.addSource('country-lines', {
@@ -872,6 +887,7 @@ function displayMap() {
     }
   }, labelLayer);
   globalBoundaryLayer = 'country-boundaries';
+  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
 
 
   //subnational fills
@@ -885,7 +901,7 @@ function displayMap() {
     'source': 'subnational-polygons',
     'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
-      'fill-color': '#f1f1ee',
+      'fill-color': '#F1F1EE',
       'fill-opacity': 1,
     }
   }, labelLayer);
@@ -940,31 +956,7 @@ function displayMap() {
 
   mapFeatures = map.queryRenderedFeatures();
 
-  //load pop density rasters
-  var countryList = Object.keys(countryCodeList);
-  countryList.forEach(function(country_code) {
-    var id = country_code.toLowerCase();
-    var raster = countryCodeList[country_code];
-    if (raster!='') {
-      map.addSource(id+'-pop-tileset', {
-        type: 'raster',
-        url: 'mapbox://humdata.'+raster
-      });
-
-      map.addLayer(
-        {
-          id: id+'-popdensity',
-          type: 'raster',
-          source: {
-            type: 'raster',
-            tiles: ['https://api.mapbox.com/v4/humdata.'+raster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
-          }
-        },
-        labelLayer
-      );
-      map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
-    }
-  });
+  loadRasters();
 
   //zoom into region
   var offset = 100;
@@ -986,6 +978,59 @@ function displayMap() {
     closeButton: false,
     closeOnClick: false,
     className: 'map-tooltip'
+  });
+}
+
+
+function loadRasters() {
+  //load pop density and chirps rasters
+  var countryList = Object.keys(countryCodeList);
+  countryList.forEach(function(country_code) {
+    var id = country_code.toLowerCase();
+
+    //pop rasters
+    var raster = countryCodeList[country_code].pop;
+    if (raster!='') {
+      map.addSource(id+'-pop-tileset', {
+        type: 'raster',
+        url: 'mapbox://humdata.'+raster
+      });
+
+      map.addLayer(
+        {
+          id: id+'-popdensity',
+          type: 'raster',
+          source: {
+            type: 'raster',
+            tiles: ['https://api.mapbox.com/v4/humdata.'+raster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
+          }
+        },
+        globalBoundaryLayer
+      );
+      map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
+    }
+
+    //chirps rasters
+    var chirpsRaster = countryCodeList[country_code].chirps;
+    if (chirpsRaster!='') {
+      map.addSource(id+'-chirps-tileset', {
+        type: 'raster',
+        url: 'mapbox://humdata.'+chirpsRaster
+      });
+
+      map.addLayer(
+        {
+          id: id+'-chirps',
+          type: 'raster',
+          source: {
+            type: 'raster',
+            tiles: ['https://api.mapbox.com/v4/humdata.'+chirpsRaster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
+          }
+        },
+        globalBoundaryLayer
+      );
+      map.setLayoutProperty(id+'-chirps', 'visibility', 'none');
+    }
   });
 }
 
@@ -1129,8 +1174,8 @@ function initKeyFigures() {
    //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
   impactDiv.children().remove();  
-  createFigure(impactDiv, {className: 'population', title: 'Population', stat: shortenNumFormat(data['#population']), indicator: '#population'});
   createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
+  createFigure(impactDiv, {className: 'population', title: 'Population', stat: shortenNumFormat(data['#population']), indicator: '#population'});
 }
 
 
@@ -1301,6 +1346,7 @@ var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
 var populationColorRange = ['#FFE281','#FDB96D','#FA9059','#F27253','#E9554D'];
+var chirpsColorRange = ['#e31a1c', '#fd8d3c', '#fecc5c', '#ffffb2', '#a1dab4', '#41b6c4', '#225ea8'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
 var regionBoundaryData, regionalData, nationalData, subnationalDataByCountry, dataByCountry, colorScale, viewportWidth, viewportHeight = '';

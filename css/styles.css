@@ -1374,6 +1374,10 @@ a:visited {
       height: 20px; }
       .map-legend .legend-container.no-data .legendCells {
         display: none; }
+    .map-legend .legend-container.chirps {
+      height: 125px; }
+      .map-legend .legend-container.chirps .legendCells .cell:nth-child(8) {
+        display: none; }
   .map-legend .legend-marker {
     display: flex;
     padding-top: 8px; }
