@@ -1112,10 +1112,10 @@ function resetMap() {
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
 
-  map.flyTo({ 
-    speed: 1,
-    zoom: zoomLevel,
-    center: [37, 6]
+  var offset = 100;
+  map.fitBounds(regionBoundaryData[0].bbox, {
+    padding: {top: offset, right: 0, bottom: offset, left: $('.key-figure-panel').outerWidth()},
+    linear: true
   });
   map.once('moveend', initKeyFigures);
 }
