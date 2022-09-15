@@ -53,7 +53,7 @@ function initGlobalLayer() {
 }
 
 
-function updateGlobalLayer(country_code) {
+function updateGlobalLayer() {
   //color scale
   colorScale = getGlobalLegendScale();
 
@@ -68,40 +68,19 @@ function updateGlobalLayer(country_code) {
   //default value for no data
   expression.push(colorDefault);
   
-  //set properties
+  //update map and legend
   map.setPaintProperty(globalLayer, 'fill-color', expression);
-
-
-//   //color scales
-//   colorScale = getGlobalLegendScale();
-//   colorNoData = '#FFF';
-
-//   //data join
-//   var expression = ['match', ['get', 'ISO_3']];
-//   nationalData.forEach(function(d) {
-//     if (country_code==='' || d['#country+code']===country_code) {    
-//       var val = d[currentIndicator.id];
-//       var color = (val==null) ? colorNoData : colorScale(val);
-//       if (currentIndicator.id=='#population') color = colorDefault;
-//       console.log('updateGlobalLayer',currentIndicator.id, color);
-//       expression.push(d['#country+code'], color);
-//     }
-//   });
-
-//   //default value for no data
-//   expression.push(colorDefault);
-
-//   //map.setPaintProperty(globalLayer, 'fill-color', expression);
-//   map.setPaintProperty(globalLayer, 'fill-color', expression);
   updateMapLegend(colorScale);
 
   //toggle pop density rasters
   var countryList = Object.keys(countryCodeList);
   let state = (currentIndicator.id=='#population') ? 'visible' : 'none';
   countryList.forEach(function(country_code) {
-    var id = country_code.toLowerCase();
-    if (map.getLayer(id+'-popdensity'))
-      map.setLayoutProperty(id+'-popdensity', 'visibility', state);
+    if (currentCountry.code=='' || country_code==currentCountry.code) {
+      var id = country_code.toLowerCase();
+      if (map.getLayer(id+'-popdensity'))
+        map.setLayoutProperty(id+'-popdensity', 'visibility', state);
+    }
   });
 }
 

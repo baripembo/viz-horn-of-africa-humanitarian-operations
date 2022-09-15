@@ -217,17 +217,6 @@ function deepLinkView() {
   }
 }
 
-function selectLayer(layer) {
-  currentIndicator = {id: layer.val(), name: layer.parent().text()};
-  updateGlobalLayer();
-  //vizTrack(`main ${currentCountry.code} view`, currentCountryIndicator.name);
-
-//   //reset any deep links
-//   let layerID = layer.attr('data-layer');
-//   let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
-//   window.history.replaceState(null, null, location);
-}
-
 function matchMapFeatures(country_code) {
   //loop through mapFeatures to find matches to currentCountry.code
   var selectedFeatures = [];
@@ -243,7 +232,15 @@ function createEvents() {
   //map legend radio events
   $('input[type="radio"]').click(function(){
     var selected = $('input[name="countryIndicators"]:checked');
-    selectLayer(selected);
+    currentIndicator = {id: selected.val(), name: selected.parent().text()};
+    //selectLayer(selected);
+    if (currentCountry.code=='') {
+      updateGlobalLayer();
+    }
+    else {
+      var selectedFeatures = matchMapFeatures(currentCountry.code);
+      selectCountry(selectedFeatures);
+    }
   });
 
   //chart view trendseries select event
@@ -261,53 +258,27 @@ function createEvents() {
     currentCountry.name = d3.select('.country-select option:checked').text();
     if (currentCountry.code==='') {
       resetMap();
+      updateGlobalLayer(currentCountry.code);
     }
     else {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
     }
-
-    updateGlobalLayer(currentCountry.code);
   });
 }
 
 
-// function selectCountry(features) {
-//   //set first country indicator
-//   $('#population').prop('checked', true);
-//   currentCountryIndicator = {
-//     id: $('input[name="countryIndicators"]:checked').val(), 
-//     name: $('input[name="countryIndicators"]:checked').parent().text()
-//   };
+function selectLayer(layer) {
+  currentIndicator = {id: layer.val(), name: layer.parent().text()};
+  updateGlobalLayer();
+  //vizTrack(`main ${currentCountry.code} view`, currentCountryIndicator.name);
 
-//   //reset panel
-//   $('.panel-content').animate({scrollTop: 0}, 300);
-//   $('.indicator-select').val('');
-
-//   updateCountryLayer();
-//   map.setLayoutProperty(globalLayer, 'visibility', 'none');
-//   map.setLayoutProperty(globalMarkerLayer, 'visibility', 'none');
-//   map.setLayoutProperty(countryLayer, 'visibility', 'visible');
-//   map.setLayoutProperty(countryBoundaryLayer, 'visibility', 'visible');
-//   map.setLayoutProperty(countryLabelLayer, 'visibility', 'visible');
-//   map.setLayoutProperty(countryMarkerLayer, 'visibility', 'visible');
-
-//   var target = bbox.default(turfHelpers.featureCollection(features));
-//   var offset = 50;
-//   map.fitBounds(target, {
-//     padding: {top: offset, right: $('.map-legend.country').outerWidth()+offset, bottom: offset, left: ($('.key-figure-panel').outerWidth() - $('.content-left').outerWidth()) + offset},
-//     linear: true
-//   });
-
-//   map.once('moveend', initCountryView);
-//   vizTrack(currentCountry.code, currentCountryIndicator.name);
-
-//   //append country code to url
-//   window.history.replaceState(null, null, '?c='+currentCountry.code);
-// }
-
-
+//   //reset any deep links
+//   let layerID = layer.attr('data-layer');
+//   let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
+//   window.history.replaceState(null, null, location);
+}
 
 
 function selectCountry(features) {
