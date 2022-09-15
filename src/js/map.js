@@ -82,7 +82,7 @@ function displayMap() {
       'line-color': '#E0E0E0',
       'line-opacity': 1
     }
-  });
+  }, labelLayer);
   globalBoundaryLayer = 'country-boundaries';
 
 
@@ -100,7 +100,7 @@ function displayMap() {
       'fill-color': '#f1f1ee',
       'fill-opacity': 1,
     }
-  });
+  }, labelLayer);
   subnationalLayer = 'subnational-fills';
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
 
@@ -118,7 +118,7 @@ function displayMap() {
       'line-color': '#E0E0E0',
       'line-opacity': 1
     }
-  });
+  }, labelLayer);
   subnationalBoundaryLayer = 'subnational-boundaries';
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
 
