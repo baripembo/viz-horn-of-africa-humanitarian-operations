@@ -178,6 +178,14 @@ function displayMap() {
     }
   });
 
+  //zoom into region
+  var offset = 100;
+  map.fitBounds(regionBoundaryData[0].bbox, {
+    padding: {top: offset, right: 0, bottom: offset, left: $('.key-figure-panel').outerWidth()},
+    linear: true
+  });
+
+
   //init global and country layers
   initGlobalLayer();
   initCountryLayer();
