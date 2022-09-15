@@ -1,4 +1,4 @@
-var map, mapFeatures, globalLayer, globalBoundaryLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
+var map, mapFeatures, labelLayer, globalLayer, globalBoundaryLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
 var adm0SourceLayer = 'wrl_polbnda_1m_ungis';
 var adm1SourceLayer = 'hornafrica_polbnda_int_uncs-9e96cy';
 var hoveredStateId = null;
@@ -42,7 +42,6 @@ function displayMap() {
 
   //get layers
   const layers = map.getStyle().layers;
-  let labelLayer;
   for (const layer of layers) {
     if (layer.id==='Countries 2-4') {
       labelLayer = layer.id;
@@ -62,11 +61,12 @@ function displayMap() {
     'source': 'country-polygons',
     'source-layer': 'hornafrica_polbnda_int_uncs-9e96cy',
     'paint': {
-      'fill-color': '#f1f1ee',
+      'fill-color': '#F1F1EE',
       'fill-opacity': 1
     }
   }, labelLayer);
   globalLayer = 'country-fills';
+  map.setLayoutProperty(globalLayer, 'visibility', 'visible');
 
   //country boundaries
   map.addSource('country-lines', {
@@ -84,6 +84,7 @@ function displayMap() {
     }
   }, labelLayer);
   globalBoundaryLayer = 'country-boundaries';
+  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
 
 
   //subnational fills
@@ -97,7 +98,7 @@ function displayMap() {
     'source': 'subnational-polygons',
     'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
-      'fill-color': '#f1f1ee',
+      'fill-color': '#F1F1EE',
       'fill-opacity': 1,
     }
   }, labelLayer);
@@ -152,31 +153,7 @@ function displayMap() {
 
   mapFeatures = map.queryRenderedFeatures();
 
-  //load pop density rasters
-  var countryList = Object.keys(countryCodeList);
-  countryList.forEach(function(country_code) {
-    var id = country_code.toLowerCase();
-    var raster = countryCodeList[country_code];
-    if (raster!='') {
-      map.addSource(id+'-pop-tileset', {
-        type: 'raster',
-        url: 'mapbox://humdata.'+raster
-      });
-
-      map.addLayer(
-        {
-          id: id+'-popdensity',
-          type: 'raster',
-          source: {
-            type: 'raster',
-            tiles: ['https://api.mapbox.com/v4/humdata.'+raster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
-          }
-        },
-        labelLayer
-      );
-      map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
-    }
-  });
+  loadRasters();
 
   //zoom into region
   var offset = 100;
@@ -198,6 +175,59 @@ function displayMap() {
     closeButton: false,
     closeOnClick: false,
     className: 'map-tooltip'
+  });
+}
+
+
+function loadRasters() {
+  //load pop density and chirps rasters
+  var countryList = Object.keys(countryCodeList);
+  countryList.forEach(function(country_code) {
+    var id = country_code.toLowerCase();
+
+    //pop rasters
+    var raster = countryCodeList[country_code].pop;
+    if (raster!='') {
+      map.addSource(id+'-pop-tileset', {
+        type: 'raster',
+        url: 'mapbox://humdata.'+raster
+      });
+
+      map.addLayer(
+        {
+          id: id+'-popdensity',
+          type: 'raster',
+          source: {
+            type: 'raster',
+            tiles: ['https://api.mapbox.com/v4/humdata.'+raster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
+          }
+        },
+        globalBoundaryLayer
+      );
+      map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
+    }
+
+    //chirps rasters
+    var chirpsRaster = countryCodeList[country_code].chirps;
+    if (chirpsRaster!='') {
+      map.addSource(id+'-chirps-tileset', {
+        type: 'raster',
+        url: 'mapbox://humdata.'+chirpsRaster
+      });
+
+      map.addLayer(
+        {
+          id: id+'-chirps',
+          type: 'raster',
+          source: {
+            type: 'raster',
+            tiles: ['https://api.mapbox.com/v4/humdata.'+chirpsRaster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
+          }
+        },
+        globalBoundaryLayer
+      );
+      map.setLayoutProperty(id+'-chirps', 'visibility', 'none');
+    }
   });
 }
 

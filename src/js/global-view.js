@@ -59,27 +59,41 @@ function updateGlobalLayer() {
 
   //data join
   var expression = ['match', ['get', 'ISO_3']];
+  var expressionBoundary = ['match', ['get', 'ISO_3']];
   nationalData.forEach(function(d) {
-    var val = d[currentIndicator.id];
+    var val = +d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
+    var boundaryColor = '#E0E0E0';
+
+    //turn off choropleth for raster layers
+    if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
+      color = colorDefault;
+      boundaryColor = '#FFF';
+    }
+
     expression.push(d['#country+code'], color);
+    expressionBoundary.push(d['#country+code'], boundaryColor);
   });
 
   //default value for no data
   expression.push(colorDefault);
+  expressionBoundary.push('#E0E0E0');
   
   //update map and legend
   map.setPaintProperty(globalLayer, 'fill-color', expression);
+  map.setPaintProperty(globalBoundaryLayer, 'line-color', expressionBoundary);
   updateMapLegend(colorScale);
 
-  //toggle pop density rasters
+  //toggle rasters
   var countryList = Object.keys(countryCodeList);
-  let state = (currentIndicator.id=='#population') ? 'visible' : 'none';
   countryList.forEach(function(country_code) {
     if (currentCountry.code=='' || country_code==currentCountry.code) {
       var id = country_code.toLowerCase();
       if (map.getLayer(id+'-popdensity'))
-        map.setLayoutProperty(id+'-popdensity', 'visibility', state);
+        map.setLayoutProperty(id+'-popdensity', 'visibility', (currentIndicator.id=='#population') ? 'visible' : 'none');
+
+      if (map.getLayer(id+'-chirps'))
+        map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#chirps') ? 'visible' : 'none');
     }
   });
 }
@@ -135,6 +149,9 @@ function updateMapLegend(scale) {
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
   $('.map-legend .legend-title').html(legendTitle);
 
+  var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
+  $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
+
   //update legend
   var legend = d3.legendColor()
     .labelFormat(shortenNumFormat)
@@ -161,14 +178,24 @@ function getGlobalLegendScale() {
     case '#population':
       clrRange = populationColorRange;
       break;
+    case '#chirps':
+      clrRange = chirpsColorRange;
+      break;
     default:
       clrRange = colorRange;
   }
 
   //set scale
-  var scale = d3.scaleQuantize().domain([0, max]).range(clrRange);
+  var scale;
+  if (currentIndicator.id=='#chirps') {
+    scale = d3.scaleOrdinal().domain(['-750', '-400', '-150', '0', '150', '400', '750']).range(clrRange);
+  }
+  else {
+    scale = d3.scaleQuantize().domain([0, max]).range(clrRange);
+  }
 
-  return (max==undefined) ? null : scale;
+  return scale;
+  //return (max==undefined) ? null : scale;
 }
 
 function setGlobalLegend(scale) {
@@ -207,6 +234,7 @@ function setGlobalLegend(scale) {
     $('.map-legend .legend-container').show();
     var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
     $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
+
 
     var legendFormat = (currentIndicator.id.indexOf('pct')>-1 || currentIndicator.id.indexOf('ratio')>-1) ? d3.format('.0%') : shortenNumFormat;
     var legend = d3.legendColor()

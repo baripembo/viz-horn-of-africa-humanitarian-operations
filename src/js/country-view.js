@@ -52,8 +52,8 @@ function updateCountryLayer() {
   }
 
   //update legend
-  var countryColorScale = d3.scaleQuantize().domain([0, max]).range(clrRange);
-  updateMapLegend(countryColorScale);
+  var colorScale = getGlobalLegendScale();
+  updateMapLegend(colorScale);
 
   //data join
   var expression = ['match', ['get', 'ADM1_PCODE']];
@@ -64,21 +64,23 @@ function updateCountryLayer() {
     if (d['#country+code']==currentCountry.code) {
       var val = +d[currentIndicator.id];
       layerOpacity = 1;
+      boundaryColor = '#E0E0E0';
       color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : countryColorScale(val);
 
-      //turn off choropleth for population layer
-      if (currentIndicator.id=='#population') {
+      //turn off choropleth for raster layers
+      if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
         color = colorDefault;
+        boundaryColor = '#FFF';
       }
     }
     else {
       color = colorDefault;
-      // boundaryColor = '#E0E0E0';
+      boundaryColor = '#E0E0E0';
       layerOpacity = 0;
     }
     
     expression.push(d['#adm1+code'], color);
-    //expressionBoundary.push(d['#adm1+code'], boundaryColor);
+    expressionBoundary.push(d['#adm1+code'], boundaryColor);
     expressionOpacity.push(d['#adm1+code'], layerOpacity);
   });
   //set expression defaults
@@ -87,40 +89,33 @@ function updateCountryLayer() {
   expressionOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
-  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population') ? 0 : 1);
+  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') ? 0 : 1);
+  map.setPaintProperty(subnationalBoundaryLayer, 'line-color', expressionBoundary);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-opacity', expressionOpacity);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionOpacity);
 
-  //hide all pop density rasters
+  //hide all rasters
   var countryList = Object.keys(countryCodeList);
   countryList.forEach(function(country_code) {
     var id = country_code.toLowerCase();
     if (map.getLayer(id+'-popdensity'))
       map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
+
+    if (map.getLayer(id+'-chirps'))
+      map.setLayoutProperty(id+'-chirps', 'visibility', 'none');
   });
 
-  //set properties
+  //set pop raster properties
   if (currentIndicator.id=='#population') {
     var id = currentCountry.code.toLowerCase();
     map.setLayoutProperty(id+'-popdensity', 'visibility', 'visible');
   }
 
-
-  //toggle layers
-  // if (currentCountryIndicator.id=='#acled+events') {
-  //   resetLayers();
-  //   map.setLayoutProperty('acled-dots', 'visibility', 'visible');
-  //   map.setLayoutProperty('border-crossings-layer', 'visibility', 'none');
-  //   map.setLayoutProperty('hostilities-layer', 'visibility', 'none');
-  // }
-  // else if (currentCountryIndicator.id=='#affected+idps') {
-  //   resetLayers();
-  //   map.setLayoutProperty(countryLayer, 'visibility', 'none');
-  //   map.setLayoutProperty('macro-regions', 'visibility', 'visible');
-  // }
-  // else {
-  //   resetLayers();
-  // }
+  //set chirps raster properties
+  if (currentIndicator.id=='#chirps') {
+    var id = currentCountry.code.toLowerCase();
+    map.setLayoutProperty(id+'-chirps', 'visibility', 'visible');
+  }
 }
 
 function getCountryIndicatorMax() {
@@ -132,14 +127,6 @@ function getCountryIndicatorMax() {
   return max;
 }
 
-
-function resetLayers() {
-  // map.setLayoutProperty(countryLayer, 'visibility', 'visible')
-  // map.setLayoutProperty('acled-dots', 'visibility', 'none');
-  // map.setLayoutProperty('border-crossings-layer', 'visibility', 'visible');
-  // map.setLayoutProperty('hostilities-layer', 'visibility', 'visible');
-  // map.setLayoutProperty('macro-regions', 'visibility', 'none');
-}
 
 
 // function createCountryLegend(scale) {

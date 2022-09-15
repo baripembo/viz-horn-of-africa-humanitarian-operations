@@ -94,8 +94,8 @@ function getCurvedLine(start, end) {
 
 //country codes and raster ids
 const countryCodeList = {
-  ETH: '8l382re2',
-  KEN: '2e1m7o07',
-  SOM: '3s7xeitz'
+  ETH: {pop: '8l382re2', chirps: '9f35wnzq'},
+  KEN: {pop: '2e1m7o07', chirps: '0zdu5z45'},
+  SOM: {pop: '3s7xeitz', chirps: '1bl7k2zs'}
 };
 

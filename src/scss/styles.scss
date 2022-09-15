@@ -299,6 +299,14 @@ a:visited {
 				display: none;
 			}
 		}
+		&.chirps {
+			height: 125px;
+			.legendCells .cell {
+				&:nth-child(8) { //hack
+					display: none;
+				}
+			}
+		}
 	}
 	.legend-marker {
 		display: flex;
