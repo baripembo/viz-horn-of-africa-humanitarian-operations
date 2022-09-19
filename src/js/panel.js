@@ -6,9 +6,22 @@ function initKeyFigures() {
 
    //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
-  impactDiv.children().remove();  
+  impactDiv.children().remove();
+  createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: shortenNumFormat(data['#affected+inneed']), indicator: '#affected+inneed'});
+  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+displaced']), indicator: '#affected+displaced'});
   createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
-  createFigure(impactDiv, {className: 'population', title: 'Population', stat: shortenNumFormat(data['#population']), indicator: '#population'});
+  createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+children+sam']), indicator: '#affected+children+sam'});
+
+   //humanitarian impact figures
+  var fundingDiv = $('.key-figure-panel .funding .panel-inner');
+  fundingDiv.children().remove();
+  createFigure(fundingDiv, {className: 'requirement', title: 'Requirement', stat: formatValue(data['#value+funding+hrp+required+usd']), indicator: '#value+funding+hrp+required+usd'});
+  createFigure(fundingDiv, {className: 'funded', title: 'Funding', stat: formatValue(data['#value+funding+hrp+total+usd']), indicator: '#value+funding+hrp+total+usd'});
+  createFigure(fundingDiv, {className: 'percent-funded', title: 'Percent Funded', stat: formatValue(data['#value+funding+hrp+pct'], 'percent'), indicator: '#value+funding+hrp+pct'});
+
+  if (currentCountry.code!='') {
+    createFigure(fundingDiv, {className: 'other', title: data['#value+funding+other+plan_name'], stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
+  }
 }
 
 

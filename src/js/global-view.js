@@ -13,10 +13,10 @@ function handleGlobalEvents(layer) {
     features.forEach(function(feature) {
       if (feature.sourceLayer==adm1SourceLayer)
         target = feature;
-    });      
+    });
     if (target!=undefined) {
       tooltip.setLngLat(e.lngLat);
-      createMapTooltip(target.properties.ISO_3, target.properties.Terr_Name, e.point);
+      createMapTooltip(target.properties.ADM_PCODE, target.properties.ADM_REF, e.point);
     }
   });
      
@@ -31,15 +31,15 @@ function initGlobalLayer() {
   initKeyFigures();
 
   //color scale
-  colorScale = getGlobalLegendScale();
+  colorScale = getLegendScale();
   createMapLegend(colorScale);
 
   //data join
-  var expression = ['match', ['get', 'ISO_3']];
-  nationalData.forEach(function(d) {
+  var expression = ['match', ['get', 'ADM_PCODE']];
+  adminone_data.forEach(function(d) {
     var val = d[currentIndicator.id];
-    var color = (val==null) ? colorNoData : colorScale(val);
-    expression.push(d['#country+code'], color);
+    var color = (val==null || isNaN(val)) ? colorNoData : colorScale(val);
+    expression.push(d['#adm1+code'], color);
   });
 
   //default value for no data
@@ -55,24 +55,24 @@ function initGlobalLayer() {
 
 function updateGlobalLayer() {
   //color scale
-  colorScale = getGlobalLegendScale();
+  colorScale = getLegendScale();
 
   //data join
-  var expression = ['match', ['get', 'ISO_3']];
-  var expressionBoundary = ['match', ['get', 'ISO_3']];
-  nationalData.forEach(function(d) {
+  var expression = ['match', ['get', 'ADM_PCODE']];
+  var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
+  adminone_data.forEach(function(d) {
     var val = +d[currentIndicator.id];
-    var color = (val==null) ? colorNoData : colorScale(val);
+    var color = (val==null || isNaN(val)) ? colorNoData : colorScale(val);
     var boundaryColor = '#E0E0E0';
 
     //turn off choropleth for raster layers
-    if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
+    if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
       color = colorDefault;
       boundaryColor = '#FFF';
     }
 
-    expression.push(d['#country+code'], color);
-    expressionBoundary.push(d['#country+code'], boundaryColor);
+    expression.push(d['#adm1+code'], color);
+    expressionBoundary.push(d['#adm1+code'], boundaryColor);
   });
 
   //default value for no data
@@ -93,7 +93,7 @@ function updateGlobalLayer() {
         map.setLayoutProperty(id+'-popdensity', 'visibility', (currentIndicator.id=='#population') ? 'visible' : 'none');
 
       if (map.getLayer(id+'-chirps'))
-        map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#chirps') ? 'visible' : 'none');
+        map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#climate+rainfall+anomaly') ? 'visible' : 'none');
     }
   });
 }
@@ -106,6 +106,7 @@ function createMapLegend(scale) {
 
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
+  createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
   createSource($('.map-legend .population-source'), '#population');
 
   var legend = d3.legendColor()
@@ -163,14 +164,25 @@ function updateMapLegend(scale) {
 }
 
 
-function getGlobalLegendScale() {
+function getLegendScale() {
   //get min/max
-  var min = d3.min(nationalData, function(d) { 
-    return +d[currentIndicator.id]; 
-  });
-  var max = d3.max(nationalData, function(d) { 
-    return +d[currentIndicator.id];
-  });
+  let min, max;
+  if (currentCountry.code=='') { //regional view
+    min = d3.min(adminone_data, d => +d[currentIndicator.id]);
+    max = d3.max(adminone_data, d => +d[currentIndicator.id]);
+  }
+  else { //country view
+    min =  d3.min(admintwo_data, function(d) { 
+      if (d['#country+code']==currentCountry.code) {
+        return +d[currentIndicator.id]; 
+      }
+    });
+    max =  d3.max(admintwo_data, function(d) { 
+      if (d['#country+code']==currentCountry.code) {
+        return +d[currentIndicator.id]; 
+      }
+    });
+  }
 
   //set color range
   var clrRange;
@@ -178,7 +190,7 @@ function getGlobalLegendScale() {
     case '#population':
       clrRange = populationColorRange;
       break;
-    case '#chirps':
+    case '#climate+rainfall+anomaly':
       clrRange = chirpsColorRange;
       break;
     default:
@@ -187,8 +199,8 @@ function getGlobalLegendScale() {
 
   //set scale
   var scale;
-  if (currentIndicator.id=='#chirps') {
-    scale = d3.scaleOrdinal().domain(['-750', '-400', '-150', '0', '150', '400', '750']).range(clrRange);
+  if (currentIndicator.id=='#climate+rainfall+anomaly') {
+    scale = d3.scaleOrdinal().domain(['> 300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '< -300']).range(clrRange);
   }
   else {
     scale = d3.scaleQuantize().domain([0, max]).range(clrRange);

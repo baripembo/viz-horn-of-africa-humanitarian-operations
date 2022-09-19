@@ -4,16 +4,15 @@
 function initCountryLayer() {
   //color scale
   countryColorScale = d3.scaleQuantize().domain([0, 1]).range(colorRange);
-  //createCountryLegend(countryColorScale);
 
   //mouse events
   map.on('mouseenter', subnationalLayer, onMouseEnter);
   map.on('mouseleave', subnationalLayer, onMouseLeave);
   map.on('mousemove', subnationalLayer, function(e) {
     var f = map.queryRenderedFeatures(e.point)[0];
-    if (f.properties.ADM1_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name) {
+    if (f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name) {
       map.getCanvas().style.cursor = 'pointer';
-      createCountryMapTooltip(f.properties.ADM1_REF, f.properties.ADM1_PCODE, e.point);
+      createCountryMapTooltip(f.properties.ADM_REF, f.properties.ADM_PCODE, e.point);
       tooltip
         .addTo(map)
         .setLngLat(e.lngLat);
@@ -29,6 +28,8 @@ function initCountryLayer() {
 
 function updateCountryLayer() {
   map.setLayoutProperty(globalLayer, 'visibility', 'none');
+  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'none');
+  map.setLayoutProperty(globalLabelLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
@@ -52,23 +53,29 @@ function updateCountryLayer() {
   }
 
   //update legend
-  var colorScale = getGlobalLegendScale();
-  updateMapLegend(colorScale);
+  var colorScale = getLegendScale();
+  if (isNaN(colorScale.domain()[1])) {
+    $('.legend-container').hide();
+  }
+  else {
+    $('.legend-container').show();
+    updateMapLegend(colorScale);
+  }
 
   //data join
-  var expression = ['match', ['get', 'ADM1_PCODE']];
-  var expressionBoundary = ['match', ['get', 'ADM1_PCODE']];
-  var expressionOpacity = ['match', ['get', 'ADM1_PCODE']];
-  subnationalData.forEach(function(d) {
+  var expression = ['match', ['get', 'ADM_PCODE']];
+  var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
+  var expressionOpacity = ['match', ['get', 'ADM_PCODE']];
+  admintwo_data.forEach(function(d) {
     var color, boundaryColor, layerOpacity;
     if (d['#country+code']==currentCountry.code) {
       var val = +d[currentIndicator.id];
       layerOpacity = 1;
       boundaryColor = '#E0E0E0';
-      color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : countryColorScale(val);
+      color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : colorScale(val);
 
       //turn off choropleth for raster layers
-      if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
+      if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
         color = colorDefault;
         boundaryColor = '#FFF';
       }
@@ -89,7 +96,7 @@ function updateCountryLayer() {
   expressionOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
-  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') ? 0 : 1);
+  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') ? 0 : 1);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-color', expressionBoundary);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-opacity', expressionOpacity);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionOpacity);
@@ -112,91 +119,20 @@ function updateCountryLayer() {
   }
 
   //set chirps raster properties
-  if (currentIndicator.id=='#chirps') {
+  if (currentIndicator.id=='#climate+rainfall+anomaly') {
     var id = currentCountry.code.toLowerCase();
     map.setLayoutProperty(id+'-chirps', 'visibility', 'visible');
   }
 }
 
 function getCountryIndicatorMax() {
-  var max =  d3.max(subnationalData, function(d) { 
+  var max =  d3.max(admintwo_data, function(d) { 
     if (d['#country+code']==currentCountry.code) {
       return +d[currentIndicator.id]; 
     }
   });
   return max;
 }
-
-
-
-// function createCountryLegend(scale) {
-//   //set data sources
-//   createSource($('.map-legend.country .ipc-source'), '#affected+food+ipc+p3plus+num');
-//   createSource($('.map-legend.country .population-source'), '#population');
-
-//   var legend = d3.legendColor()
-//     .labelFormat(percentFormat)
-//     .cells(colorRange.length)
-//     .scale(scale);
-
-//   var div = d3.select('.map-legend.country .legend-scale');
-//   var svg = div.append('svg')
-//     .attr('class', 'legend-container');
-
-//   svg.append('g')
-//     .attr('class', 'scale')
-//     .call(legend);
-
-//   //no data
-//   var nodata = div.append('svg')
-//     .attr('class', 'no-data-key');
-
-//   nodata.append('rect')
-//     .attr('width', 15)
-//     .attr('height', 15);
-
-//   nodata.append('text')
-//     .attr('class', 'label')
-//     .text('No Data');
-
-//   //boundaries disclaimer
-//   createFootnote('.map-legend.country', '', 'The boundaries and names shown and the designations used on this map do not imply official endorsement or acceptance by the United Nations.');
-
-//   //expand/collapse functionality
-//   $('.map-legend.country .toggle-icon, .map-legend.country .collapsed-title').on('click', function() {
-//     $(this).parent().toggleClass('collapsed');
-//     $('.legend-gradient').toggleClass('collapsed');
-//   });
-// }
-
-
-// function updateCountryLegend(scale) {
-//   //set format for legend format
-//   let legendFormat = (currentCountryIndicator.id=='#population') ? shortenNumFormat : d3.format('.0f');
-
-//   //set legend title
-//   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
-//   $('.map-legend.country .legend-title').html(legendTitle);
-
-//   //update legend
-//   var legend = d3.legendColor()
-//     .labelFormat(legendFormat)
-//     .cells(colorRange.length)
-//     .scale(scale);
-
-//   var g = d3.select('.map-legend.country .scale');
-//   g.call(legend);
-// }
-
-
-// function getCountryIndicatorMax() {
-//   var max =  d3.max(subnationalData, function(d) { 
-//     if (d['#country+code']==currentCountry.code) {
-//       return +d[currentCountryIndicator.id]; 
-//     }
-//   });
-//   return max;
-// }
 
 
 //mouse event/leave events

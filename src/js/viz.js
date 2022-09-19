@@ -5,17 +5,17 @@ var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
 var populationColorRange = ['#FFE281','#FDB96D','#FA9059','#F27253','#E9554D'];
-var chirpsColorRange = ['#e31a1c', '#fd8d3c', '#fecc5c', '#ffffb2', '#a1dab4', '#41b6c4', '#225ea8'];
+var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
-var regionBoundaryData, regionalData, nationalData, subnationalDataByCountry, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
+var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
 var countryTimeseriesChart = '';
 var mapLoaded = false;
 var dataLoaded = false;
 var viewInitialized = false;
 var isMobile = false;
 var zoomLevel = 4.9;
-var minZoom = 2;
+var minZoom = 3;
 
 var globalCountryList = [];
 var currentIndicator = {};
@@ -81,15 +81,10 @@ $( document ).ready(function() {
       var allData = data[0];
       regionalData = allData.regional_data[0];
       nationalData = allData.national_data;
-      subnationalData = allData.subnational_data;
+      adminone_data = allData.adminone_data;
+      admintwo_data = allData.admintwo_data;
       sourcesData = allData.sources_data;
-      regionBoundaryData = data[1].features; 
-
-      //format data
-      // subnationalData.forEach(function(item) {
-      //   var pop = item['#population'];
-      //   if (item['#population']!=undefined) item['#population'] = parseInt(pop.replace(/,/g, ''), 10);
-      // });
+      regionBoundaryData = data[1].features;
 
       //parse national data
       nationalData.forEach(function(item) {
@@ -131,7 +126,7 @@ $( document ).ready(function() {
       else {
         $('#chart-view').hide();
       }
-      vizTrack($(this).data('id'), currentIndicator.name);
+      //vizTrack($(this).data('id'), currentIndicator.name);
     });
 
     //create country dropdown
@@ -148,29 +143,19 @@ $( document ).ready(function() {
     currentCountry = {code: '', name:''}
 
     //create chart view country select
-    $('.trendseries-select').append($('<option value="All">All Clusters</option>')); 
-    var trendseriesSelect = d3.select('.trendseries-select')
-      .selectAll('option')
-      .data(subnationalData)
-      .enter().append('option')
-        .text(function(d) {
-          let name = (d['#adm1+code']=='UA80') ? d['#adm1+name'] + ' (city)' : d['#adm1+name'];
-          return name; 
-        })
-        .attr('value', function (d) { return d['#adm1+code']; });
+    // $('.trendseries-select').append($('<option value="All">All Clusters</option>')); 
+    // var trendseriesSelect = d3.select('.trendseries-select')
+    //   .selectAll('option')
+    //   .data(subnationalData)
+    //   .enter().append('option')
+    //     .text(function(d) {
+    //       let name = (d['#adm1+code']=='UA80') ? d['#adm1+name'] + ' (city)' : d['#adm1+name'];
+    //       return name; 
+    //     })
+    //     .attr('value', function (d) { return d['#adm1+code']; });
 
     viewInitialized = true;
   }
-
-
-  // function initCountryView() {
-  //   $('.content').addClass('country-view');
-  //   $('.key-figure-panel').scrollTop(0);
-  //   $('#population').prop('checked', true);
-  //   currentCountryIndicator = {id: $('input[name="countryIndicators"]:checked').val(), name: $('input[name="countryIndicators"]:checked').parent().text()};
-
-  //   initKeyFigures();
-  // }
 
 
   function initTracking() {

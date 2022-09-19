@@ -2,7 +2,7 @@
 /*** TOOLTIP FUNCTIONS ***/
 /*************************/
 function createMapTooltip(country_code, country_name, point) {
-  var country = nationalData.filter(c => c['#country+code'] == country_code);
+  var country = adminone_data.filter(c => c['#adm1+code'] == country_code);
   if (country[0]!=undefined) {
     var val = country[0][currentIndicator.id];
 
@@ -15,33 +15,47 @@ function createMapTooltip(country_code, country_name, point) {
     }
 
     //format content for display
-    var content = '<h2>'+ country_name +'</h2>';
+    var content = '<h2>'+ country_name +', ' + country[0]['#country+name'] + '</h2>';
 
     //ipc layer
     if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-      var dateSpan = '';
-      if (country[0]['#date+ipc+start']!=undefined) {
-        var startDate = new Date(country[0]['#date+ipc+start']);
-        var endDate = new Date(country[0]['#date+ipc+end']);
-        startDate = (startDate.getFullYear()==endDate.getFullYear()) ? d3.utcFormat('%b')(startDate) : d3.utcFormat('%b %Y')(startDate);
-        var dateSpan = '<span class="subtext">('+ startDate +'-'+ d3.utcFormat('%b %Y')(endDate) +' - '+ country[0]['#date+ipc+period'] +')</span>';
-      }
       var shortVal = (isNaN(val)) ? val : shortenNumFormat(val);
-      content += 'Total Population in IPC Phase 3+ '+ dateSpan +':<div class="stat">' + shortVal + '</div>';
-      if (val!='No Data') {
-        if (country[0]['#affected+food+ipc+analysed+num']!=undefined) content += '<span>('+ shortenNumFormat(country[0]['#affected+food+ipc+analysed+num']) +' of total country population analysed)</span>';
-        var tableArray = [{label: 'IPC Phase 3 (Critical)', value: country[0]['#affected+food+ipc+p3+num']},
-                          {label: 'IPC Phase 4 (Emergency)', value: country[0]['#affected+food+ipc+p4+num']},
-                          {label: 'IPC Phase 5 (Famine)', value: country[0]['#affected+food+ipc+p5+num']}];
-        content += '<div class="table-display">Breakdown:';
-        tableArray.forEach(function(row) {
-          if (row.value!=undefined) {
-            var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
-            content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-          }
-        });
-        content += '</div>';
-      }
+      content += 'Total Population in IPC Phase 3+: <div class="stat">' + shortVal + '</div>';
+      // var dateSpan = '';
+      // if (country[0]['#date+ipc+start']!=undefined) {
+      //   var startDate = new Date(country[0]['#date+ipc+start']);
+      //   var endDate = new Date(country[0]['#date+ipc+end']);
+      //   startDate = (startDate.getFullYear()==endDate.getFullYear()) ? d3.utcFormat('%b')(startDate) : d3.utcFormat('%b %Y')(startDate);
+      //   var dateSpan = '<span class="subtext">('+ startDate +'-'+ d3.utcFormat('%b %Y')(endDate) +' - '+ country[0]['#date+ipc+period'] +')</span>';
+      // }
+      // var shortVal = (isNaN(val)) ? val : shortenNumFormat(val);
+      // content += 'Total Population in IPC Phase 3+ '+ dateSpan +':<div class="stat">' + shortVal + '</div>';
+      // if (val!='No Data') {
+      //   if (country[0]['#affected+food+ipc+analysed+num']!=undefined) content += '<span>('+ shortenNumFormat(country[0]['#affected+food+ipc+analysed+num']) +' of total country population analysed)</span>';
+      //   var tableArray = [{label: 'IPC Phase 3 (Critical)', value: country[0]['#affected+food+ipc+p3+num']},
+      //                     {label: 'IPC Phase 4 (Emergency)', value: country[0]['#affected+food+ipc+p4+num']},
+      //                     {label: 'IPC Phase 5 (Famine)', value: country[0]['#affected+food+ipc+p5+num']}];
+      //   content += '<div class="table-display">Breakdown:';
+      //   tableArray.forEach(function(row) {
+      //     if (row.value!=undefined) {
+      //       var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
+      //       content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+      //     }
+      //   });
+      //   content += '</div>';
+      // }
+    }
+    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
+      var tableArray = [{label: 'Population', value: country[0]['#population']},
+                        {label: 'Total Population in IPC Phase 3+', value: country[0]['#affected+food+ipc+p3plus+num']}];
+      content += '<div class="table-display">';
+      tableArray.forEach(function(row) {
+        if (row.value!=undefined) {
+          var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
+          content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+        }
+      });
+      content += '</div>';
     }
     //all other layers
     else {
@@ -57,7 +71,7 @@ function createMapTooltip(country_code, country_name, point) {
 
 
 function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
-  var adm1 = subnationalData.filter(function(c) {
+  var adm1 = admintwo_data.filter(function(c) {
     if (c['#adm1+code']==adm1_pcode && c['#country+code']==currentCountry.code)
       return c;
   });
@@ -75,7 +89,24 @@ function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
     }
 
     let content = '';
-    content = `<h2>${adm1_name}</h2>${label}:<div class="stat">${val}</div>`;
+    content = `<h2>${adm1_name}</h2>`;
+
+
+    if (currentIndicator.id=='#climate+rainfall+anomaly') {
+      var tableArray = [{label: 'Population', value: adm1[0]['#population']},
+                        {label: 'Total Population in IPC Phase 3+', value: adm1[0]['#affected+food+ipc+p3plus+num']}];
+      content += '<div class="table-display">';
+      tableArray.forEach(function(row) {
+        //if (row.value!=undefined) {
+          var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
+          content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+        //}
+      });
+      content += '</div>';
+    }
+    else {
+      content += `${label}:<div class="stat">${val}</div>`;
+    }
 
     tooltip.setHTML(content);
     //if (!isMobile) setTooltipPosition(point)

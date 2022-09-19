@@ -1,6 +1,6 @@
-var map, mapFeatures, labelLayer, globalLayer, globalBoundaryLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
+var map, mapFeatures, baseLayer, globalLayer, globalBoundaryLayer, globalLabelLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
 var adm0SourceLayer = 'wrl_polbnda_1m_ungis';
-var adm1SourceLayer = 'hornafrica_polbnda_int_uncs-9e96cy';
+var adm1SourceLayer = 'hornafrica_polbnda_subnationa-2rkvd2';
 var hoveredStateId = null;
 function initMap() {
   console.log('Loading map...')
@@ -40,51 +40,82 @@ function displayMap() {
   //init element events
   createEvents();
 
-  //get layers
+  //get bottommost layer
   const layers = map.getStyle().layers;
   for (const layer of layers) {
-    if (layer.id==='Countries 2-4') {
-      labelLayer = layer.id;
-      break;
+    if (layer.id==='Dashed bnd 1m') {
+      baseLayer = layer.id;
+      //break;
     }
+    //if (layer.id==='Countries 6-8') console.log(layer)
   }
 
   //add map layers
   //country fills
   map.addSource('country-polygons', {
-    'url': 'mapbox://humdata.4p7qgaya',
+    'url': 'mapbox://humdata.8j9ay0ba',
     'type': 'vector'
   });
   map.addLayer({
     'id': 'country-fills',
     'type': 'fill',
     'source': 'country-polygons',
-    'source-layer': 'hornafrica_polbnda_int_uncs-9e96cy',
+    'filter': ['==', 'ADM_LEVEL', 1],
+    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'fill-color': '#F1F1EE',
       'fill-opacity': 1
     }
-  }, labelLayer);
+  }, baseLayer);
   globalLayer = 'country-fills';
   map.setLayoutProperty(globalLayer, 'visibility', 'visible');
 
   //country boundaries
   map.addSource('country-lines', {
-    'url': 'mapbox://humdata.d6fpfzk8',
+    'url': 'mapbox://humdata.8j9ay0ba',
     'type': 'vector'
   });
   map.addLayer({
     'id': 'country-boundaries',
     'type': 'line',
     'source': 'country-lines',
-    'source-layer': 'hornafrica_polbndl_int_uncs-8iaq93',
+    'filter': ['==', 'ADM_LEVEL', 1],
+    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'line-color': '#E0E0E0',
       'line-opacity': 1
     }
-  }, labelLayer);
+  }, baseLayer);
   globalBoundaryLayer = 'country-boundaries';
   map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
+
+  //adm1 centroids
+  map.addSource('country-centroids', {
+    'url': 'mapbox://humdata.cywtvjt9',
+    'type': 'vector'
+  });
+  map.addLayer({
+    'id': 'country-labels',
+    'type': 'symbol',
+    'source': 'country-centroids',
+    'filter': ['==', 'ADM_LEVEL', 1],
+    'source-layer': 'hornafrica_polbndp_subnationa-a7lq5r',
+    'layout': {
+      'text-field': ['get', 'ADM_REF'],
+      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
+      'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+      'text-radial-offset': 0.4
+    },
+    paint: {
+      'text-color': '#888',
+      'text-halo-color': '#EEE',
+      'text-halo-width': 1,
+      'text-halo-blur': 1
+    }
+  }, baseLayer);
+  globalLabelLayer = 'country-labels';
+  map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
 
 
   //subnational fills
@@ -96,12 +127,13 @@ function displayMap() {
     'id': 'subnational-fills',
     'type': 'fill',
     'source': 'subnational-polygons',
+    'filter': ['==', 'ADM_LEVEL', 2],
     'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'fill-color': '#F1F1EE',
       'fill-opacity': 1,
     }
-  }, labelLayer);
+  }, baseLayer);
   subnationalLayer = 'subnational-fills';
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
 
@@ -114,12 +146,13 @@ function displayMap() {
     'id': 'subnational-boundaries',
     'type': 'line',
     'source': 'subnational-lines',
+    'filter': ['==', 'ADM_LEVEL', 2],
     'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'line-color': '#E0E0E0',
       'line-opacity': 1
     }
-  }, labelLayer);
+  }, baseLayer);
   subnationalBoundaryLayer = 'subnational-boundaries';
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
 
@@ -133,9 +166,10 @@ function displayMap() {
     'id': 'subnational-labels',
     'type': 'symbol',
     'source': 'subnational-centroids',
+    'filter': ['==', 'ADM_LEVEL', 2],
     'source-layer': 'hornafrica_polbndp_subnationa-a7lq5r',
     'layout': {
-      'text-field': ['get', 'ADM1_REF'],
+      'text-field': ['get', 'ADM_REF'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
       'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
@@ -150,6 +184,24 @@ function displayMap() {
   });
   subnationalLabelLayer = 'subnational-labels';
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
+
+  //water bodies
+  map.addSource('waterbodies', {
+    'url': 'mapbox://humdata.bo7vgo3j',
+    'type': 'vector'
+  });
+  map.addLayer({
+    'id': 'waterbodies-layer',
+    'type': 'fill',
+    'source': 'waterbodies',
+    'source-layer': 'hornafrica_waterbodies-8qylz8',
+    'paint': {
+      'fill-color': '#99daea'
+    }
+  }, subnationalLabelLayer);
+  waterLayer = 'waterbodies-layer';
+  map.setLayoutProperty(waterLayer, 'visibility', 'visible');
+
 
   mapFeatures = map.queryRenderedFeatures();
 
@@ -249,9 +301,9 @@ function deepLinkView() {
   //deep link to specific layer in global view
   if (location.indexOf('?layer=')>-1) {
     var layer = location.split('layer=')[1];
-    // var menuItem = $('.menu-indicators').find('li[data-layer="'+layer+'"]');
-    // menuItem = (menuItem.length<1) ? $('.menu-indicators').find('li[data-layer="covid-19_cases_and_deaths"]') : menuItem;
-    // selectLayer(menuItem);
+    var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
+    selected.prop('checked', true);
+    onLayerSelected(selected);
   }
 }
 
@@ -267,30 +319,7 @@ function matchMapFeatures(country_code) {
 }
 
 function createEvents() {
-  //map legend radio events
-  $('input[type="radio"]').click(function(){
-    var selected = $('input[name="countryIndicators"]:checked');
-    currentIndicator = {id: selected.val(), name: selected.parent().text()};
-    //selectLayer(selected);
-    if (currentCountry.code=='') {
-      updateGlobalLayer();
-    }
-    else {
-      var selectedFeatures = matchMapFeatures(currentCountry.code);
-      selectCountry(selectedFeatures);
-    }
-  });
-
-  //chart view trendseries select event
-  d3.select('.trendseries-select').on('change',function(e) {
-    var selected = d3.select('.trendseries-select').node().value;
-    updateTimeseries(selected);
-    if (currentCountry.code!==undefined && selected!==undefined)
-      vizTrack(`chart ${currentCountry.code} view`, selected);
-  });
-
-
-  //country select event
+  //country dropdown select event
   d3.select('.country-select').on('change',function(e) {
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
@@ -304,18 +333,43 @@ function createEvents() {
       selectCountry(selectedFeatures);
     }
   });
+
+  //map legend radio events
+  $('input[type="radio"]').click(function(){
+    var selected = $('input[name="countryIndicators"]:checked');
+    onLayerSelected(selected);
+  });
+
+  //chart view trendseries select event
+  // d3.select('.trendseries-select').on('change',function(e) {
+  //   var selected = d3.select('.trendseries-select').node().value;
+  //   updateTimeseries(selected);
+  //   if (currentCountry.code!==undefined && selected!==undefined)
+  //     vizTrack(`chart ${currentCountry.code} view`, selected);
+  // });
+}
+
+function onLayerSelected(selected) {
+  currentIndicator = {id: selected.val(), name: selected.parent().text()};
+  selectLayer(selected);
+  
+  if (currentCountry.code=='') {
+    updateGlobalLayer();
+  }
+  else {
+    var selectedFeatures = matchMapFeatures(currentCountry.code);
+    selectCountry(selectedFeatures);
+  }
 }
 
 
 function selectLayer(layer) {
-  currentIndicator = {id: layer.val(), name: layer.parent().text()};
-  updateGlobalLayer();
-  //vizTrack(`main ${currentCountry.code} view`, currentCountryIndicator.name);
+  //vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
 
-//   //reset any deep links
-//   let layerID = layer.attr('data-layer');
-//   let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
-//   window.history.replaceState(null, null, location);
+  //reset any deep links
+  let layerID = layer.attr('data-layer');
+  let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
+  window.history.replaceState(null, null, location);
 }
 
 
@@ -330,7 +384,7 @@ function selectCountry(features) {
         bottom: 0
     } :
     { 
-      top: $('.tab-menubar').outerHeight(),
+      top: $('.tab-menubar').outerHeight() + padding,
       right: $('.map-legend').outerWidth(),
       bottom: padding,
       left: $('.key-figure-panel').outerWidth() + padding,
@@ -350,6 +404,8 @@ function selectCountry(features) {
 function resetMap() {
   //reset layers
   map.setLayoutProperty(globalLayer, 'visibility', 'visible');
+  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
+  map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');

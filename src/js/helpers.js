@@ -1,6 +1,6 @@
 function vizTrack(view, content) {
   mpTrack(view, content);
-  gaTrack('viz interaction hdx', 'switch viz', 'ukr data explorer', content);
+  gaTrack('viz interaction hdx', 'switch viz', 'horn of africa data explorer', content);
 }
 
 function mpTrack(view, content) {
@@ -9,7 +9,7 @@ function mpTrack(view, content) {
     'page title': document.title,
     'embedded in': window.location.href,
     'action': 'switch viz',
-    'viz type': 'ukr data explorer',
+    'viz type': 'horn of africa data explorer',
     'current view': view,
     'content': content
   });
@@ -32,8 +32,8 @@ function truncateString(str, num) {
 }
 
 
-function formatValue(val) {
-  var format = d3.format('$.3s');
+function formatValue(val, format) {
+  var format = (format=='percent') ? d3.format('.1%') : d3.format('$.3s');
   var value;
   if (!isVal(val)) {
     value = 'NA';
@@ -72,25 +72,6 @@ function createFootnote(target, indicator, text) {
     }
   });
 }
-
-
-function getCurvedLine(start, end) {
-  const radius = turf.rhumbDistance(start, end);
-  const midpoint = turf.midpoint(start, end);
-  const bearing = turf.rhumbBearing(start, end) - 89; // <-- not 90˚
-  const origin = turf.rhumbDestination(midpoint, radius, bearing);
-
-  const curvedLine = turf.lineArc(
-    origin,
-    turf.distance(origin, start),
-    turf.bearing(origin, end),
-    turf.bearing(origin, start),
-    { steps: 128 }
-  );
-
-  return { line: curvedLine, bearing: bearing };
-}
-
 
 //country codes and raster ids
 const countryCodeList = {
