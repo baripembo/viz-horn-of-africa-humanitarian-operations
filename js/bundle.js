@@ -242,16 +242,15 @@ function createPieChart(data, div) {
 function initCountryLayer() {
   //color scale
   countryColorScale = d3.scaleQuantize().domain([0, 1]).range(colorRange);
-  //createCountryLegend(countryColorScale);
 
   //mouse events
   map.on('mouseenter', subnationalLayer, onMouseEnter);
   map.on('mouseleave', subnationalLayer, onMouseLeave);
   map.on('mousemove', subnationalLayer, function(e) {
     var f = map.queryRenderedFeatures(e.point)[0];
-    if (f.properties.ADM1_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name) {
+    if (f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name) {
       map.getCanvas().style.cursor = 'pointer';
-      createCountryMapTooltip(f.properties.ADM1_REF, f.properties.ADM1_PCODE, e.point);
+      createCountryMapTooltip(f.properties.ADM_REF, f.properties.ADM_PCODE, e.point);
       tooltip
         .addTo(map)
         .setLngLat(e.lngLat);
@@ -267,6 +266,8 @@ function initCountryLayer() {
 
 function updateCountryLayer() {
   map.setLayoutProperty(globalLayer, 'visibility', 'none');
+  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'none');
+  map.setLayoutProperty(globalLabelLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
@@ -290,23 +291,29 @@ function updateCountryLayer() {
   }
 
   //update legend
-  var colorScale = getGlobalLegendScale();
-  updateMapLegend(colorScale);
+  var colorScale = getLegendScale();
+  if (isNaN(colorScale.domain()[1])) {
+    $('.legend-container').hide();
+  }
+  else {
+    $('.legend-container').show();
+    updateMapLegend(colorScale);
+  }
 
   //data join
-  var expression = ['match', ['get', 'ADM1_PCODE']];
-  var expressionBoundary = ['match', ['get', 'ADM1_PCODE']];
-  var expressionOpacity = ['match', ['get', 'ADM1_PCODE']];
-  subnationalData.forEach(function(d) {
+  var expression = ['match', ['get', 'ADM_PCODE']];
+  var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
+  var expressionOpacity = ['match', ['get', 'ADM_PCODE']];
+  admintwo_data.forEach(function(d) {
     var color, boundaryColor, layerOpacity;
     if (d['#country+code']==currentCountry.code) {
       var val = +d[currentIndicator.id];
       layerOpacity = 1;
       boundaryColor = '#E0E0E0';
-      color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : countryColorScale(val);
+      color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : colorScale(val);
 
       //turn off choropleth for raster layers
-      if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
+      if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
         color = colorDefault;
         boundaryColor = '#FFF';
       }
@@ -327,7 +334,7 @@ function updateCountryLayer() {
   expressionOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
-  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') ? 0 : 1);
+  map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') ? 0 : 1);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-color', expressionBoundary);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-opacity', expressionOpacity);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionOpacity);
@@ -350,91 +357,20 @@ function updateCountryLayer() {
   }
 
   //set chirps raster properties
-  if (currentIndicator.id=='#chirps') {
+  if (currentIndicator.id=='#climate+rainfall+anomaly') {
     var id = currentCountry.code.toLowerCase();
     map.setLayoutProperty(id+'-chirps', 'visibility', 'visible');
   }
 }
 
 function getCountryIndicatorMax() {
-  var max =  d3.max(subnationalData, function(d) { 
+  var max =  d3.max(admintwo_data, function(d) { 
     if (d['#country+code']==currentCountry.code) {
       return +d[currentIndicator.id]; 
     }
   });
   return max;
 }
-
-
-
-// function createCountryLegend(scale) {
-//   //set data sources
-//   createSource($('.map-legend.country .ipc-source'), '#affected+food+ipc+p3plus+num');
-//   createSource($('.map-legend.country .population-source'), '#population');
-
-//   var legend = d3.legendColor()
-//     .labelFormat(percentFormat)
-//     .cells(colorRange.length)
-//     .scale(scale);
-
-//   var div = d3.select('.map-legend.country .legend-scale');
-//   var svg = div.append('svg')
-//     .attr('class', 'legend-container');
-
-//   svg.append('g')
-//     .attr('class', 'scale')
-//     .call(legend);
-
-//   //no data
-//   var nodata = div.append('svg')
-//     .attr('class', 'no-data-key');
-
-//   nodata.append('rect')
-//     .attr('width', 15)
-//     .attr('height', 15);
-
-//   nodata.append('text')
-//     .attr('class', 'label')
-//     .text('No Data');
-
-//   //boundaries disclaimer
-//   createFootnote('.map-legend.country', '', 'The boundaries and names shown and the designations used on this map do not imply official endorsement or acceptance by the United Nations.');
-
-//   //expand/collapse functionality
-//   $('.map-legend.country .toggle-icon, .map-legend.country .collapsed-title').on('click', function() {
-//     $(this).parent().toggleClass('collapsed');
-//     $('.legend-gradient').toggleClass('collapsed');
-//   });
-// }
-
-
-// function updateCountryLegend(scale) {
-//   //set format for legend format
-//   let legendFormat = (currentCountryIndicator.id=='#population') ? shortenNumFormat : d3.format('.0f');
-
-//   //set legend title
-//   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
-//   $('.map-legend.country .legend-title').html(legendTitle);
-
-//   //update legend
-//   var legend = d3.legendColor()
-//     .labelFormat(legendFormat)
-//     .cells(colorRange.length)
-//     .scale(scale);
-
-//   var g = d3.select('.map-legend.country .scale');
-//   g.call(legend);
-// }
-
-
-// function getCountryIndicatorMax() {
-//   var max =  d3.max(subnationalData, function(d) { 
-//     if (d['#country+code']==currentCountry.code) {
-//       return +d[currentCountryIndicator.id]; 
-//     }
-//   });
-//   return max;
-// }
 
 
 //mouse event/leave events
@@ -461,10 +397,10 @@ function handleGlobalEvents(layer) {
     features.forEach(function(feature) {
       if (feature.sourceLayer==adm1SourceLayer)
         target = feature;
-    });      
+    });
     if (target!=undefined) {
       tooltip.setLngLat(e.lngLat);
-      createMapTooltip(target.properties.ISO_3, target.properties.Terr_Name, e.point);
+      createMapTooltip(target.properties.ADM_PCODE, target.properties.ADM_REF, e.point);
     }
   });
      
@@ -479,15 +415,15 @@ function initGlobalLayer() {
   initKeyFigures();
 
   //color scale
-  colorScale = getGlobalLegendScale();
+  colorScale = getLegendScale();
   createMapLegend(colorScale);
 
   //data join
-  var expression = ['match', ['get', 'ISO_3']];
-  nationalData.forEach(function(d) {
+  var expression = ['match', ['get', 'ADM_PCODE']];
+  adminone_data.forEach(function(d) {
     var val = d[currentIndicator.id];
-    var color = (val==null) ? colorNoData : colorScale(val);
-    expression.push(d['#country+code'], color);
+    var color = (val==null || isNaN(val)) ? colorNoData : colorScale(val);
+    expression.push(d['#adm1+code'], color);
   });
 
   //default value for no data
@@ -503,24 +439,24 @@ function initGlobalLayer() {
 
 function updateGlobalLayer() {
   //color scale
-  colorScale = getGlobalLegendScale();
+  colorScale = getLegendScale();
 
   //data join
-  var expression = ['match', ['get', 'ISO_3']];
-  var expressionBoundary = ['match', ['get', 'ISO_3']];
-  nationalData.forEach(function(d) {
+  var expression = ['match', ['get', 'ADM_PCODE']];
+  var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
+  adminone_data.forEach(function(d) {
     var val = +d[currentIndicator.id];
-    var color = (val==null) ? colorNoData : colorScale(val);
+    var color = (val==null || isNaN(val)) ? colorNoData : colorScale(val);
     var boundaryColor = '#E0E0E0';
 
     //turn off choropleth for raster layers
-    if (currentIndicator.id=='#population' || currentIndicator.id=='#chirps') {
+    if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
       color = colorDefault;
       boundaryColor = '#FFF';
     }
 
-    expression.push(d['#country+code'], color);
-    expressionBoundary.push(d['#country+code'], boundaryColor);
+    expression.push(d['#adm1+code'], color);
+    expressionBoundary.push(d['#adm1+code'], boundaryColor);
   });
 
   //default value for no data
@@ -541,7 +477,7 @@ function updateGlobalLayer() {
         map.setLayoutProperty(id+'-popdensity', 'visibility', (currentIndicator.id=='#population') ? 'visible' : 'none');
 
       if (map.getLayer(id+'-chirps'))
-        map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#chirps') ? 'visible' : 'none');
+        map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#climate+rainfall+anomaly') ? 'visible' : 'none');
     }
   });
 }
@@ -554,6 +490,7 @@ function createMapLegend(scale) {
 
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
+  createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
   createSource($('.map-legend .population-source'), '#population');
 
   var legend = d3.legendColor()
@@ -611,14 +548,25 @@ function updateMapLegend(scale) {
 }
 
 
-function getGlobalLegendScale() {
+function getLegendScale() {
   //get min/max
-  var min = d3.min(nationalData, function(d) { 
-    return +d[currentIndicator.id]; 
-  });
-  var max = d3.max(nationalData, function(d) { 
-    return +d[currentIndicator.id];
-  });
+  let min, max;
+  if (currentCountry.code=='') { //regional view
+    min = d3.min(adminone_data, d => +d[currentIndicator.id]);
+    max = d3.max(adminone_data, d => +d[currentIndicator.id]);
+  }
+  else { //country view
+    min =  d3.min(admintwo_data, function(d) { 
+      if (d['#country+code']==currentCountry.code) {
+        return +d[currentIndicator.id]; 
+      }
+    });
+    max =  d3.max(admintwo_data, function(d) { 
+      if (d['#country+code']==currentCountry.code) {
+        return +d[currentIndicator.id]; 
+      }
+    });
+  }
 
   //set color range
   var clrRange;
@@ -626,7 +574,7 @@ function getGlobalLegendScale() {
     case '#population':
       clrRange = populationColorRange;
       break;
-    case '#chirps':
+    case '#climate+rainfall+anomaly':
       clrRange = chirpsColorRange;
       break;
     default:
@@ -635,8 +583,8 @@ function getGlobalLegendScale() {
 
   //set scale
   var scale;
-  if (currentIndicator.id=='#chirps') {
-    scale = d3.scaleOrdinal().domain(['-750', '-400', '-150', '0', '150', '400', '750']).range(clrRange);
+  if (currentIndicator.id=='#climate+rainfall+anomaly') {
+    scale = d3.scaleOrdinal().domain(['> 300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '< -300']).range(clrRange);
   }
   else {
     scale = d3.scaleQuantize().domain([0, max]).range(clrRange);
@@ -701,7 +649,7 @@ function setGlobalLegend(scale) {
 
 function vizTrack(view, content) {
   mpTrack(view, content);
-  gaTrack('viz interaction hdx', 'switch viz', 'ukr data explorer', content);
+  gaTrack('viz interaction hdx', 'switch viz', 'horn of africa data explorer', content);
 }
 
 function mpTrack(view, content) {
@@ -710,7 +658,7 @@ function mpTrack(view, content) {
     'page title': document.title,
     'embedded in': window.location.href,
     'action': 'switch viz',
-    'viz type': 'ukr data explorer',
+    'viz type': 'horn of africa data explorer',
     'current view': view,
     'content': content
   });
@@ -733,8 +681,8 @@ function truncateString(str, num) {
 }
 
 
-function formatValue(val) {
-  var format = d3.format('$.3s');
+function formatValue(val, format) {
+  var format = (format=='percent') ? d3.format('.1%') : d3.format('$.3s');
   var value;
   if (!isVal(val)) {
     value = 'NA';
@@ -774,25 +722,6 @@ function createFootnote(target, indicator, text) {
   });
 }
 
-
-function getCurvedLine(start, end) {
-  const radius = turf.rhumbDistance(start, end);
-  const midpoint = turf.midpoint(start, end);
-  const bearing = turf.rhumbBearing(start, end) - 89; // <-- not 90˚
-  const origin = turf.rhumbDestination(midpoint, radius, bearing);
-
-  const curvedLine = turf.lineArc(
-    origin,
-    turf.distance(origin, start),
-    turf.bearing(origin, end),
-    turf.bearing(origin, start),
-    { steps: 128 }
-  );
-
-  return { line: curvedLine, bearing: bearing };
-}
-
-
 //country codes and raster ids
 const countryCodeList = {
   ETH: {pop: '8l382re2', chirps: '9f35wnzq'},
@@ -801,9 +730,9 @@ const countryCodeList = {
 };
 
 
-var map, mapFeatures, labelLayer, globalLayer, globalBoundaryLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
+var map, mapFeatures, baseLayer, globalLayer, globalBoundaryLayer, globalLabelLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
 var adm0SourceLayer = 'wrl_polbnda_1m_ungis';
-var adm1SourceLayer = 'hornafrica_polbnda_int_uncs-9e96cy';
+var adm1SourceLayer = 'hornafrica_polbnda_subnationa-2rkvd2';
 var hoveredStateId = null;
 function initMap() {
   console.log('Loading map...')
@@ -843,51 +772,82 @@ function displayMap() {
   //init element events
   createEvents();
 
-  //get layers
+  //get bottommost layer
   const layers = map.getStyle().layers;
   for (const layer of layers) {
-    if (layer.id==='Countries 2-4') {
-      labelLayer = layer.id;
-      break;
+    if (layer.id==='Dashed bnd 1m') {
+      baseLayer = layer.id;
+      //break;
     }
+    //if (layer.id==='Countries 6-8') console.log(layer)
   }
 
   //add map layers
   //country fills
   map.addSource('country-polygons', {
-    'url': 'mapbox://humdata.4p7qgaya',
+    'url': 'mapbox://humdata.8j9ay0ba',
     'type': 'vector'
   });
   map.addLayer({
     'id': 'country-fills',
     'type': 'fill',
     'source': 'country-polygons',
-    'source-layer': 'hornafrica_polbnda_int_uncs-9e96cy',
+    'filter': ['==', 'ADM_LEVEL', 1],
+    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'fill-color': '#F1F1EE',
       'fill-opacity': 1
     }
-  }, labelLayer);
+  }, baseLayer);
   globalLayer = 'country-fills';
   map.setLayoutProperty(globalLayer, 'visibility', 'visible');
 
   //country boundaries
   map.addSource('country-lines', {
-    'url': 'mapbox://humdata.d6fpfzk8',
+    'url': 'mapbox://humdata.8j9ay0ba',
     'type': 'vector'
   });
   map.addLayer({
     'id': 'country-boundaries',
     'type': 'line',
     'source': 'country-lines',
-    'source-layer': 'hornafrica_polbndl_int_uncs-8iaq93',
+    'filter': ['==', 'ADM_LEVEL', 1],
+    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'line-color': '#E0E0E0',
       'line-opacity': 1
     }
-  }, labelLayer);
+  }, baseLayer);
   globalBoundaryLayer = 'country-boundaries';
   map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
+
+  //adm1 centroids
+  map.addSource('country-centroids', {
+    'url': 'mapbox://humdata.cywtvjt9',
+    'type': 'vector'
+  });
+  map.addLayer({
+    'id': 'country-labels',
+    'type': 'symbol',
+    'source': 'country-centroids',
+    'filter': ['==', 'ADM_LEVEL', 1],
+    'source-layer': 'hornafrica_polbndp_subnationa-a7lq5r',
+    'layout': {
+      'text-field': ['get', 'ADM_REF'],
+      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
+      'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+      'text-radial-offset': 0.4
+    },
+    paint: {
+      'text-color': '#888',
+      'text-halo-color': '#EEE',
+      'text-halo-width': 1,
+      'text-halo-blur': 1
+    }
+  }, baseLayer);
+  globalLabelLayer = 'country-labels';
+  map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
 
 
   //subnational fills
@@ -899,12 +859,13 @@ function displayMap() {
     'id': 'subnational-fills',
     'type': 'fill',
     'source': 'subnational-polygons',
+    'filter': ['==', 'ADM_LEVEL', 2],
     'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'fill-color': '#F1F1EE',
       'fill-opacity': 1,
     }
-  }, labelLayer);
+  }, baseLayer);
   subnationalLayer = 'subnational-fills';
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
 
@@ -917,12 +878,13 @@ function displayMap() {
     'id': 'subnational-boundaries',
     'type': 'line',
     'source': 'subnational-lines',
+    'filter': ['==', 'ADM_LEVEL', 2],
     'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
     'paint': {
       'line-color': '#E0E0E0',
       'line-opacity': 1
     }
-  }, labelLayer);
+  }, baseLayer);
   subnationalBoundaryLayer = 'subnational-boundaries';
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
 
@@ -936,9 +898,10 @@ function displayMap() {
     'id': 'subnational-labels',
     'type': 'symbol',
     'source': 'subnational-centroids',
+    'filter': ['==', 'ADM_LEVEL', 2],
     'source-layer': 'hornafrica_polbndp_subnationa-a7lq5r',
     'layout': {
-      'text-field': ['get', 'ADM1_REF'],
+      'text-field': ['get', 'ADM_REF'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
       'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
@@ -953,6 +916,24 @@ function displayMap() {
   });
   subnationalLabelLayer = 'subnational-labels';
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
+
+  //water bodies
+  map.addSource('waterbodies', {
+    'url': 'mapbox://humdata.bo7vgo3j',
+    'type': 'vector'
+  });
+  map.addLayer({
+    'id': 'waterbodies-layer',
+    'type': 'fill',
+    'source': 'waterbodies',
+    'source-layer': 'hornafrica_waterbodies-8qylz8',
+    'paint': {
+      'fill-color': '#99daea'
+    }
+  }, subnationalLabelLayer);
+  waterLayer = 'waterbodies-layer';
+  map.setLayoutProperty(waterLayer, 'visibility', 'visible');
+
 
   mapFeatures = map.queryRenderedFeatures();
 
@@ -1052,9 +1033,9 @@ function deepLinkView() {
   //deep link to specific layer in global view
   if (location.indexOf('?layer=')>-1) {
     var layer = location.split('layer=')[1];
-    // var menuItem = $('.menu-indicators').find('li[data-layer="'+layer+'"]');
-    // menuItem = (menuItem.length<1) ? $('.menu-indicators').find('li[data-layer="covid-19_cases_and_deaths"]') : menuItem;
-    // selectLayer(menuItem);
+    var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
+    selected.prop('checked', true);
+    onLayerSelected(selected);
   }
 }
 
@@ -1070,30 +1051,7 @@ function matchMapFeatures(country_code) {
 }
 
 function createEvents() {
-  //map legend radio events
-  $('input[type="radio"]').click(function(){
-    var selected = $('input[name="countryIndicators"]:checked');
-    currentIndicator = {id: selected.val(), name: selected.parent().text()};
-    //selectLayer(selected);
-    if (currentCountry.code=='') {
-      updateGlobalLayer();
-    }
-    else {
-      var selectedFeatures = matchMapFeatures(currentCountry.code);
-      selectCountry(selectedFeatures);
-    }
-  });
-
-  //chart view trendseries select event
-  d3.select('.trendseries-select').on('change',function(e) {
-    var selected = d3.select('.trendseries-select').node().value;
-    updateTimeseries(selected);
-    if (currentCountry.code!==undefined && selected!==undefined)
-      vizTrack(`chart ${currentCountry.code} view`, selected);
-  });
-
-
-  //country select event
+  //country dropdown select event
   d3.select('.country-select').on('change',function(e) {
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
@@ -1107,18 +1065,43 @@ function createEvents() {
       selectCountry(selectedFeatures);
     }
   });
+
+  //map legend radio events
+  $('input[type="radio"]').click(function(){
+    var selected = $('input[name="countryIndicators"]:checked');
+    onLayerSelected(selected);
+  });
+
+  //chart view trendseries select event
+  // d3.select('.trendseries-select').on('change',function(e) {
+  //   var selected = d3.select('.trendseries-select').node().value;
+  //   updateTimeseries(selected);
+  //   if (currentCountry.code!==undefined && selected!==undefined)
+  //     vizTrack(`chart ${currentCountry.code} view`, selected);
+  // });
+}
+
+function onLayerSelected(selected) {
+  currentIndicator = {id: selected.val(), name: selected.parent().text()};
+  selectLayer(selected);
+  
+  if (currentCountry.code=='') {
+    updateGlobalLayer();
+  }
+  else {
+    var selectedFeatures = matchMapFeatures(currentCountry.code);
+    selectCountry(selectedFeatures);
+  }
 }
 
 
 function selectLayer(layer) {
-  currentIndicator = {id: layer.val(), name: layer.parent().text()};
-  updateGlobalLayer();
-  //vizTrack(`main ${currentCountry.code} view`, currentCountryIndicator.name);
+  //vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
 
-//   //reset any deep links
-//   let layerID = layer.attr('data-layer');
-//   let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
-//   window.history.replaceState(null, null, location);
+  //reset any deep links
+  let layerID = layer.attr('data-layer');
+  let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
+  window.history.replaceState(null, null, location);
 }
 
 
@@ -1133,7 +1116,7 @@ function selectCountry(features) {
         bottom: 0
     } :
     { 
-      top: $('.tab-menubar').outerHeight(),
+      top: $('.tab-menubar').outerHeight() + padding,
       right: $('.map-legend').outerWidth(),
       bottom: padding,
       left: $('.key-figure-panel').outerWidth() + padding,
@@ -1153,6 +1136,8 @@ function selectCountry(features) {
 function resetMap() {
   //reset layers
   map.setLayoutProperty(globalLayer, 'visibility', 'visible');
+  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
+  map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
@@ -1173,9 +1158,22 @@ function initKeyFigures() {
 
    //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
-  impactDiv.children().remove();  
+  impactDiv.children().remove();
+  createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: shortenNumFormat(data['#affected+inneed']), indicator: '#affected+inneed'});
+  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+displaced']), indicator: '#affected+displaced'});
   createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
-  createFigure(impactDiv, {className: 'population', title: 'Population', stat: shortenNumFormat(data['#population']), indicator: '#population'});
+  createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+children+sam']), indicator: '#affected+children+sam'});
+
+   //humanitarian impact figures
+  var fundingDiv = $('.key-figure-panel .funding .panel-inner');
+  fundingDiv.children().remove();
+  createFigure(fundingDiv, {className: 'requirement', title: 'Requirement', stat: formatValue(data['#value+funding+hrp+required+usd']), indicator: '#value+funding+hrp+required+usd'});
+  createFigure(fundingDiv, {className: 'funded', title: 'Funding', stat: formatValue(data['#value+funding+hrp+total+usd']), indicator: '#value+funding+hrp+total+usd'});
+  createFigure(fundingDiv, {className: 'percent-funded', title: 'Percent Funded', stat: formatValue(data['#value+funding+hrp+pct'], 'percent'), indicator: '#value+funding+hrp+pct'});
+
+  if (currentCountry.code!='') {
+    createFigure(fundingDiv, {className: 'other', title: data['#value+funding+other+plan_name'], stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
+  }
 }
 
 
@@ -1230,7 +1228,7 @@ function getSource(indicator) {
 /*** TOOLTIP FUNCTIONS ***/
 /*************************/
 function createMapTooltip(country_code, country_name, point) {
-  var country = nationalData.filter(c => c['#country+code'] == country_code);
+  var country = adminone_data.filter(c => c['#adm1+code'] == country_code);
   if (country[0]!=undefined) {
     var val = country[0][currentIndicator.id];
 
@@ -1243,33 +1241,47 @@ function createMapTooltip(country_code, country_name, point) {
     }
 
     //format content for display
-    var content = '<h2>'+ country_name +'</h2>';
+    var content = '<h2>'+ country_name +', ' + country[0]['#country+name'] + '</h2>';
 
     //ipc layer
     if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-      var dateSpan = '';
-      if (country[0]['#date+ipc+start']!=undefined) {
-        var startDate = new Date(country[0]['#date+ipc+start']);
-        var endDate = new Date(country[0]['#date+ipc+end']);
-        startDate = (startDate.getFullYear()==endDate.getFullYear()) ? d3.utcFormat('%b')(startDate) : d3.utcFormat('%b %Y')(startDate);
-        var dateSpan = '<span class="subtext">('+ startDate +'-'+ d3.utcFormat('%b %Y')(endDate) +' - '+ country[0]['#date+ipc+period'] +')</span>';
-      }
       var shortVal = (isNaN(val)) ? val : shortenNumFormat(val);
-      content += 'Total Population in IPC Phase 3+ '+ dateSpan +':<div class="stat">' + shortVal + '</div>';
-      if (val!='No Data') {
-        if (country[0]['#affected+food+ipc+analysed+num']!=undefined) content += '<span>('+ shortenNumFormat(country[0]['#affected+food+ipc+analysed+num']) +' of total country population analysed)</span>';
-        var tableArray = [{label: 'IPC Phase 3 (Critical)', value: country[0]['#affected+food+ipc+p3+num']},
-                          {label: 'IPC Phase 4 (Emergency)', value: country[0]['#affected+food+ipc+p4+num']},
-                          {label: 'IPC Phase 5 (Famine)', value: country[0]['#affected+food+ipc+p5+num']}];
-        content += '<div class="table-display">Breakdown:';
-        tableArray.forEach(function(row) {
-          if (row.value!=undefined) {
-            var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
-            content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-          }
-        });
-        content += '</div>';
-      }
+      content += 'Total Population in IPC Phase 3+: <div class="stat">' + shortVal + '</div>';
+      // var dateSpan = '';
+      // if (country[0]['#date+ipc+start']!=undefined) {
+      //   var startDate = new Date(country[0]['#date+ipc+start']);
+      //   var endDate = new Date(country[0]['#date+ipc+end']);
+      //   startDate = (startDate.getFullYear()==endDate.getFullYear()) ? d3.utcFormat('%b')(startDate) : d3.utcFormat('%b %Y')(startDate);
+      //   var dateSpan = '<span class="subtext">('+ startDate +'-'+ d3.utcFormat('%b %Y')(endDate) +' - '+ country[0]['#date+ipc+period'] +')</span>';
+      // }
+      // var shortVal = (isNaN(val)) ? val : shortenNumFormat(val);
+      // content += 'Total Population in IPC Phase 3+ '+ dateSpan +':<div class="stat">' + shortVal + '</div>';
+      // if (val!='No Data') {
+      //   if (country[0]['#affected+food+ipc+analysed+num']!=undefined) content += '<span>('+ shortenNumFormat(country[0]['#affected+food+ipc+analysed+num']) +' of total country population analysed)</span>';
+      //   var tableArray = [{label: 'IPC Phase 3 (Critical)', value: country[0]['#affected+food+ipc+p3+num']},
+      //                     {label: 'IPC Phase 4 (Emergency)', value: country[0]['#affected+food+ipc+p4+num']},
+      //                     {label: 'IPC Phase 5 (Famine)', value: country[0]['#affected+food+ipc+p5+num']}];
+      //   content += '<div class="table-display">Breakdown:';
+      //   tableArray.forEach(function(row) {
+      //     if (row.value!=undefined) {
+      //       var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
+      //       content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+      //     }
+      //   });
+      //   content += '</div>';
+      // }
+    }
+    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
+      var tableArray = [{label: 'Population', value: country[0]['#population']},
+                        {label: 'Total Population in IPC Phase 3+', value: country[0]['#affected+food+ipc+p3plus+num']}];
+      content += '<div class="table-display">';
+      tableArray.forEach(function(row) {
+        if (row.value!=undefined) {
+          var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
+          content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+        }
+      });
+      content += '</div>';
     }
     //all other layers
     else {
@@ -1285,7 +1297,7 @@ function createMapTooltip(country_code, country_name, point) {
 
 
 function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
-  var adm1 = subnationalData.filter(function(c) {
+  var adm1 = admintwo_data.filter(function(c) {
     if (c['#adm1+code']==adm1_pcode && c['#country+code']==currentCountry.code)
       return c;
   });
@@ -1303,7 +1315,24 @@ function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
     }
 
     let content = '';
-    content = `<h2>${adm1_name}</h2>${label}:<div class="stat">${val}</div>`;
+    content = `<h2>${adm1_name}</h2>`;
+
+
+    if (currentIndicator.id=='#climate+rainfall+anomaly') {
+      var tableArray = [{label: 'Population', value: adm1[0]['#population']},
+                        {label: 'Total Population in IPC Phase 3+', value: adm1[0]['#affected+food+ipc+p3plus+num']}];
+      content += '<div class="table-display">';
+      tableArray.forEach(function(row) {
+        //if (row.value!=undefined) {
+          var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
+          content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+        //}
+      });
+      content += '</div>';
+    }
+    else {
+      content += `${label}:<div class="stat">${val}</div>`;
+    }
 
     tooltip.setHTML(content);
     //if (!isMobile) setTooltipPosition(point)
@@ -1346,17 +1375,17 @@ var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
 var populationColorRange = ['#FFE281','#FDB96D','#FA9059','#F27253','#E9554D'];
-var chirpsColorRange = ['#e31a1c', '#fd8d3c', '#fecc5c', '#ffffb2', '#a1dab4', '#41b6c4', '#225ea8'];
+var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
-var regionBoundaryData, regionalData, nationalData, subnationalDataByCountry, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
+var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
 var countryTimeseriesChart = '';
 var mapLoaded = false;
 var dataLoaded = false;
 var viewInitialized = false;
 var isMobile = false;
 var zoomLevel = 4.9;
-var minZoom = 2;
+var minZoom = 3;
 
 var globalCountryList = [];
 var currentIndicator = {};
@@ -1422,15 +1451,10 @@ $( document ).ready(function() {
       var allData = data[0];
       regionalData = allData.regional_data[0];
       nationalData = allData.national_data;
-      subnationalData = allData.subnational_data;
+      adminone_data = allData.adminone_data;
+      admintwo_data = allData.admintwo_data;
       sourcesData = allData.sources_data;
-      regionBoundaryData = data[1].features; 
-
-      //format data
-      // subnationalData.forEach(function(item) {
-      //   var pop = item['#population'];
-      //   if (item['#population']!=undefined) item['#population'] = parseInt(pop.replace(/,/g, ''), 10);
-      // });
+      regionBoundaryData = data[1].features;
 
       //parse national data
       nationalData.forEach(function(item) {
@@ -1472,7 +1496,7 @@ $( document ).ready(function() {
       else {
         $('#chart-view').hide();
       }
-      vizTrack($(this).data('id'), currentIndicator.name);
+      //vizTrack($(this).data('id'), currentIndicator.name);
     });
 
     //create country dropdown
@@ -1489,29 +1513,19 @@ $( document ).ready(function() {
     currentCountry = {code: '', name:''}
 
     //create chart view country select
-    $('.trendseries-select').append($('<option value="All">All Clusters</option>')); 
-    var trendseriesSelect = d3.select('.trendseries-select')
-      .selectAll('option')
-      .data(subnationalData)
-      .enter().append('option')
-        .text(function(d) {
-          let name = (d['#adm1+code']=='UA80') ? d['#adm1+name'] + ' (city)' : d['#adm1+name'];
-          return name; 
-        })
-        .attr('value', function (d) { return d['#adm1+code']; });
+    // $('.trendseries-select').append($('<option value="All">All Clusters</option>')); 
+    // var trendseriesSelect = d3.select('.trendseries-select')
+    //   .selectAll('option')
+    //   .data(subnationalData)
+    //   .enter().append('option')
+    //     .text(function(d) {
+    //       let name = (d['#adm1+code']=='UA80') ? d['#adm1+name'] + ' (city)' : d['#adm1+name'];
+    //       return name; 
+    //     })
+    //     .attr('value', function (d) { return d['#adm1+code']; });
 
     viewInitialized = true;
   }
-
-
-  // function initCountryView() {
-  //   $('.content').addClass('country-view');
-  //   $('.key-figure-panel').scrollTop(0);
-  //   $('#population').prop('checked', true);
-  //   currentCountryIndicator = {id: $('input[name="countryIndicators"]:checked').val(), name: $('input[name="countryIndicators"]:checked').parent().text()};
-
-  //   initKeyFigures();
-  // }
 
 
   function initTracking() {

@@ -1367,16 +1367,16 @@ a:visited {
   .map-legend .legend-scale {
     display: block; }
   .map-legend .legend-container {
-    height: 92px;
+    height: 82px;
     overflow: visible;
     transform: translate(0px, 5px); }
     .map-legend .legend-container.no-data {
       height: 20px; }
       .map-legend .legend-container.no-data .legendCells {
         display: none; }
-    .map-legend .legend-container.chirps {
-      height: 125px; }
-      .map-legend .legend-container.chirps .legendCells .cell:nth-child(8) {
+    .map-legend .legend-container.climate-rainfall-anomaly {
+      height: 205px; }
+      .map-legend .legend-container.climate-rainfall-anomaly .legendCells .cell:nth-child(13) {
         display: none; }
   .map-legend .legend-marker {
     display: flex;
@@ -1435,7 +1435,8 @@ a:visited {
     cursor: pointer;
     display: none; }
   .map-legend .no-data-key {
-    height: 20px; }
+    height: 20px;
+    margin-top: 10px; }
     .map-legend .no-data-key rect {
       fill: #FFF;
       stroke: #CCC; }
