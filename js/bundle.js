@@ -1305,14 +1305,14 @@ function createMapTooltip(country_code, country_name, point) {
 }
 
 
-function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
-  var adm1 = admintwo_data.filter(function(c) {
-    if (c['#adm1+code']==adm1_pcode && c['#country+code']==currentCountry.code)
+function createCountryMapTooltip(name, pcode, point) {
+  var location = admintwo_data.filter(function(c) {
+    if (c['#adm2+code']==pcode && c['#country+code']==currentCountry.code)
       return c;
   });
 
-  if (adm1[0]!=undefined) {
-    var val = adm1[0][currentIndicator.id];
+  if (location[0]!=undefined) {
+    var val = location[0][currentIndicator.id];
     var label = currentIndicator.name;
 
     //format content for tooltip
@@ -1324,12 +1324,12 @@ function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
     }
 
     let content = '';
-    content = `<h2>${adm1_name}</h2>`;
+    content = `<h2>${name}</h2>`;
 
 
     if (currentIndicator.id=='#climate+rainfall+anomaly') {
-      var tableArray = [{label: 'Population', value: adm1[0]['#population']},
-                        {label: 'Total Population in IPC Phase 3+', value: adm1[0]['#affected+food+ipc+p3plus+num']}];
+      var tableArray = [{label: 'Population', value: location[0]['#population']},
+                        {label: 'Total Population in IPC Phase 3+', value: location[0]['#affected+food+ipc+p3plus+num']}];
       content += '<div class="table-display">';
       tableArray.forEach(function(row) {
         //if (row.value!=undefined) {
