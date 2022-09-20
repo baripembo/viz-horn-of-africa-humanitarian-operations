@@ -681,9 +681,19 @@ function truncateString(str, num) {
 }
 
 
-function formatValue(val, format) {
-  var format = (format=='percent') ? d3.format('.1%') : d3.format('$.3s');
-  var value;
+function formatValue(val, type) {
+  let format;
+  switch(type) {
+    case 'percent':
+      format = percentFormat;
+      break;
+    case 'short':
+      format = shortenNumFormat;
+      break;
+    default:
+      format = d3.format('$.3s');
+  }
+  let value;
   if (!isVal(val)) {
     value = 'NA';
   }
@@ -1159,7 +1169,7 @@ function initKeyFigures() {
    //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
   impactDiv.children().remove();
-  createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: shortenNumFormat(data['#inneed']), indicator: '#inneed'});
+  createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: formatValue(data['#inneed'], 'short'), indicator: '#inneed'});
   createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
   createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+children+sam']), indicator: '#affected+children+sam'});
@@ -1175,7 +1185,6 @@ function initKeyFigures() {
     createFigure(fundingDiv, {className: 'other', title: data['#value+funding+other+plan_name'], stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
   }
 }
-
 
 
 function createFigure(div, obj) {
