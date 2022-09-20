@@ -1159,8 +1159,8 @@ function initKeyFigures() {
    //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
   impactDiv.children().remove();
-  createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: shortenNumFormat(data['#affected+inneed']), indicator: '#affected+inneed'});
-  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+displaced']), indicator: '#affected+displaced'});
+  createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: shortenNumFormat(data['#inneed']), indicator: '#inneed'});
+  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
   createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+children+sam']), indicator: '#affected+children+sam'});
 
