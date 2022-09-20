@@ -215,6 +215,9 @@ a:visited {
 		right: 24px;
 		opacity: 1;
 		z-index: 3;
+		.indicator.country-only {
+			display: none;
+		}
 	}
 }
 

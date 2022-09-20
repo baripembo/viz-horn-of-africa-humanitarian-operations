@@ -33,6 +33,7 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
+  $('.map-legend .indicator.country-only').show();
 
   //update key figures
   initKeyFigures();

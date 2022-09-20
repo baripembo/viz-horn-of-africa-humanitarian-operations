@@ -107,6 +107,7 @@ function createMapLegend(scale) {
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
   createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
+  createSource($('.map-legend .idp-source'), '#affected+idps+ind');
   createSource($('.map-legend .population-source'), '#population');
 
   var legend = d3.legendColor()

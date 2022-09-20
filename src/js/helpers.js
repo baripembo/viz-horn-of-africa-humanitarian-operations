@@ -32,9 +32,19 @@ function truncateString(str, num) {
 }
 
 
-function formatValue(val, format) {
-  var format = (format=='percent') ? d3.format('.1%') : d3.format('$.3s');
-  var value;
+function formatValue(val, type) {
+  let format;
+  switch(type) {
+    case 'percent':
+      format = percentFormat;
+      break;
+    case 'short':
+      format = shortenNumFormat;
+      break;
+    default:
+      format = d3.format('$.3s');
+  }
+  let value;
   if (!isVal(val)) {
     value = 'NA';
   }
@@ -71,6 +81,10 @@ function createFootnote(target, indicator, text) {
       $(this).html(`${text}<a href='#' class='collapse'>LESS</a>`);
     }
   });
+}
+
+function isCountryView() {
+  return currentCountry.code=='' ? false : true;
 }
 
 //country codes and raster ids

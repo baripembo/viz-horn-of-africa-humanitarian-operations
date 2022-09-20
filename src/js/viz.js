@@ -15,7 +15,7 @@ var dataLoaded = false;
 var viewInitialized = false;
 var isMobile = false;
 var zoomLevel = 4.9;
-var minZoom = 3;
+var minZoom = 3.5;
 
 var globalCountryList = [];
 var currentIndicator = {};
