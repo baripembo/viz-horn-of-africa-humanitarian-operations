@@ -86,9 +86,9 @@ function updateCountryLayer() {
       layerOpacity = 0;
     }
     
-    expression.push(d['#adm1+code'], color);
-    expressionBoundary.push(d['#adm1+code'], boundaryColor);
-    expressionOpacity.push(d['#adm1+code'], layerOpacity);
+    expression.push(d['#adm2+code'], color);
+    expressionBoundary.push(d['#adm2+code'], boundaryColor);
+    expressionOpacity.push(d['#adm2+code'], layerOpacity);
   });
   //set expression defaults
   expression.push(colorDefault);
