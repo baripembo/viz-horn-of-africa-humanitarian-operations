@@ -64,27 +64,30 @@
               <h4 class='collapsed-title'>MAP LEGEND</h4>
               <h4 class='indicator-title'>MAP DATA LAYER</h4>
               
-              <label>IPC Acute Food Insecurity<input checked='true' name='countryIndicators' type='radio' value='#affected+food+ipc+p3plus+num' id='ipc' data-legend='IPC Acute Food Insecurity (population in IPC Phase 3+)' data-layer='ipc_acute_food_insecurity'></label>
-              <div class="source-container ipc-source"></div>
+              <div class='indicator'>
+                <label>IPC Acute Food Insecurity<input checked='true' name='countryIndicators' type='radio' value='#affected+food+ipc+p3plus+num' id='ipc' data-legend='IPC Acute Food Insecurity (population in IPC Phase 3+)' data-layer='ipc_acute_food_insecurity'></label>
+                <div class="source-container ipc-source"></div>
+              </div>
 
-              <label>Seasonal CHIRPS Accumulation Anomaly<input name='countryIndicators' type='radio' value='#climate+rainfall+anomaly' id='chirps' data-legend='Seasonal CHIRPS Accumulation Anomaly' data-layer='chirps-rainfall'></label>
-              <div class="source-container chirps-source"></div>
+              <div class='indicator'>
+                <label>Seasonal CHIRPS Accumulation Anomaly<input name='countryIndicators' type='radio' value='#climate+rainfall+anomaly' id='chirps' data-legend='Seasonal CHIRPS Accumulation Anomaly' data-layer='chirps-rainfall'></label>
+                <div class="source-container chirps-source"></div>
+              </div>
 
-              <label>Population<input name='countryIndicators' type='radio' value='#population' id='population' data-legend='Population Density (people per sq km)' data-layer='population'></label>
-              <div class='source-container population-source'></div>
+              <div class='indicator country-only'>
+                <label>Internally Displaced People<input name='countryIndicators' type='radio' value='#affected+idps+ind' id='idps' data-legend='Internally Displaced People' data-layer='idps'></label>
+                <div class='source-container idp-source'></div>
+              </div>
+
+              <div class='indicator'>
+                <label>Population<input name='countryIndicators' type='radio' value='#population' id='population' data-legend='Population Density (people per sq km)' data-layer='population'></label>
+                <div class='source-container population-source'></div>
+              </div>
 
               <hr>
               <h4 class='indicator-title'>MAP LEGEND</h4>
               <h4 class='legend-title'></h4>
               <div class='legend-scale'></div>
-
-<!--               <div class='legend-marker hostilities'>
-                <div class='marker'><img src='assets/marker-hostility.svg' /></div>
-                <div>
-                  <label>Hostilities</label>
-                  <div class='source-container hostilities-source'></div>
-                </div>
-              </div> -->
 
             </div>
             <div class='legend-gradient'></div>

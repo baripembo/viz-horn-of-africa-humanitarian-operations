@@ -1306,6 +1306,8 @@ a:visited {
     right: 24px;
     opacity: 1;
     z-index: 3; }
+    .content .map-legend .indicator.country-only {
+      display: none; }
 
 .org-logo {
   display: flex;

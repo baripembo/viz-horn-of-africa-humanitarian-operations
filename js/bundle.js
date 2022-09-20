@@ -271,6 +271,7 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
+  $('.map-legend .indicator.country-only').show();
 
   //update key figures
   initKeyFigures();
@@ -491,6 +492,7 @@ function createMapLegend(scale) {
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
   createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
+  createSource($('.map-legend .idp-source'), '#affected+idps+ind');
   createSource($('.map-legend .population-source'), '#population');
 
   var legend = d3.legendColor()
@@ -732,6 +734,10 @@ function createFootnote(target, indicator, text) {
   });
 }
 
+function isCountryView() {
+  return currentCountry.code=='' ? false : true;
+}
+
 //country codes and raster ids
 const countryCodeList = {
   ETH: {pop: '8l382re2', chirps: '9f35wnzq'},
@@ -779,21 +785,21 @@ function displayMap() {
     name: $('input[name="countryIndicators"]:checked').parent().text()
   };
 
-  //init element events
-  createEvents();
-
-  //get bottommost layer
+  //get bottommost layer from basemap
   const layers = map.getStyle().layers;
   for (const layer of layers) {
     if (layer.id==='Dashed bnd 1m') {
       baseLayer = layer.id;
-      //break;
     }
-    //if (layer.id==='Countries 6-8') console.log(layer)
+    if (layer.id.startsWith('Countries')) {
+      map.setLayoutProperty(layer.id, 'text-allow-overlap', true);
+    }
   }
 
   //add map layers
-  //country fills
+  //adm1 fills
+  let subnationalSource = 'hornafrica_polbnda_subnationa-2rkvd2';
+  let subnationalCentroidSource = 'hornafrica_polbndp_subnationa-a7lq5r';
   map.addSource('country-polygons', {
     'url': 'mapbox://humdata.8j9ay0ba',
     'type': 'vector'
@@ -803,7 +809,7 @@ function displayMap() {
     'type': 'fill',
     'source': 'country-polygons',
     'filter': ['==', 'ADM_LEVEL', 1],
-    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
+    'source-layer': subnationalSource,
     'paint': {
       'fill-color': '#F1F1EE',
       'fill-opacity': 1
@@ -812,17 +818,13 @@ function displayMap() {
   globalLayer = 'country-fills';
   map.setLayoutProperty(globalLayer, 'visibility', 'visible');
 
-  //country boundaries
-  map.addSource('country-lines', {
-    'url': 'mapbox://humdata.8j9ay0ba',
-    'type': 'vector'
-  });
+  //adm1 boundaries
   map.addLayer({
     'id': 'country-boundaries',
     'type': 'line',
-    'source': 'country-lines',
+    'source': 'country-polygons',
     'filter': ['==', 'ADM_LEVEL', 1],
-    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
+    'source-layer': subnationalSource,
     'paint': {
       'line-color': '#E0E0E0',
       'line-opacity': 1
@@ -841,7 +843,7 @@ function displayMap() {
     'type': 'symbol',
     'source': 'country-centroids',
     'filter': ['==', 'ADM_LEVEL', 1],
-    'source-layer': 'hornafrica_polbndp_subnationa-a7lq5r',
+    'source-layer': subnationalCentroidSource,
     'layout': {
       'text-field': ['get', 'ADM_REF'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
@@ -859,18 +861,13 @@ function displayMap() {
   globalLabelLayer = 'country-labels';
   map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
 
-
-  //subnational fills
-  map.addSource('subnational-polygons', {
-    'url': 'mapbox://humdata.8j9ay0ba',
-    'type': 'vector'
-  });
+  //adm2 fills
   map.addLayer({
     'id': 'subnational-fills',
     'type': 'fill',
-    'source': 'subnational-polygons',
+    'source': 'country-polygons',
     'filter': ['==', 'ADM_LEVEL', 2],
-    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
+    'source-layer': subnationalSource,
     'paint': {
       'fill-color': '#F1F1EE',
       'fill-opacity': 1,
@@ -879,17 +876,13 @@ function displayMap() {
   subnationalLayer = 'subnational-fills';
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
 
-  //subnational boundaries
-  map.addSource('subnational-lines', {
-    'url': 'mapbox://humdata.8j9ay0ba',
-    'type': 'vector'
-  });
+  //adm2 boundaries
   map.addLayer({
     'id': 'subnational-boundaries',
     'type': 'line',
-    'source': 'subnational-lines',
+    'source': 'country-polygons',
     'filter': ['==', 'ADM_LEVEL', 2],
-    'source-layer': 'hornafrica_polbnda_subnationa-2rkvd2',
+    'source-layer': subnationalSource,
     'paint': {
       'line-color': '#E0E0E0',
       'line-opacity': 1
@@ -898,18 +891,13 @@ function displayMap() {
   subnationalBoundaryLayer = 'subnational-boundaries';
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
 
-
-  //subnational centroids
-  map.addSource('subnational-centroids', {
-    'url': 'mapbox://humdata.cywtvjt9',
-    'type': 'vector'
-  });
+  //adm2 centroids
   map.addLayer({
     'id': 'subnational-labels',
     'type': 'symbol',
-    'source': 'subnational-centroids',
+    'source': 'country-centroids',
     'filter': ['==', 'ADM_LEVEL', 2],
-    'source-layer': 'hornafrica_polbndp_subnationa-a7lq5r',
+    'source-layer': subnationalCentroidSource,
     'layout': {
       'text-field': ['get', 'ADM_REF'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
@@ -923,7 +911,7 @@ function displayMap() {
       'text-halo-width': 1,
       'text-halo-blur': 1
     }
-  });
+  }, baseLayer);
   subnationalLabelLayer = 'subnational-labels';
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
 
@@ -947,7 +935,15 @@ function displayMap() {
 
   mapFeatures = map.queryRenderedFeatures();
 
+  //load raster layers
   loadRasters();
+
+  //init element events
+  createEvents();
+
+  //init global and country layers
+  initGlobalLayer();
+  initCountryLayer();
 
   //zoom into region
   var offset = 100;
@@ -955,11 +951,6 @@ function displayMap() {
     padding: {top: offset, right: 0, bottom: offset, left: $('.key-figure-panel').outerWidth()},
     linear: true
   });
-
-
-  //init global and country layers
-  initGlobalLayer();
-  initCountryLayer();
 
   //deeplink to country if parameter exists
   if (viewInitialized==true) deepLinkView();
@@ -1043,9 +1034,14 @@ function deepLinkView() {
   //deep link to specific layer in global view
   if (location.indexOf('?layer=')>-1) {
     var layer = location.split('layer=')[1];
-    var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
-    selected.prop('checked', true);
-    onLayerSelected(selected);
+    if (layer=='idps') {
+      window.history.replaceState(null, null, window.location.pathname);
+    }
+    else {
+      var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
+      selected.prop('checked', true);
+      onLayerSelected(selected);
+    }
   }
 }
 
@@ -1065,14 +1061,14 @@ function createEvents() {
   d3.select('.country-select').on('change',function(e) {
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
-    if (currentCountry.code==='') {
-      resetMap();
-      updateGlobalLayer(currentCountry.code);
-    }
-    else {
+    if (isCountryView()) {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
+    }
+    else {
+      resetMap();
+      updateGlobalLayer(currentCountry.code);
     }
   });
 
@@ -1138,6 +1134,9 @@ function selectCountry(features) {
   });
 
   map.once('moveend', updateCountryLayer);
+
+  //append country code to url
+  window.history.replaceState(null, null, '?c='+currentCountry.code);
 }
 
 
@@ -1151,6 +1150,7 @@ function resetMap() {
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
+  $('.map-legend .indicator.country-only').hide();
 
   var offset = 100;
   map.fitBounds(regionBoundaryData[0].bbox, {
@@ -1158,6 +1158,8 @@ function resetMap() {
     linear: true
   });
   map.once('moveend', initKeyFigures);
+
+  window.history.replaceState(null, null, '/');
 }
 
 /***********************/
@@ -1178,11 +1180,13 @@ function initKeyFigures() {
   var fundingDiv = $('.key-figure-panel .funding .panel-inner');
   fundingDiv.children().remove();
   createFigure(fundingDiv, {className: 'requirement', title: 'Requirement', stat: formatValue(data['#value+funding+hrp+required+usd']), indicator: '#value+funding+hrp+required+usd'});
-  createFigure(fundingDiv, {className: 'funded', title: 'Funding', stat: formatValue(data['#value+funding+hrp+total+usd']), indicator: '#value+funding+hrp+total+usd'});
+  createFigure(fundingDiv, {className: 'funded', title: 'Funded', stat: formatValue(data['#value+funding+hrp+total+usd']), indicator: '#value+funding+hrp+total+usd'});
   createFigure(fundingDiv, {className: 'percent-funded', title: 'Percent Funded', stat: formatValue(data['#value+funding+hrp+pct'], 'percent'), indicator: '#value+funding+hrp+pct'});
 
-  if (currentCountry.code!='') {
-    createFigure(fundingDiv, {className: 'other', title: data['#value+funding+other+plan_name'], stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
+  if (isCountryView()) {
+    createFigure(fundingDiv, {className: 'other-requirement', title: data['#value+funding+other+plan_name'] + ' Requirement', stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
+    createFigure(fundingDiv, {className: 'other-funded', title: data['#value+funding+other+plan_name'] + ' Funded', stat: formatValue(data['#value+funding+other+total+usd']), indicator: '#value+funding+other+total+usd'});
+    createFigure(fundingDiv, {className: 'other-percent-funded', title: data['#value+funding+other+plan_name'] + ' Percent Funded', stat: formatValue(data['#value+funding+other+pct'], 'percent'), indicator: '#value+funding+other+pct'});
   }
 }
 
@@ -1332,15 +1336,21 @@ function createCountryMapTooltip(name, pcode, point) {
                         {label: 'Total Population in IPC Phase 3+', value: location[0]['#affected+food+ipc+p3plus+num']}];
       content += '<div class="table-display">';
       tableArray.forEach(function(row) {
-        //if (row.value!=undefined) {
-          var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
-          content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-        //}
+        var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
+        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
       });
       content += '</div>';
     }
     else {
       content += `${label}:<div class="stat">${val}</div>`;
+      var tableArray = [{label: 'People in Need', value: location[0]['#inneed']},
+                        {label: 'People Targeted', value: location[0]['#targeted']}];
+      content += '<div class="table-display">';
+      tableArray.forEach(function(row) {
+        var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
+        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+      });
+      content += '</div>';
     }
 
     tooltip.setHTML(content);
@@ -1394,7 +1404,7 @@ var dataLoaded = false;
 var viewInitialized = false;
 var isMobile = false;
 var zoomLevel = 4.9;
-var minZoom = 3;
+var minZoom = 3.5;
 
 var globalCountryList = [];
 var currentIndicator = {};
