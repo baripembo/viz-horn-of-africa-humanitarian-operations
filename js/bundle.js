@@ -1289,10 +1289,8 @@ function createMapTooltip(country_code, country_name, point) {
                         {label: 'Total Population in IPC Phase 3+', value: country[0]['#affected+food+ipc+p3plus+num']}];
       content += '<div class="table-display">';
       tableArray.forEach(function(row) {
-        if (row.value!=undefined) {
-          var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
-          content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-        }
+        var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
+        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
       });
       content += '</div>';
     }
