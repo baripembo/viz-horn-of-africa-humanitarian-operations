@@ -11,7 +11,7 @@ function initKeyFigures() {
   createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted'], 'short'), indicator: '#targeted'});
   createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached'], 'short'), indicator: '#reached'});
   createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity (population in IPC Phase 3+)', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
+  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+children+sam']), indicator: '#affected+children+sam'});
 
    //humanitarian impact figures

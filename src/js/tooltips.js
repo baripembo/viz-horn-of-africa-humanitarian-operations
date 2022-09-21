@@ -2,9 +2,9 @@
 /*** TOOLTIP FUNCTIONS ***/
 /*************************/
 function createMapTooltip(country_code, country_name, point) {
-  var country = adminone_data.filter(c => c['#adm1+code'] == country_code);
-  if (country[0]!=undefined) {
-    var val = country[0][currentIndicator.id];
+  var location = adminone_data.filter(c => c['#adm1+code'] == country_code);
+  if (location[0]!=undefined) {
+    var val = location[0][currentIndicator.id];
 
     //format content for tooltip
     if (isVal(val)) {
@@ -15,12 +15,12 @@ function createMapTooltip(country_code, country_name, point) {
     }
 
     //format content for display
-    var content = '<h2>'+ country_name +', ' + country[0]['#country+name'] + '</h2>';
+    var content = '<h2>'+ country_name +', ' + location[0]['#country+name'] + '</h2>';
 
     //ipc layer
-    if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-      var shortVal = (isNaN(val)) ? val : shortenNumFormat(val);
-      content += 'Total Population in IPC Phase 3+: <div class="stat">' + shortVal + '</div>';
+    // if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
+    //   var shortVal = (isNaN(val)) ? val : shortenNumFormat(val);
+    //   content += 'Total Population in IPC Phase 3+: <div class="stat">' + shortVal + '</div>';
       // var dateSpan = '';
       // if (country[0]['#date+ipc+start']!=undefined) {
       //   var startDate = new Date(country[0]['#date+ipc+start']);
@@ -44,21 +44,34 @@ function createMapTooltip(country_code, country_name, point) {
       //   });
       //   content += '</div>';
       // }
-    }
-    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
-      var tableArray = [{label: 'Population', value: country[0]['#population']},
-                        {label: 'Total Population in IPC Phase 3+', value: country[0]['#affected+food+ipc+p3plus+num']}];
-      content += '<div class="table-display">';
-      tableArray.forEach(function(row) {
-        var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
-        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-      });
-      content += '</div>';
-    }
+    // }
+    // else if (currentIndicator.id=='#climate+rainfall+anomaly') {
+    //   var tableArray = [{label: 'Population', value: country[0]['#population']},
+    //                     {label: 'Total Population in IPC Phase 3+', value: country[0]['#affected+food+ipc+p3plus+num']}];
+    //   content += '<div class="table-display">';
+    //   tableArray.forEach(function(row) {
+    //     var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
+    //     content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
+    //   });
+    //   content += '</div>';
+    // }
     //all other layers
-    else {
-      content += currentIndicator.name + ':<div class="stat">' + val + '</div>';
-    }
+    //else {
+    content += currentIndicator.name + ':<div class="stat">' + val + '</div>';
+    var tableArray = [{label: 'Population', indicator: '#population'},
+                      {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
+                      {label: 'People in Need', indicator: '#inneed'},
+                      {label: 'People Targeted', indicator: '#targeted'}];
+    content += '<div class="table-display">';
+    tableArray.forEach(function(row) {
+      if (row.indicator!=currentIndicator.id) {
+        let value = location[0][row.indicator];
+        let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
+        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortVal +'</div></div>';
+      }
+    });
+    content += '</div>';
+    //}
 
     //set content for tooltip
     tooltip.setHTML(content);
@@ -88,29 +101,20 @@ function createCountryMapTooltip(name, pcode, point) {
 
     let content = '';
     content = `<h2>${name}</h2>`;
-
-
-    if (currentIndicator.id=='#climate+rainfall+anomaly') {
-      var tableArray = [{label: 'Population', value: location[0]['#population']},
-                        {label: 'Total Population in IPC Phase 3+', value: location[0]['#affected+food+ipc+p3plus+num']}];
-      content += '<div class="table-display">';
-      tableArray.forEach(function(row) {
-        var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
-        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-      });
-      content += '</div>';
-    }
-    else {
-      content += `${label}:<div class="stat">${val}</div>`;
-      var tableArray = [{label: 'People in Need', value: location[0]['#inneed']},
-                        {label: 'People Targeted', value: location[0]['#targeted']}];
-      content += '<div class="table-display">';
-      tableArray.forEach(function(row) {
-        var shortRowVal = (row.value==0 || isNaN(row.value)) ? 'No Data' : shortenNumFormat(row.value);
-        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-      });
-      content += '</div>';
-    }
+    content += currentIndicator.name + ':<div class="stat">' + val + '</div>';
+    var tableArray = [{label: 'Population', indicator: '#population'},
+                      {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
+                      {label: 'People in Need', indicator: '#inneed'},
+                      {label: 'People Targeted', indicator: '#targeted'}];
+    content += '<div class="table-display">';
+    tableArray.forEach(function(row) {
+      if (row.indicator!=currentIndicator.id) {
+        let value = location[0][row.indicator];
+        let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
+        content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortVal +'</div></div>';
+      }
+    });
+    content += '</div>';
 
     tooltip.setHTML(content);
     //if (!isMobile) setTooltipPosition(point)
