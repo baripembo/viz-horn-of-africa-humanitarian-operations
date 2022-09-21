@@ -55,7 +55,7 @@ function updateCountryLayer() {
 
   //update legend
   var colorScale = getLegendScale();
-  if (isNaN(colorScale.domain()[1]) && currentIndicator.id!='#climate+rainfall+anomaly' && currentIndicator.id!='#population') {
+  if (currentIndicator.id=='#affected+idps+ind' && currentCountry.code=='KEN') {
     $('.legend-container').hide();
   }
   else {
@@ -70,7 +70,7 @@ function updateCountryLayer() {
   admintwo_data.forEach(function(d) {
     var color, boundaryColor, layerOpacity;
     if (d['#country+code']==currentCountry.code) {
-      var val = +d[currentIndicator.id];
+      var val = d[currentIndicator.id];
       layerOpacity = 1;
       boundaryColor = '#E0E0E0';
       color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : colorScale(val);

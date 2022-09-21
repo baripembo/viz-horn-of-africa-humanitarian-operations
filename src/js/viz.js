@@ -5,6 +5,7 @@ var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
+var ipcColorRange = ['#E67800', '#C80100', '#640100'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
@@ -97,6 +98,48 @@ $( document ).ready(function() {
           return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
         });
       });
+
+
+      //parse adm1 ipc data
+      adminone_data.forEach(function(d) {
+        switch(d['#affected+food+ipc+phase+type']) {
+          case 2:
+            d['#affected+food+ipc+phase+type'] = 'NA';
+            break;
+          case 3:
+            d['#affected+food+ipc+phase+type'] = '3 - Crisis';
+            break;
+          case 4:
+            d['#affected+food+ipc+phase+type'] = '4 - Emergency';
+            break;
+          case 5:
+            d['#affected+food+ipc+phase+type'] = '5 - Famine';
+            break;
+          default:
+            d['#affected+food+ipc+phase+type'] = 'NA';
+        }
+      });
+
+      //parse adm1 ipc data
+      admintwo_data.forEach(function(d) {
+        switch(+d['#affected+food+ipc+phase+type']) {
+          case 2:
+            d['#affected+food+ipc+phase+type'] = 'NA';
+            break;
+          case 3:
+            d['#affected+food+ipc+phase+type'] = '3 - Crisis';
+            break;
+          case 4:
+            d['#affected+food+ipc+phase+type'] = '4 - Emergency';
+            break;
+          case 5:
+            d['#affected+food+ipc+phase+type'] = '5 - Famine';
+            break;
+          default:
+            d['#affected+food+ipc+phase+type'] = 'NA';
+        }
+      });
+      console.log(admintwo_data)
 
       //group national data by country -- drives country panel    
       dataByCountry = d3.nest()
