@@ -1136,7 +1136,7 @@ function selectCountry(features) {
   map.once('moveend', updateCountryLayer);
 
   //append country code to url
-  window.history.replaceState(null, null, '?c='+currentCountry.code);
+  window.history.replaceState(null, null, window.location.pathname + '?c='+currentCountry.code);
 }
 
 
@@ -1159,7 +1159,7 @@ function resetMap() {
   });
   map.once('moveend', initKeyFigures);
 
-  window.history.replaceState(null, null, '/');
+  window.history.replaceState(null, null, window.location.pathname);
 }
 
 /***********************/
