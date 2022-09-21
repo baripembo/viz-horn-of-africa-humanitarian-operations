@@ -8,16 +8,18 @@ function initKeyFigures() {
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
   impactDiv.children().remove();
   createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: formatValue(data['#inneed'], 'short'), indicator: '#inneed'});
+  createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted'], 'short'), indicator: '#targeted'});
+  createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached'], 'short'), indicator: '#reached'});
   createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
+  createFigure(impactDiv, {className: 'ipc', title: 'IPC Acute Food Insecurity (population in IPC Phase 3+)', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+children+sam']), indicator: '#affected+children+sam'});
 
    //humanitarian impact figures
   var fundingDiv = $('.key-figure-panel .funding .panel-inner');
   fundingDiv.children().remove();
-  createFigure(fundingDiv, {className: 'requirement', title: 'Requirement', stat: formatValue(data['#value+funding+hrp+required+usd']), indicator: '#value+funding+hrp+required+usd'});
-  createFigure(fundingDiv, {className: 'funded', title: 'Funded', stat: formatValue(data['#value+funding+hrp+total+usd']), indicator: '#value+funding+hrp+total+usd'});
-  createFigure(fundingDiv, {className: 'percent-funded', title: 'Percent Funded', stat: formatValue(data['#value+funding+hrp+pct'], 'percent'), indicator: '#value+funding+hrp+pct'});
+  createFigure(fundingDiv, {className: 'requirement', title: 'Requirement', stat: formatValue(data['#value+funding+required+usd']), indicator: '#value+funding+required+usd'});
+  createFigure(fundingDiv, {className: 'funded', title: 'Funded', stat: formatValue(data['#value+funding+total+usd']), indicator: '#value+funding+total+usd'});
+  createFigure(fundingDiv, {className: 'percent-funded', title: 'Percent Funded', stat: formatValue(data['#value+funding+pct'], 'percent'), indicator: '#value+funding+pct'});
 
   if (isCountryView()) {
     createFigure(fundingDiv, {className: 'other-requirement', title: data['#value+funding+other+plan_name'] + ' Requirement', stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
