@@ -293,7 +293,7 @@ function updateCountryLayer() {
 
   //update legend
   var colorScale = getLegendScale();
-  if (isNaN(colorScale.domain()[1]) && currentIndicator.id!='#climate+rainfall+anomaly') {
+  if (isNaN(colorScale.domain()[1]) && currentIndicator.id!='#climate+rainfall+anomaly' && currentIndicator.id!='#population') {
     $('.legend-container').hide();
   }
   else {
@@ -441,6 +441,7 @@ function initGlobalLayer() {
 function updateGlobalLayer() {
   //color scale
   colorScale = getLegendScale();
+  updateMapLegend(colorScale)
 
   //data join
   var expression = ['match', ['get', 'ADM_PCODE']];
@@ -467,7 +468,6 @@ function updateGlobalLayer() {
   //update map and legend
   map.setPaintProperty(globalLayer, 'fill-color', expression);
   map.setPaintProperty(globalBoundaryLayer, 'line-color', expressionBoundary);
-  updateMapLegend(colorScale);
 
   //toggle rasters
   var countryList = Object.keys(countryCodeList);
@@ -536,6 +536,7 @@ function updateMapLegend(scale) {
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
   $('.map-legend .legend-title').html(legendTitle);
 
+  //set class to current indicator
   var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
   $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
 
@@ -570,26 +571,16 @@ function getLegendScale() {
     });
   }
 
-  //set color range
-  var clrRange;
-  switch(currentIndicator.id) {
-    case '#population':
-      clrRange = populationColorRange;
-      break;
-    case '#climate+rainfall+anomaly':
-      clrRange = chirpsColorRange;
-      break;
-    default:
-      clrRange = colorRange;
-  }
-
   //set scale
   var scale;
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
-    scale = d3.scaleOrdinal().domain(['> 300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '< -300']).range(clrRange);
+    scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
+  }
+  else if (currentIndicator.id=='#population') {
+    scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
   }
   else {
-    scale = d3.scaleQuantize().domain([0, max]).range(clrRange);
+    scale = d3.scaleQuantize().domain([0, max]).range(colorRange);
   }
 
   return scale;
@@ -740,9 +731,9 @@ function isCountryView() {
 
 //country codes and raster ids
 const countryCodeList = {
-  ETH: {pop: '8l382re2', chirps: '9f35wnzq'},
-  KEN: {pop: '2e1m7o07', chirps: '0zdu5z45'},
-  SOM: {pop: '3s7xeitz', chirps: '1bl7k2zs'}
+  ETH: {pop: '1jx1mpm4', chirps: '9f35wnzq'},
+  KEN: {pop: '1iwk6136', chirps: '0zdu5z45'},
+  SOM: {pop: 'd0xh6ux7', chirps: '1bl7k2zs'}
 };
 
 
@@ -1175,7 +1166,7 @@ function initKeyFigures() {
   createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted'], 'short'), indicator: '#targeted'});
   createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached'], 'short'), indicator: '#reached'});
   createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
+  createFigure(impactDiv, {className: 'ipc', title: 'Population in IPC Phase 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+children+sam']), indicator: '#affected+children+sam'});
 
    //humanitarian impact figures
@@ -1397,7 +1388,7 @@ var percentFormat = d3.format('.1%');
 var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
-var populationColorRange = ['#FFE281','#FDB96D','#FA9059','#F27253','#E9554D'];
+var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
