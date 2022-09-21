@@ -55,7 +55,7 @@ function updateCountryLayer() {
 
   //update legend
   var colorScale = getLegendScale();
-  if (isNaN(colorScale.domain()[1]) && currentIndicator.id!='#climate+rainfall+anomaly') {
+  if (isNaN(colorScale.domain()[1]) && currentIndicator.id!='#climate+rainfall+anomaly' && currentIndicator.id!='#population') {
     $('.legend-container').hide();
   }
   else {

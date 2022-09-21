@@ -89,8 +89,8 @@ function isCountryView() {
 
 //country codes and raster ids
 const countryCodeList = {
-  ETH: {pop: '8l382re2', chirps: '9f35wnzq'},
-  KEN: {pop: '2e1m7o07', chirps: '0zdu5z45'},
-  SOM: {pop: '3s7xeitz', chirps: '1bl7k2zs'}
+  ETH: {pop: '1jx1mpm4', chirps: '9f35wnzq'},
+  KEN: {pop: '1iwk6136', chirps: '0zdu5z45'},
+  SOM: {pop: 'd0xh6ux7', chirps: '1bl7k2zs'}
 };
 

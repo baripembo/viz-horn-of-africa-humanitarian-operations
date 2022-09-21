@@ -56,6 +56,7 @@ function initGlobalLayer() {
 function updateGlobalLayer() {
   //color scale
   colorScale = getLegendScale();
+  updateMapLegend(colorScale)
 
   //data join
   var expression = ['match', ['get', 'ADM_PCODE']];
@@ -82,7 +83,6 @@ function updateGlobalLayer() {
   //update map and legend
   map.setPaintProperty(globalLayer, 'fill-color', expression);
   map.setPaintProperty(globalBoundaryLayer, 'line-color', expressionBoundary);
-  updateMapLegend(colorScale);
 
   //toggle rasters
   var countryList = Object.keys(countryCodeList);
@@ -151,6 +151,7 @@ function updateMapLegend(scale) {
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
   $('.map-legend .legend-title').html(legendTitle);
 
+  //set class to current indicator
   var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
   $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
 
@@ -185,26 +186,16 @@ function getLegendScale() {
     });
   }
 
-  //set color range
-  var clrRange;
-  switch(currentIndicator.id) {
-    case '#population':
-      clrRange = populationColorRange;
-      break;
-    case '#climate+rainfall+anomaly':
-      clrRange = chirpsColorRange;
-      break;
-    default:
-      clrRange = colorRange;
-  }
-
   //set scale
   var scale;
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
-    scale = d3.scaleOrdinal().domain(['> 300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '< -300']).range(clrRange);
+    scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
+  }
+  else if (currentIndicator.id=='#population') {
+    scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
   }
   else {
-    scale = d3.scaleQuantize().domain([0, max]).range(clrRange);
+    scale = d3.scaleQuantize().domain([0, max]).range(colorRange);
   }
 
   return scale;
