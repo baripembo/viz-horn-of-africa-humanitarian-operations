@@ -7,15 +7,12 @@ function createMapTooltip(country_code, country_name, point) {
     var val = location[0][currentIndicator.id];
 
     //format content for tooltip
-    if (isVal(val)) {
-      val = shortenNumFormat(val);
-    }
-    else {
+    if (!isVal(val)) {
       val = 'No Data';
     }
 
     //format content for display
-    var content = '<h2>'+ country_name +', ' + location[0]['#country+name'] + '</h2>';
+    var content = `<h2>${country_name}, ${location[0]['#country+name']}</h2>`;
 
     //ipc layer
     // if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
@@ -57,7 +54,14 @@ function createMapTooltip(country_code, country_name, point) {
     // }
     //all other layers
     //else {
-    content += currentIndicator.name + ':<div class="stat">' + val + '</div>';
+    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+      content += currentIndicator.name + ':<div class="stat">' + val + '</div>';
+    }
+    else {
+      content += currentIndicator.name + ':<div class="stat">' + shortenNumFormat(val) + '</div>';
+    }
+    //}
+
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
                       {label: 'People in Need', indicator: '#inneed'},
@@ -71,7 +75,6 @@ function createMapTooltip(country_code, country_name, point) {
       }
     });
     content += '</div>';
-    //}
 
     //set content for tooltip
     tooltip.setHTML(content);
@@ -92,12 +95,11 @@ function createCountryMapTooltip(name, pcode, point) {
     var label = currentIndicator.name;
 
     //format content for tooltip
-    if (val!=undefined && val!='' && !isNaN(val)) {
-      val = shortenNumFormat(val);
-    }
-    else {
+    if (!isVal(val)) {
       val = 'No Data';
     }
+
+    val = (currentIndicator.id=='#affected+food+ipc+phase+type') ? val : shortenNumFormat(val);
 
     let content = '';
     content = `<h2>${name}</h2>`;

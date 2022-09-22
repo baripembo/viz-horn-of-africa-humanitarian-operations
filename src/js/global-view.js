@@ -38,7 +38,7 @@ function initGlobalLayer() {
   var expression = ['match', ['get', 'ADM_PCODE']];
   adminone_data.forEach(function(d) {
     var val = d[currentIndicator.id];
-    var color = (val==null || isNaN(val)) ? colorNoData : colorScale(val);
+    var color = (val==null) ? colorNoData : colorScale(val);
     expression.push(d['#adm1+code'], color);
   });
 
@@ -63,7 +63,7 @@ function updateGlobalLayer() {
   var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
   adminone_data.forEach(function(d) {
     var val = +d[currentIndicator.id];
-    var color = (val==null || isNaN(val)) ? colorNoData : colorScale(val);
+    var color = (val==null) ? colorNoData : colorScale(val);
     var boundaryColor = '#E0E0E0';
 
     //turn off choropleth for raster layers
@@ -192,7 +192,7 @@ function getLegendScale() {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
   else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-    scale = d3.scaleOrdinal().domain(['3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
+    scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);

@@ -73,7 +73,7 @@ function updateCountryLayer() {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
       boundaryColor = '#E0E0E0';
-      color = (val<0 || !isVal(val) || isNaN(val)) ? colorNoData : colorScale(val);
+      color = (val<0 || !isVal(val)) ? colorNoData : colorScale(val);
 
       //turn off choropleth for raster layers
       if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
