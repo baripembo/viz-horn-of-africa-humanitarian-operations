@@ -105,7 +105,7 @@ function displayMap() {
     },
     paint: {
       'text-color': '#888',
-      'text-halo-color': '#EEE',
+      'text-halo-color': '#FFF',
       'text-halo-width': 1,
       'text-halo-blur': 1
     }
@@ -198,11 +198,7 @@ function displayMap() {
   initCountryLayer();
 
   //zoom into region
-  var offset = 100;
-  map.fitBounds(regionBoundaryData[0].bbox, {
-    padding: {top: offset, right: $('.map-legend').outerWidth()/2, bottom: offset/2, left: $('.key-figure-panel').outerWidth()},
-    linear: true
-  });
+  zoomToRegion();
 
   //deeplink to country if parameter exists
   if (viewInitialized==true) deepLinkView();
@@ -370,7 +366,7 @@ function selectCountry(features) {
     {
         top: 0,
         right: -100,
-        left: -200,
+        left: -100,
         bottom: 0
     } :
     { 
@@ -392,7 +388,26 @@ function selectCountry(features) {
 }
 
 
-
+function zoomToRegion() {
+  var offset = 100;
+  let mapPadding = (isMobile) ?
+    {
+        top: 0,
+        right: -100,
+        left: -100,
+        bottom: 0
+    } :
+    { 
+      top: offset,
+      right: 0,
+      bottom: offset,
+      left: $('.key-figure-panel').outerWidth(),
+    };
+  map.fitBounds(regionBoundaryData[0].bbox, {
+    padding: {top: mapPadding.top, right: mapPadding.right, bottom: mapPadding.bottom, left: mapPadding.left},
+    linear: true
+  });
+}
 
 function resetMap() {
   //reset layers
@@ -404,12 +419,10 @@ function resetMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   $('.map-legend .indicator.country-only').hide();
 
-  var offset = 100;
-  map.fitBounds(regionBoundaryData[0].bbox, {
-    padding: {top: offset, right: 0, bottom: offset, left: $('.key-figure-panel').outerWidth()},
-    linear: true
-  });
+  //zoom to region
+  zoomToRegion()
   map.once('moveend', initKeyFigures);
 
+  //reset location
   window.history.replaceState(null, null, window.location.pathname);
 }

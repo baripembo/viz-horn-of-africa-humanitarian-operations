@@ -101,51 +101,14 @@ $( document ).ready(function() {
       });
 
 
-      //parse adm1 ipc data
+      //transform adm1 ipc data
       adminone_data.forEach(function(d) {
-        switch(+d['#affected+food+ipc+phase+type']) {
-          case 1:
-            d['#affected+food+ipc+phase+type'] = '1 – Minimal';
-            break;
-          case 2:
-            d['#affected+food+ipc+phase+type'] = '2 – Stressed';
-            break;
-          case 3:
-            d['#affected+food+ipc+phase+type'] = '3 – Crisis';
-            break;
-          case 4:
-            d['#affected+food+ipc+phase+type'] = '4 – Emergency';
-            break;
-          case 5:
-            d['#affected+food+ipc+phase+type'] = '5 – Famine';
-            break;
-          default:
-            d['#affected+food+ipc+phase+type'] = d['#affected+food+ipc+phase+type'];
-        }
+        d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
       });
 
-      //parse adm1 ipc data
+      //transform adm2 ipc and priority data
       admintwo_data.forEach(function(d) {
-        switch(+d['#affected+food+ipc+phase+type']) {
-          case 1:
-            d['#affected+food+ipc+phase+type'] = '1 – Minimal';
-            break;
-          case 2:
-            d['#affected+food+ipc+phase+type'] = '2 – Stressed';
-            break;
-          case 3:
-            d['#affected+food+ipc+phase+type'] = '3 – Crisis';
-            break;
-          case 4:
-            d['#affected+food+ipc+phase+type'] = '4 – Emergency';
-            break;
-          case 5:
-            d['#affected+food+ipc+phase+type'] = '5 – Famine';
-            break;
-          default:
-            d['#affected+food+ipc+phase+type'] = d['#affected+food+ipc+phase+type'];
-        }
-
+        d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
 
         switch(+d['#priority']) {
           case 1:
@@ -174,6 +137,29 @@ $( document ).ready(function() {
     });
   }
 
+  function transformIPC(value) {
+    let phase;
+    switch(+value) {
+      case 1:
+        phase = '1 – Minimal';
+        break;
+      case 2:
+        phase = '2 – Stressed';
+        break;
+      case 3:
+        phase = '3 – Crisis';
+        break;
+      case 4:
+        phase = '4 – Emergency';
+        break;
+      case 5:
+        phase = '5 – Famine';
+        break;
+      default:
+        phase = value;
+    }
+    return phase;
+  }
 
   function initView() {
     //check map loaded status
