@@ -277,6 +277,7 @@ function deepLinkView() {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
+      updateIPCSource();
     }
   }
   //deep link to specific layer in global view
@@ -318,6 +319,9 @@ function createEvents() {
       resetMap();
       updateGlobalLayer(currentCountry.code);
     }
+
+    //update ipc source
+    updateIPCSource();
   });
 
   //map legend radio events
@@ -387,6 +391,13 @@ function selectCountry(features) {
   window.history.replaceState(null, null, window.location.pathname + '?c='+currentCountry.code);
 }
 
+
+function updateIPCSource() {
+  // let country = (currentCountry.code=='') ? '' : `+${currentCountry.code}`
+  // let sourceTag = `#affected+food+ipc+phase+type${country}`;
+
+  // updateSource($('.map-legend .ipc-source'), sourceTag);
+}
 
 function zoomToRegion() {
   var offset = 50;

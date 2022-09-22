@@ -107,7 +107,7 @@ function createMapLegend(scale) {
   $('.map-legend .legend-title').html(legendTitle);
 
   //set data sources
-  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
+  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type');
   createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
   createSource($('.map-legend .priority-source'), '#priority');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind');
@@ -172,11 +172,7 @@ function updateMapLegend(scale) {
 function getLegendScale() {
   //get min/max
   let min, max;
-  if (currentCountry.code=='') { //regional view
-    min = d3.min(adminone_data, d => +d[currentIndicator.id]);
-    max = d3.max(adminone_data, d => +d[currentIndicator.id]);
-  }
-  else { //country view
+  if (isCountryView()) {
     min =  d3.min(admintwo_data, function(d) { 
       if (d['#country+code']==currentCountry.code) {
         return +d[currentIndicator.id]; 
@@ -187,6 +183,10 @@ function getLegendScale() {
         return +d[currentIndicator.id]; 
       }
     });
+  }
+  else { //regional view
+    min = d3.min(adminone_data, d => +d[currentIndicator.id]);
+    max = d3.max(adminone_data, d => +d[currentIndicator.id]);
   }
 
   //set scale
@@ -208,58 +208,4 @@ function getLegendScale() {
   }
 
   return scale;
-  //return (max==undefined) ? null : scale;
-}
-
-function setGlobalLegend(scale) {
-  var div = d3.select('.map-legend');
-  var svg;
-  var indicator = currentIndicator.id;
-  $('.map-legend .source-secondary').empty();
-
-  //SETUP
-  if ($('.map-legend .scale').empty()) {
-    //current indicator
-    createSource($('.map-legend .indicator-source'), indicator);
-    svg = div.append('svg')
-      .attr('class', 'legend-container');
-    svg.append('g')
-      .attr('class', 'scale');
-
-    //expand/collapse functionality
-    $('.map-legend .toggle-icon, .map-legend .collapsed-title').on('click', function() {
-      $(this).parent().toggleClass('collapsed');
-    });
-  }
-  else {
-    updateSource($('.indicator-source'), indicator);
-  }
-
-  //set legend title
-  let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
-  $('.map-legend .legend-title').html(legendTitle);
-
-  //current indicator
-  if (scale==null) {
-    $('.map-legend .legend-container').hide();
-  }
-  else {
-    $('.map-legend .legend-container').show();
-    var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
-    $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
-
-
-    var legendFormat = (currentIndicator.id.indexOf('pct')>-1 || currentIndicator.id.indexOf('ratio')>-1) ? d3.format('.0%') : shortenNumFormat;
-    var legend = d3.legendColor()
-      .labelFormat(legendFormat)
-      .cells(colorRange.length)
-      .scale(scale);
-    var g = d3.select('.map-legend .scale');
-    g.call(legend);
-  }
-
-  //no data
-  var noDataKey = $('.map-legend .no-data-key');
-  noDataKey.find('.label').text('No Data');
-  noDataKey.find('rect').css('fill', '#FFF');
 }
