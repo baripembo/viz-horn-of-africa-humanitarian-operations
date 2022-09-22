@@ -9,14 +9,14 @@ function initKeyFigures() {
   impactDiv.children().remove();
 
   //set special source tag for ipc
-  // let ipcCountry = (currentCountry.code=='') ? '' : `+${currentCountry.code}`;
-  // let ipcSourceTag = `#affected+food+ipc+phase+type${ipcCountry}`;
+  let ipcCountry = (currentCountry.code=='') ? '' : `+${currentCountry.code}`;
+  let ipcSourceTag = `#affected+food+ipc+phase+type${ipcCountry}`;
 
   createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: formatValue(data['#inneed'], 'short'), indicator: '#inneed'});
   createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted'], 'short'), indicator: '#targeted'});
   createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached'], 'short'), indicator: '#reached'});
   createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+phase+type'});
+  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: ipcSourceTag});
   createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: shortenNumFormat(data['#affected+water']), indicator: '#affected+water'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+sam']), indicator: '#affected+sam'});
   createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: shortenNumFormat(data['#affected+gam']), indicator: '#affected+gam'});

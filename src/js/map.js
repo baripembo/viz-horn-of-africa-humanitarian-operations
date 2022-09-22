@@ -393,10 +393,10 @@ function selectCountry(features) {
 
 
 function updateIPCSource() {
-  // let country = (currentCountry.code=='') ? '' : `+${currentCountry.code}`
-  // let sourceTag = `#affected+food+ipc+phase+type${country}`;
+  let country = (currentCountry.code=='') ? '' : `+${currentCountry.code}`
+  let sourceTag = `#affected+food+ipc+phase+type${country}`;
 
-  // updateSource($('.map-legend .ipc-source'), sourceTag);
+  updateSource($('.map-legend .ipc-source'), sourceTag);
 }
 
 function zoomToRegion() {
