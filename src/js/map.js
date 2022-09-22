@@ -389,7 +389,7 @@ function selectCountry(features) {
 
 
 function zoomToRegion() {
-  var offset = 100;
+  var offset = 50;
   let mapPadding = (isMobile) ?
     {
         top: 0,
@@ -401,7 +401,7 @@ function zoomToRegion() {
       top: offset,
       right: 0,
       bottom: offset,
-      left: $('.key-figure-panel').outerWidth(),
+      left: $('.key-figure-panel').outerWidth() - offset,
     };
   map.fitBounds(regionBoundaryData[0].bbox, {
     padding: {top: mapPadding.top, right: mapPadding.right, bottom: mapPadding.bottom, left: mapPadding.left},
