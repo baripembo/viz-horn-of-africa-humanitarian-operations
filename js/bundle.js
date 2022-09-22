@@ -1295,6 +1295,9 @@ function createMapTooltip(country_code, country_name, point) {
     if (currentIndicator.id=='#affected+food+ipc+phase+type') {
       content += currentIndicator.name + ':<div class="stat">' + val + '</div>';
     }
+    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
+      content += currentIndicator.name + ':<div class="stat">' + shortenNumFormat(val) + 'mm</div>';
+    }
     else {
       content += currentIndicator.name + ':<div class="stat">' + shortenNumFormat(val) + '</div>';
     }
@@ -1337,7 +1340,10 @@ function createCountryMapTooltip(name, pcode, point) {
       val = 'No Data';
     }
 
-    val = (currentIndicator.id=='#affected+food+ipc+phase+type') ? val : shortenNumFormat(val);
+    if (currentIndicator.id=='#affected+food+ipc+phase+type')
+      val = shortenNumFormat(val);
+    if (currentIndicator.id=='#climate+rainfall+anomaly')
+      val = shortenNumFormat(val) + 'mm';
 
     let content = '';
     content = `<h2>${name}</h2>`;
