@@ -447,7 +447,7 @@ function updateGlobalLayer() {
   var expression = ['match', ['get', 'ADM_PCODE']];
   var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
   adminone_data.forEach(function(d) {
-    var val = +d[currentIndicator.id];
+    var val = d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
     var boundaryColor = '#E0E0E0';
 
@@ -492,6 +492,7 @@ function createMapLegend(scale) {
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
   createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
+  createSource($('.map-legend .priority-source'), '#priority');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind');
   createSource($('.map-legend .population-source'), '#population');
 
@@ -578,6 +579,9 @@ function getLegendScale() {
   }
   else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
     scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
+  }
+  else if (currentIndicator.id=='#priority') {
+    scale = d3.scaleOrdinal().domain(['High', 'Medium', 'Low']).range(priorityColorRange);
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
@@ -1116,7 +1120,7 @@ function selectCountry(features) {
         bottom: 0
     } :
     { 
-      top: $('.tab-menubar').outerHeight() + padding,
+      top: padding,//$('.tab-menubar').outerHeight() + padding
       right: $('.map-legend').outerWidth(),
       bottom: padding,
       left: $('.key-figure-panel').outerWidth() + padding,
@@ -1172,7 +1176,6 @@ function initKeyFigures() {
   createFigure(impactDiv, {className: 'ipc', title: 'Population in IPC Phase 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
   createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: shortenNumFormat(data['#affected+water']), indicator: '#affected+water'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+sam']), indicator: '#affected+sam'});
-  createFigure(impactDiv, {className: 'mam', title: 'Moderate Acute Malnutrition', stat: shortenNumFormat(data['#affected+mam']), indicator: '#affected+mam'});
   createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: shortenNumFormat(data['#affected+gam']), indicator: '#affected+gam'});
 
    //humanitarian impact figures
@@ -1340,10 +1343,12 @@ function createCountryMapTooltip(name, pcode, point) {
       val = 'No Data';
     }
 
-    if (currentIndicator.id=='#affected+food+ipc+phase+type')
-      val = shortenNumFormat(val);
-    if (currentIndicator.id=='#climate+rainfall+anomaly')
+    if (currentIndicator.id=='#affected+food+ipc+phase+type' || 'currentIndicator.id'=='#priority' || isNaN(val))
+      val = val;
+    else if (currentIndicator.id=='#climate+rainfall+anomaly')
       val = shortenNumFormat(val) + 'mm';
+    else 
+      val = shortenNumFormat(val);
 
     let content = '';
     content = `<h2>${name}</h2>`;
@@ -1402,6 +1407,7 @@ var percentFormat = d3.format('.1%');
 var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
+var priorityColorRange = ['#FF0000', '#FBBD00', '#FFE699'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
 var ipcColorRange = ['#CDFACD', '#FAE61C', '#E67800', '#C80100', '#640100'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
@@ -1454,7 +1460,7 @@ $( document ).ready(function() {
     if (viewportHeight<696) {
       zoomLevel = 1.4;
     }
-    $('#chart-view').height(viewportHeight-$('.tab-menubar').outerHeight()-30);
+    $('#chart-view').height(viewportHeight-30);//$('#chart-view').height(viewportHeight-$('.tab-menubar').outerHeight()-30);
 
     //load static map -- will only work for screens smaller than 1280
     if (viewportWidth<=1280) {
@@ -1542,8 +1548,22 @@ $( document ).ready(function() {
           default:
             d['#affected+food+ipc+phase+type'] = d['#affected+food+ipc+phase+type'];
         }
+
+
+        switch(+d['#priority']) {
+          case 1:
+            d['#priority'] = 'High';
+            break;
+          case 2:
+            d['#priority'] = 'Medium';
+            break;
+          case 3:
+            d['#priority'] = 'Low';
+            break;
+          default:
+            d['#priority'] = d['#priority'];
+        }
       });
-      console.log(admintwo_data)
 
       //group national data by country -- drives country panel    
       dataByCountry = d3.nest()

@@ -1380,6 +1380,8 @@ a:visited {
       height: 202px; }
     .map-legend .legend-container.population {
       height: 118px; }
+    .map-legend .legend-container.priority {
+      height: 48px; }
   .map-legend .legend-marker {
     display: flex;
     padding-top: 8px; }
