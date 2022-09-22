@@ -1577,7 +1577,7 @@ a:visited {
       border-bottom: 1px solid #CCC;
       padding-bottom: 15px; }
       .key-figure-panel .figure .figure-inner .title {
-        height: 36px; }
+        height: 30px; }
       .key-figure-panel .figure .figure-inner .stat {
         display: flex;
         gap: 5px;
@@ -1779,17 +1779,18 @@ a:visited {
     margin: 15px 0;
     padding: 0 20px; }
   .mapboxgl-ctrl-top-right {
-    top: 50px;
     right: 0; }
   .content {
     width: 100% !important; }
   .tab-menubar {
     left: 0;
     top: 50%; }
+  .country-select {
+    height: 38px; }
   #global-map {
-    height: 50%;
+    height: 45%;
     position: absolute;
-    top: 50%; }
+    top: 55%; }
   #chart-view {
     height: 50%;
     margin-top: 50px;
@@ -1814,7 +1815,7 @@ a:visited {
   label.label-small {
     margin: 0; }
   .key-figure-panel {
-    height: 50%;
+    height: 55%;
     overflow-y: scroll;
     padding: 10px 0 0;
     width: 100%; }
@@ -1834,11 +1835,11 @@ a:visited {
         .key-figure-panel .figure .figure-inner .title .small {
           font-size: 11px;
           line-height: 15px; }
-      .key-figure-panel .figure.refugees .figure-inner .title, .key-figure-panel .figure.idps .figure-inner .title {
+      .key-figure-panel .figure.idps .figure-inner .title {
         height: 36px; }
   .stat {
     font-size: 24px;
-    margin: 20px 0 5px;
+    margin: 5px 0;
     gap: 3px; } }
 
 @media only screen and (max-height: 850px) {

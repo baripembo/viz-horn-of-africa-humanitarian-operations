@@ -851,7 +851,7 @@ function displayMap() {
     },
     paint: {
       'text-color': '#888',
-      'text-halo-color': '#EEE',
+      'text-halo-color': '#FFF',
       'text-halo-width': 1,
       'text-halo-blur': 1
     }
@@ -944,11 +944,7 @@ function displayMap() {
   initCountryLayer();
 
   //zoom into region
-  var offset = 100;
-  map.fitBounds(regionBoundaryData[0].bbox, {
-    padding: {top: offset, right: $('.map-legend').outerWidth()/2, bottom: offset/2, left: $('.key-figure-panel').outerWidth()},
-    linear: true
-  });
+  zoomToRegion();
 
   //deeplink to country if parameter exists
   if (viewInitialized==true) deepLinkView();
@@ -1116,7 +1112,7 @@ function selectCountry(features) {
     {
         top: 0,
         right: -100,
-        left: -200,
+        left: -100,
         bottom: 0
     } :
     { 
@@ -1138,7 +1134,26 @@ function selectCountry(features) {
 }
 
 
-
+function zoomToRegion() {
+  var offset = 100;
+  let mapPadding = (isMobile) ?
+    {
+        top: 0,
+        right: -100,
+        left: -100,
+        bottom: 0
+    } :
+    { 
+      top: offset,
+      right: 0,
+      bottom: offset,
+      left: $('.key-figure-panel').outerWidth(),
+    };
+  map.fitBounds(regionBoundaryData[0].bbox, {
+    padding: {top: mapPadding.top, right: mapPadding.right, bottom: mapPadding.bottom, left: mapPadding.left},
+    linear: true
+  });
+}
 
 function resetMap() {
   //reset layers
@@ -1150,13 +1165,11 @@ function resetMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   $('.map-legend .indicator.country-only').hide();
 
-  var offset = 100;
-  map.fitBounds(regionBoundaryData[0].bbox, {
-    padding: {top: offset, right: 0, bottom: offset, left: $('.key-figure-panel').outerWidth()},
-    linear: true
-  });
+  //zoom to region
+  zoomToRegion()
   map.once('moveend', initKeyFigures);
 
+  //reset location
   window.history.replaceState(null, null, window.location.pathname);
 }
 
@@ -1173,7 +1186,7 @@ function initKeyFigures() {
   createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted'], 'short'), indicator: '#targeted'});
   createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached'], 'short'), indicator: '#reached'});
   createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'Population in IPC Phase 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
+  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
   createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: shortenNumFormat(data['#affected+water']), indicator: '#affected+water'});
   createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+sam']), indicator: '#affected+sam'});
   createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: shortenNumFormat(data['#affected+gam']), indicator: '#affected+gam'});
@@ -1504,51 +1517,14 @@ $( document ).ready(function() {
       });
 
 
-      //parse adm1 ipc data
+      //transform adm1 ipc data
       adminone_data.forEach(function(d) {
-        switch(+d['#affected+food+ipc+phase+type']) {
-          case 1:
-            d['#affected+food+ipc+phase+type'] = '1 – Minimal';
-            break;
-          case 2:
-            d['#affected+food+ipc+phase+type'] = '2 – Stressed';
-            break;
-          case 3:
-            d['#affected+food+ipc+phase+type'] = '3 – Crisis';
-            break;
-          case 4:
-            d['#affected+food+ipc+phase+type'] = '4 – Emergency';
-            break;
-          case 5:
-            d['#affected+food+ipc+phase+type'] = '5 – Famine';
-            break;
-          default:
-            d['#affected+food+ipc+phase+type'] = d['#affected+food+ipc+phase+type'];
-        }
+        d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
       });
 
-      //parse adm1 ipc data
+      //transform adm2 ipc and priority data
       admintwo_data.forEach(function(d) {
-        switch(+d['#affected+food+ipc+phase+type']) {
-          case 1:
-            d['#affected+food+ipc+phase+type'] = '1 – Minimal';
-            break;
-          case 2:
-            d['#affected+food+ipc+phase+type'] = '2 – Stressed';
-            break;
-          case 3:
-            d['#affected+food+ipc+phase+type'] = '3 – Crisis';
-            break;
-          case 4:
-            d['#affected+food+ipc+phase+type'] = '4 – Emergency';
-            break;
-          case 5:
-            d['#affected+food+ipc+phase+type'] = '5 – Famine';
-            break;
-          default:
-            d['#affected+food+ipc+phase+type'] = d['#affected+food+ipc+phase+type'];
-        }
-
+        d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
 
         switch(+d['#priority']) {
           case 1:
@@ -1577,6 +1553,29 @@ $( document ).ready(function() {
     });
   }
 
+  function transformIPC(value) {
+    let phase;
+    switch(+value) {
+      case 1:
+        phase = '1 – Minimal';
+        break;
+      case 2:
+        phase = '2 – Stressed';
+        break;
+      case 3:
+        phase = '3 – Crisis';
+        break;
+      case 4:
+        phase = '4 – Emergency';
+        break;
+      case 5:
+        phase = '5 – Famine';
+        break;
+      default:
+        phase = value;
+    }
+    return phase;
+  }
 
   function initView() {
     //check map loaded status
