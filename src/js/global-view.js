@@ -69,6 +69,8 @@ function updateGlobalLayer() {
     //turn off choropleth for raster layers
     if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
       color = colorDefault;
+    }
+    if (currentIndicator.id=='#climate+rainfall+anomaly') {
       boundaryColor = '#FFF';
     }
 
@@ -196,7 +198,7 @@ function getLegendScale() {
     scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
   }
   else if (currentIndicator.id=='#priority') {
-    scale = d3.scaleOrdinal().domain(['High', 'Medium', 'Low']).range(priorityColorRange);
+    scale = d3.scaleOrdinal().domain(['Low', 'Medium', 'High']).range(priorityColorRange);
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
