@@ -54,10 +54,10 @@
         <div class='content-left'></div>
         <div class='content-right'>
 
-          <div class="tab-menubar">
+          <!-- <div class="tab-menubar">
             <div class="tab-button active" data-id="map-view">Map View</div>
-            <!-- <div class="tab-button" data-id="chart-view">Chart View</div> -->
-          </div>
+            <div class="tab-button" data-id="chart-view">Chart View</div>
+          </div> -->
           <div id='global-map'>
             <div class='map-legend'>
               <div class='toggle-icon'></div>
@@ -72,6 +72,11 @@
               <div class='indicator'>
                 <label>Seasonal Rainfall Accumulation Anomaly<input name='countryIndicators' type='radio' value='#climate+rainfall+anomaly' id='rainfall' data-legend='Seasonal Rainfall Accumulation Anomaly (mm)' data-layer='chirps-rainfall'></label>
                 <div class="source-container chirps-source"></div>
+              </div>
+
+              <div class='indicator country-only'>
+                <label>Operational Priority Areas<input name='countryIndicators' type='radio' value='#priority' id='priority' data-legend='Operational Priority Areas' data-layer='priority'></label>
+                <div class='source-container priority-source'></div>
               </div>
 
               <div class='indicator country-only'>
@@ -126,7 +131,7 @@
 
             <h4>Download:</h4>
             <div class='download-link'>
-              <a href='#' target='_blank' rel='noopener' class='download-daily'><span><b>REGIONAL HUMANITARIAN OVERVIEW</b><br><span class='today-date'></span> (pdf)</span><i class='humanitarianicons-Download'></i></a>
+              <a href='https://reliefweb.int/report/ethiopia/horn-africa-drought-regional-humanitarian-overview-call-action-revised-21-september-2022' target='_blank' rel='noopener' class='download-daily'><span><b>REGIONAL HUMANITARIAN OVERVIEW</b><br><span class='today-date'></span> (pdf)</span><i class='humanitarianicons-Download'></i></a>
             </div>
 
             <label for='countrySelect' class='visuallyhidden'>Select a country: </label>

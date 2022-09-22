@@ -102,10 +102,12 @@ function createCountryMapTooltip(name, pcode, point) {
       val = 'No Data';
     }
 
-    if (currentIndicator.id=='#affected+food+ipc+phase+type')
-      val = shortenNumFormat(val);
-    if (currentIndicator.id=='#climate+rainfall+anomaly')
+    if (currentIndicator.id=='#affected+food+ipc+phase+type' || 'currentIndicator.id'=='#priority' || isNaN(val))
+      val = val;
+    else if (currentIndicator.id=='#climate+rainfall+anomaly')
       val = shortenNumFormat(val) + 'mm';
+    else 
+      val = shortenNumFormat(val);
 
     let content = '';
     content = `<h2>${name}</h2>`;

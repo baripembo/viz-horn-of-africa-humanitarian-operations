@@ -62,7 +62,7 @@ function updateGlobalLayer() {
   var expression = ['match', ['get', 'ADM_PCODE']];
   var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
   adminone_data.forEach(function(d) {
-    var val = +d[currentIndicator.id];
+    var val = d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
     var boundaryColor = '#E0E0E0';
 
@@ -107,6 +107,7 @@ function createMapLegend(scale) {
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
   createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
+  createSource($('.map-legend .priority-source'), '#priority');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind');
   createSource($('.map-legend .population-source'), '#population');
 
@@ -193,6 +194,9 @@ function getLegendScale() {
   }
   else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
     scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
+  }
+  else if (currentIndicator.id=='#priority') {
+    scale = d3.scaleOrdinal().domain(['High', 'Medium', 'Low']).range(priorityColorRange);
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);

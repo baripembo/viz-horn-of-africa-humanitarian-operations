@@ -4,6 +4,7 @@ var percentFormat = d3.format('.1%');
 var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
+var priorityColorRange = ['#FF0000', '#FBBD00', '#FFE699'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
 var ipcColorRange = ['#CDFACD', '#FAE61C', '#E67800', '#C80100', '#640100'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
@@ -56,7 +57,7 @@ $( document ).ready(function() {
     if (viewportHeight<696) {
       zoomLevel = 1.4;
     }
-    $('#chart-view').height(viewportHeight-$('.tab-menubar').outerHeight()-30);
+    $('#chart-view').height(viewportHeight-30);//$('#chart-view').height(viewportHeight-$('.tab-menubar').outerHeight()-30);
 
     //load static map -- will only work for screens smaller than 1280
     if (viewportWidth<=1280) {
@@ -144,8 +145,22 @@ $( document ).ready(function() {
           default:
             d['#affected+food+ipc+phase+type'] = d['#affected+food+ipc+phase+type'];
         }
+
+
+        switch(+d['#priority']) {
+          case 1:
+            d['#priority'] = 'High';
+            break;
+          case 2:
+            d['#priority'] = 'Medium';
+            break;
+          case 3:
+            d['#priority'] = 'Low';
+            break;
+          default:
+            d['#priority'] = d['#priority'];
+        }
       });
-      console.log(admintwo_data)
 
       //group national data by country -- drives country panel    
       dataByCountry = d3.nest()

@@ -374,7 +374,7 @@ function selectCountry(features) {
         bottom: 0
     } :
     { 
-      top: $('.tab-menubar').outerHeight() + padding,
+      top: padding,//$('.tab-menubar').outerHeight() + padding
       right: $('.map-legend').outerWidth(),
       bottom: padding,
       left: $('.key-figure-panel').outerWidth() + padding,
