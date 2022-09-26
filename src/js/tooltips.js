@@ -14,8 +14,9 @@ function createMapTooltip(country_code, country_name, point) {
     //format content for display
     var content = `<h2>${country_name}, ${location[0]['#country+name']}</h2>`;
 
-    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-      content += `IPC Food Insecurity Phase:<div class="stat">${val}</div>`;
+    if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
+      let ipcVal = (val=='No Data') ? val : shortenNumFormat(val);
+      content += `${currentIndicator.name}<div class="stat">${ipcVal}</div>`;
     }
     else if (currentIndicator.id=='#climate+rainfall+anomaly') {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
@@ -64,10 +65,9 @@ function createCountryMapTooltip(name, pcode, point) {
     let content = '';
     content = `<h2>${name}</h2>`;
 
-    if (currentIndicator.id=='#affected+food+ipc+phase+type' || 'currentIndicator.id'=='#priority' || isNaN(val)) {
-      let indicator;;
-      if (currentIndicator.id=='#affected+food+ipc+phase+type') indicator = 'IPC Food Insecurity Phase';
-      else if (currentIndicator.id=='#priority') indicator = 'Operational Priority';
+    if ('currentIndicator.id'=='#priority' || isNaN(val)) {
+      let indicator;
+      if (currentIndicator.id=='#priority') indicator = 'Operational Priority';
       else indicator = currentIndicator.name
       content += `${indicator}:<div class="stat">${val}</div>`;
     }
@@ -83,11 +83,18 @@ function createCountryMapTooltip(name, pcode, point) {
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
                       {label: 'People in Need', indicator: '#inneed'},
                       {label: 'People Targeted', indicator: '#targeted'}];
+
+    //show ipc phase for KEN only
+    if (currentCountry.code=='KEN') {
+      tableArray.splice(2, 0, {label: 'IPC Acute Food Insecurity Phase', indicator: '#affected+food+ipc+phase+type'});
+    }
+
     content += '<div class="table-display">';
     tableArray.forEach(function(row) {
       if (row.indicator!=currentIndicator.id) {
         let value = location[0][row.indicator];
         let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
+        if (row.indicator=='#affected+food+ipc+phase+type') shortVal = (value==undefined) ? 'No Data' : value;
         content += `<div class="table-row"><div>${row.label}:</div><div>${shortVal}</div></div>`;
       }
     });
