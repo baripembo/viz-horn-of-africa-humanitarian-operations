@@ -1272,10 +1272,11 @@ function createMapTooltip(country_code, country_name, point) {
     //format content for display
     var content = `<h2>${country_name}, ${location[0]['#country+name']}</h2>`;
 
-    // if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-    //   content += `IPC Food Insecurity Phase:<div class="stat">${val}</div>`;
-    // }
-    if (currentIndicator.id=='#climate+rainfall+anomaly') {
+    if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
+      let ipcVal = (val=='No Data') ? val : shortenNumFormat(val);
+      content += `${currentIndicator.name}<div class="stat">${ipcVal}</div>`;
+    }
+    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
     }
     else {
