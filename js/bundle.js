@@ -581,9 +581,9 @@ function getLegendScale() {
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
-  else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-    scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
-  }
+  // else if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
+  //   scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
+  // }
   else if (currentIndicator.id=='#priority') {
     scale = d3.scaleOrdinal().domain(['Low', 'Medium', 'High']).range(priorityColorRange);
   }
@@ -1272,10 +1272,10 @@ function createMapTooltip(country_code, country_name, point) {
     //format content for display
     var content = `<h2>${country_name}, ${location[0]['#country+name']}</h2>`;
 
-    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-      content += `IPC Food Insecurity Phase:<div class="stat">${val}</div>`;
-    }
-    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
+    // if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
+    //   content += `IPC Food Insecurity Phase:<div class="stat">${val}</div>`;
+    // }
+    if (currentIndicator.id=='#climate+rainfall+anomaly') {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
     }
     else {
@@ -1322,10 +1322,9 @@ function createCountryMapTooltip(name, pcode, point) {
     let content = '';
     content = `<h2>${name}</h2>`;
 
-    if (currentIndicator.id=='#affected+food+ipc+phase+type' || 'currentIndicator.id'=='#priority' || isNaN(val)) {
-      let indicator;;
-      if (currentIndicator.id=='#affected+food+ipc+phase+type') indicator = 'IPC Food Insecurity Phase';
-      else if (currentIndicator.id=='#priority') indicator = 'Operational Priority';
+    if ('currentIndicator.id'=='#priority' || isNaN(val)) {
+      let indicator;
+      if (currentIndicator.id=='#priority') indicator = 'Operational Priority';
       else indicator = currentIndicator.name
       content += `${indicator}:<div class="stat">${val}</div>`;
     }
@@ -1341,11 +1340,18 @@ function createCountryMapTooltip(name, pcode, point) {
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
                       {label: 'People in Need', indicator: '#inneed'},
                       {label: 'People Targeted', indicator: '#targeted'}];
+
+    //show ipc phase for KEN only
+    if (currentCountry.code=='KEN') {
+      tableArray.splice(2, 0, {label: 'IPC Acute Food Insecurity Phase', indicator: '#affected+food+ipc+phase+type'});
+    }
+
     content += '<div class="table-display">';
     tableArray.forEach(function(row) {
       if (row.indicator!=currentIndicator.id) {
         let value = location[0][row.indicator];
         let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
+        if (row.indicator=='#affected+food+ipc+phase+type') shortVal = (value==undefined) ? 'No Data' : value;
         content += `<div class="table-row"><div>${row.label}:</div><div>${shortVal}</div></div>`;
       }
     });
@@ -1392,7 +1398,7 @@ var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
 var priorityColorRange = ['#FFE699', '#FBBD00', '#FF0000'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
-var ipcColorRange = ['#CDFACD', '#FAE61C', '#E67800', '#C80100', '#640100'];
+//var ipcColorRange = ['#CDFACD', '#FAE61C', '#E67800', '#C80100', '#640100'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
@@ -1488,9 +1494,9 @@ $( document ).ready(function() {
 
 
       //transform adm1 ipc data
-      adminone_data.forEach(function(d) {
-        d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
-      });
+      // adminone_data.forEach(function(d) {
+      //   d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
+      // });
 
       //transform adm2 ipc and priority data
       admintwo_data.forEach(function(d) {
@@ -1527,19 +1533,19 @@ $( document ).ready(function() {
     let phase;
     switch(+value) {
       case 1:
-        phase = '1 – Minimal';
+        phase = '1-Minimal';
         break;
       case 2:
-        phase = '2 – Stressed';
+        phase = '2-Stressed';
         break;
       case 3:
-        phase = '3 – Crisis';
+        phase = '3-Crisis';
         break;
       case 4:
-        phase = '4 – Emergency';
+        phase = '4-Emergency';
         break;
       case 5:
-        phase = '5 – Famine';
+        phase = '5-Famine';
         break;
       default:
         phase = value;
