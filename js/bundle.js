@@ -494,7 +494,7 @@ function createMapLegend(scale) {
   $('.map-legend .legend-title').html(legendTitle);
 
   //set data sources
-  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num');
+  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type');
   createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
   createSource($('.map-legend .priority-source'), '#priority');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind');
@@ -559,11 +559,7 @@ function updateMapLegend(scale) {
 function getLegendScale() {
   //get min/max
   let min, max;
-  if (currentCountry.code=='') { //regional view
-    min = d3.min(adminone_data, d => +d[currentIndicator.id]);
-    max = d3.max(adminone_data, d => +d[currentIndicator.id]);
-  }
-  else { //country view
+  if (isCountryView()) {
     min =  d3.min(admintwo_data, function(d) { 
       if (d['#country+code']==currentCountry.code) {
         return +d[currentIndicator.id]; 
@@ -574,6 +570,10 @@ function getLegendScale() {
         return +d[currentIndicator.id]; 
       }
     });
+  }
+  else { //regional view
+    min = d3.min(adminone_data, d => +d[currentIndicator.id]);
+    max = d3.max(adminone_data, d => +d[currentIndicator.id]);
   }
 
   //set scale
@@ -595,62 +595,7 @@ function getLegendScale() {
   }
 
   return scale;
-  //return (max==undefined) ? null : scale;
 }
-
-function setGlobalLegend(scale) {
-  var div = d3.select('.map-legend');
-  var svg;
-  var indicator = currentIndicator.id;
-  $('.map-legend .source-secondary').empty();
-
-  //SETUP
-  if ($('.map-legend .scale').empty()) {
-    //current indicator
-    createSource($('.map-legend .indicator-source'), indicator);
-    svg = div.append('svg')
-      .attr('class', 'legend-container');
-    svg.append('g')
-      .attr('class', 'scale');
-
-    //expand/collapse functionality
-    $('.map-legend .toggle-icon, .map-legend .collapsed-title').on('click', function() {
-      $(this).parent().toggleClass('collapsed');
-    });
-  }
-  else {
-    updateSource($('.indicator-source'), indicator);
-  }
-
-  //set legend title
-  let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
-  $('.map-legend .legend-title').html(legendTitle);
-
-  //current indicator
-  if (scale==null) {
-    $('.map-legend .legend-container').hide();
-  }
-  else {
-    $('.map-legend .legend-container').show();
-    var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
-    $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
-
-
-    var legendFormat = (currentIndicator.id.indexOf('pct')>-1 || currentIndicator.id.indexOf('ratio')>-1) ? d3.format('.0%') : shortenNumFormat;
-    var legend = d3.legendColor()
-      .labelFormat(legendFormat)
-      .cells(colorRange.length)
-      .scale(scale);
-    var g = d3.select('.map-legend .scale');
-    g.call(legend);
-  }
-
-  //no data
-  var noDataKey = $('.map-legend .no-data-key');
-  noDataKey.find('.label').text('No Data');
-  noDataKey.find('rect').css('fill', '#FFF');
-}
-
 function vizTrack(view, content) {
   mpTrack(view, content);
   gaTrack('viz interaction hdx', 'switch viz', 'horn of africa data explorer', content);
@@ -705,6 +650,13 @@ function formatValue(val, type) {
     value = (isNaN(val) || val==0) ? val : format(val).replace(/G/, 'B');
   }
   return value;
+}
+
+
+function formatDateRange(d) {
+  let date = d.split('-');
+  date = `${dateFormat(new Date(date[0]))}-${dateFormat(new Date(date[1]))}`;
+  return date;
 }
 
 
@@ -1027,6 +979,7 @@ function deepLinkView() {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
+      updateIPCSource();
     }
   }
   //deep link to specific layer in global view
@@ -1068,6 +1021,9 @@ function createEvents() {
       resetMap();
       updateGlobalLayer(currentCountry.code);
     }
+
+    //update ipc source
+    updateIPCSource();
   });
 
   //map legend radio events
@@ -1138,6 +1094,13 @@ function selectCountry(features) {
 }
 
 
+function updateIPCSource() {
+  let country = (currentCountry.code=='') ? '' : `+${(currentCountry.code).toLowerCase()}`
+  let sourceTag = `#affected+food+ipc+phase+type${country}`;
+
+  updateSource($('.map-legend .ipc-source'), sourceTag);
+}
+
 function zoomToRegion() {
   var offset = 50;
   let mapPadding = (isMobile) ?
@@ -1186,14 +1149,19 @@ function initKeyFigures() {
    //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
   impactDiv.children().remove();
+
+  //set special source tag for ipc
+  let ipcCountry = (currentCountry.code=='') ? '' : `+${(currentCountry.code).toLowerCase()}`;
+  let ipcSourceTag = `#affected+food+ipc+phase+type${ipcCountry}`;
+
   createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: formatValue(data['#affected+total'], 'short'), indicator: '#affected+total'});
   createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted+total'], 'short'), indicator: '#targeted+total'});
   createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached+total'], 'short'), indicator: '#reached+total'});
-  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: '#affected+food+ipc+p3plus+num'});
-  createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: shortenNumFormat(data['#affected+water']), indicator: '#affected+water'});
-  createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+sam']), indicator: '#affected+sam'});
-  createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: shortenNumFormat(data['#affected+gam']), indicator: '#affected+gam'});
+  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: formatValue(data['#affected+idps'], 'short'), indicator: '#affected+idps'});
+  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: formatValue(data['#affected+food+ipc+p3plus+num'], 'short'), indicator: ipcSourceTag});
+  createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: formatValue(data['#affected+water'], 'short'), indicator: '#affected+water'});
+  createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: formatValue(data['#affected+sam'], 'short'), indicator: '#affected+sam'});
+  createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: formatValue(data['#affected+gam'], 'short'), indicator: '#affected+gam'});
 
    //humanitarian impact figures
   var fundingDiv = $('.key-figure-panel .funding .panel-inner');
@@ -1226,7 +1194,14 @@ function createFigure(div, obj) {
 /************************/
 function createSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  var date = (sourceObj['#date']==undefined) ? '' : dateFormat(new Date(sourceObj['#date']));
+  
+  var date;
+  if (sourceObj['#date']==undefined) {
+    date = '';
+  }
+  else {
+    date = (isCountryView() && indicator.includes('ipc')) ? formatDateRange(sourceObj['#date']) : dateFormat(new Date(sourceObj['#date']));
+  }
 
   var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
   var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
@@ -1238,7 +1213,16 @@ function createSource(div, indicator) {
 
 function updateSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  var date = (sourceObj['#date']==undefined) ? '' : dateFormat(new Date(sourceObj['#date']));
+  
+  var date;
+  if (sourceObj['#date']==undefined) {
+    date = '';
+  }
+  else {
+    date = (isCountryView() && indicator.includes('ipc')) ? formatDateRange(sourceObj['#date']) : dateFormat(new Date(sourceObj['#date']));
+  }
+
+
   var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
   var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
   div.find('.date').text(date);
