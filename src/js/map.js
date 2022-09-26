@@ -393,7 +393,7 @@ function selectCountry(features) {
 
 
 function updateIPCSource() {
-  let country = (currentCountry.code=='') ? '' : `+${currentCountry.code}`
+  let country = (currentCountry.code=='') ? '' : `+${(currentCountry.code).toLowerCase()}`
   let sourceTag = `#affected+food+ipc+phase+type${country}`;
 
   updateSource($('.map-legend .ipc-source'), sourceTag);

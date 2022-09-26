@@ -55,6 +55,13 @@ function formatValue(val, type) {
 }
 
 
+function formatDateRange(d) {
+  let date = d.split('-');
+  date = `${dateFormat(new Date(date[0]))}-${dateFormat(new Date(date[1]))}`;
+  return date;
+}
+
+
 function roundUp(x, limit) {
   return Math.ceil(x/limit)*limit;
 }

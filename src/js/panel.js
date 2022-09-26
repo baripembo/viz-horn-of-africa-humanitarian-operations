@@ -9,17 +9,17 @@ function initKeyFigures() {
   impactDiv.children().remove();
 
   //set special source tag for ipc
-  let ipcCountry = (currentCountry.code=='') ? '' : `+${currentCountry.code}`;
+  let ipcCountry = (currentCountry.code=='') ? '' : `+${(currentCountry.code).toLowerCase()}`;
   let ipcSourceTag = `#affected+food+ipc+phase+type${ipcCountry}`;
 
   createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: formatValue(data['#affected+total'], 'short'), indicator: '#affected+total'});
   createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted+total'], 'short'), indicator: '#targeted+total'});
   createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached+total'], 'short'), indicator: '#reached+total'});
-  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: shortenNumFormat(data['#affected+idps']), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: shortenNumFormat(data['#affected+food+ipc+p3plus+num']), indicator: ipcSourceTag});
-  createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: shortenNumFormat(data['#affected+water']), indicator: '#affected+water'});
-  createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: shortenNumFormat(data['#affected+sam']), indicator: '#affected+sam'});
-  createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: shortenNumFormat(data['#affected+gam']), indicator: '#affected+gam'});
+  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: formatValue(data['#affected+idps'], 'short'), indicator: '#affected+idps'});
+  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: formatValue(data['#affected+food+ipc+p3plus+num'], 'short'), indicator: ipcSourceTag});
+  createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: formatValue(data['#affected+water'], 'short'), indicator: '#affected+water'});
+  createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: formatValue(data['#affected+sam'], 'short'), indicator: '#affected+sam'});
+  createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: formatValue(data['#affected+gam'], 'short'), indicator: '#affected+gam'});
 
    //humanitarian impact figures
   var fundingDiv = $('.key-figure-panel .funding .panel-inner');
@@ -52,7 +52,14 @@ function createFigure(div, obj) {
 /************************/
 function createSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  var date = (sourceObj['#date']==undefined) ? '' : dateFormat(new Date(sourceObj['#date']));
+  
+  var date;
+  if (sourceObj['#date']==undefined) {
+    date = '';
+  }
+  else {
+    date = (isCountryView() && indicator.includes('ipc')) ? formatDateRange(sourceObj['#date']) : dateFormat(new Date(sourceObj['#date']));
+  }
 
   var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
   var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
@@ -64,7 +71,16 @@ function createSource(div, indicator) {
 
 function updateSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  var date = (sourceObj['#date']==undefined) ? '' : dateFormat(new Date(sourceObj['#date']));
+  
+  var date;
+  if (sourceObj['#date']==undefined) {
+    date = '';
+  }
+  else {
+    date = (isCountryView() && indicator.includes('ipc')) ? formatDateRange(sourceObj['#date']) : dateFormat(new Date(sourceObj['#date']));
+  }
+
+
   var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
   var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
   div.find('.date').text(date);
