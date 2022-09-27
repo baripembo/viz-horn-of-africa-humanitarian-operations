@@ -494,11 +494,11 @@ function createMapLegend(scale) {
   $('.map-legend .legend-title').html(legendTitle);
 
   //set data sources
-  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type');
-  createSource($('.map-legend .rainfall-source'), '#climate+rainfall+anomaly');
-  createSource($('.map-legend .priority-source'), '#priority');
-  createSource($('.map-legend .idp-source'), '#affected+idps+ind');
-  createSource($('.map-legend .population-source'), '#population');
+  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type+regional');
+  createSource($('.map-legend .rainfall-source'), '#climate+rainfall+anomaly+regional');
+  createSource($('.map-legend .priority-source'), '#priority+regional');
+  createSource($('.map-legend .idp-source'), '#affected+idps+ind+regional');
+  createSource($('.map-legend .population-source'), '#population+regional');
 
   var legend = d3.legendColor()
     .labelFormat(shortenNumFormat)
