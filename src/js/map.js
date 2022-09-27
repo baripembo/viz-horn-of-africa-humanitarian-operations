@@ -430,12 +430,6 @@ function resetMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   $('.map-legend .indicator.country-only').hide();
 
-  //select default layer
-  let defaultLayer = 'ipc_acute_food_insecurity';
-  let selected = $('.map-legend').find('input[data-layer="'+defaultLayer+'"]');
-  selected.prop('checked', true);
-  onLayerSelected(selected);
-
   //zoom to region
   zoomToRegion()
   map.once('moveend', initKeyFigures);
