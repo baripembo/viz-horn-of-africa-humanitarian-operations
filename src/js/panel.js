@@ -4,35 +4,48 @@
 function initKeyFigures() {
   var data = (currentCountry.code=='') ? regionalData : dataByCountry[currentCountry.code][0];
 
-   //humanitarian impact figures
+  //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
   impactDiv.children().remove();
 
-  //set special source tag for ipc
-  let ipcCountry = (currentCountry.code=='') ? '' : `+${(currentCountry.code).toLowerCase()}`;
-  let ipcSourceTag = `#affected+food+ipc+phase+type${ipcCountry}`;
+  let impactFigures = [
+    {className: 'pin', title: 'People Affected', tag: '#affected+total'},
+    {className: 'targeted', title: 'People Targeted', tag: '#targeted+total'},
+    {className: 'reached', title: 'People Reached', tag: '#reached+total'},
+    {className: 'idp', title: 'Internally Displaced People', tag: '#affected+idps'},
+    {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', tag: '#affected+food+ipc+p3plus+num'},
+    {className: 'water', title: 'Water Insecurity', tag: '#affected+water'},
+    {className: 'sam', title: 'Severe Acute Malnutrition', tag: '#affected+sam'},
+    {className: 'gam', title: 'Global Acute Malnutrition', tag: '#affected+gam'}
+  ];
 
-  createFigure(impactDiv, {className: 'pin', title: 'People in Need', stat: formatValue(data['#affected+total'], 'short'), indicator: '#affected+total'});
-  createFigure(impactDiv, {className: 'targeted', title: 'People Targeted', stat: formatValue(data['#targeted+total'], 'short'), indicator: '#targeted+total'});
-  createFigure(impactDiv, {className: 'reached', title: 'People Reached', stat: formatValue(data['#reached+total'], 'short'), indicator: '#reached+total'});
-  createFigure(impactDiv, {className: 'idp', title: 'Internally Displaced People', stat: formatValue(data['#affected+idps'], 'short'), indicator: '#affected+idps'});
-  createFigure(impactDiv, {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', stat: formatValue(data['#affected+food+ipc+p3plus+num'], 'short'), indicator: ipcSourceTag});
-  createFigure(impactDiv, {className: 'water', title: 'Water Insecurity', stat: formatValue(data['#affected+water'], 'short'), indicator: '#affected+water'});
-  createFigure(impactDiv, {className: 'sam', title: 'Severe Acute Malnutrition', stat: formatValue(data['#affected+sam'], 'short'), indicator: '#affected+sam'});
-  createFigure(impactDiv, {className: 'gam', title: 'Global Acute Malnutrition', stat: formatValue(data['#affected+gam'], 'short'), indicator: '#affected+gam'});
+  impactFigures.forEach(function(fig) {
+    let tag = (currentCountry.code=='') ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
+    createFigure(impactDiv, {className: fig.className, title: fig.title, stat: formatValue(data[fig.tag], 'short'), indicator: tag});
+  });
 
-   //humanitarian impact figures
+
+   //funding figures
   var fundingDiv = $('.key-figure-panel .funding .panel-inner');
   fundingDiv.children().remove();
-  createFigure(fundingDiv, {className: 'requirement', title: 'Requirement', stat: formatValue(data['#value+funding+required+usd']), indicator: '#value+funding+required+usd'});
-  createFigure(fundingDiv, {className: 'funded', title: 'Funded', stat: formatValue(data['#value+funding+total+usd']), indicator: '#value+funding+total+usd'});
-  createFigure(fundingDiv, {className: 'percent-funded', title: 'Percent Funded', stat: formatValue(data['#value+funding+pct'], 'percent'), indicator: '#value+funding+pct'});
 
-  if (isCountryView()) {
-    createFigure(fundingDiv, {className: 'other-requirement', title: data['#value+funding+other+plan_name'] + ' Requirement', stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
-    createFigure(fundingDiv, {className: 'other-funded', title: data['#value+funding+other+plan_name'] + ' Funded', stat: formatValue(data['#value+funding+other+total+usd']), indicator: '#value+funding+other+total+usd'});
-    createFigure(fundingDiv, {className: 'other-percent-funded', title: data['#value+funding+other+plan_name'] + ' Percent Funded', stat: formatValue(data['#value+funding+other+pct'], 'percent'), indicator: '#value+funding+other+pct'});
-  }
+  let fundingFigures = [
+    {className: 'requirement', title: 'Requirement', tag: '#value+funding+required+usd'},
+    {className: 'funded', title: 'Funded', tag: '#value+funding+total+usd'},
+    {className: 'percent-funded', title: 'Percent Funded', tag: '#value+funding+pct'}
+  ];
+
+  fundingFigures.forEach(function(fig) {
+    let tag = (currentCountry.code=='') ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
+    let statVal = fig.tag=='#value+funding+pct' ? formatValue(data[fig.tag], 'percent') : formatValue(data[fig.tag]);
+    createFigure(fundingDiv, {className: fig.className, title: fig.title, stat: statVal, indicator: tag});
+  });
+
+  // if (isCountryView()) {
+  //   createFigure(fundingDiv, {className: 'other-requirement', title: data['#value+funding+other+plan_name'] + ' Requirement', stat: formatValue(data['#value+funding+other+required+usd']), indicator: '#value+funding+other+required+usd'});
+  //   createFigure(fundingDiv, {className: 'other-funded', title: data['#value+funding+other+plan_name'] + ' Funded', stat: formatValue(data['#value+funding+other+total+usd']), indicator: '#value+funding+other+total+usd'});
+  //   createFigure(fundingDiv, {className: 'other-percent-funded', title: data['#value+funding+other+plan_name'] + ' Percent Funded', stat: formatValue(data['#value+funding+other+pct'], 'percent'), indicator: '#value+funding+other+pct'});
+  // }
 }
 
 
@@ -52,35 +65,18 @@ function createFigure(div, obj) {
 /************************/
 function createSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  
-  var date;
-  if (sourceObj['#date']==undefined) {
-    date = '';
-  }
-  else {
-    date = (isCountryView() && indicator.includes('ipc')) ? formatDateRange(sourceObj['#date']) : dateFormat(new Date(sourceObj['#date']));
-  }
-
+  var date = sourceObj['#date'];
   var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
   var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
   let sourceContent = `<p class='small source'><span class='date'>${date}</span> | <span class='source-name'>${sourceName}</span>`;
-  if (sourceURL!=='#') sourceContent += ` | <a href='${sourceURL}' class='dataURL' target='_blank' rel='noopener'>DATA</a>`;
+  sourceContent += ` | <a href='${sourceURL}' class='dataURL' target='_blank' rel='noopener'>DATA</a>`;
   sourceContent += `</p>`;
   div.append(sourceContent);
 }
 
 function updateSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  
-  var date;
-  if (sourceObj['#date']==undefined) {
-    date = '';
-  }
-  else {
-    date = (isCountryView() && indicator.includes('ipc')) ? formatDateRange(sourceObj['#date']) : dateFormat(new Date(sourceObj['#date']));
-  }
-
-
+  var date = sourceObj['#date'];
   var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
   var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
   div.find('.date').text(date);
@@ -89,7 +85,6 @@ function updateSource(div, indicator) {
 }
 
 function getSource(indicator) {
-  var isGlobal = ($('.content').hasClass('country-view')) ? false : true;
   var obj = {};
   sourcesData.forEach(function(item) {
     if (item['#indicator+name']==indicator) {

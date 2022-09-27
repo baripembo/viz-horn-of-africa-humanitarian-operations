@@ -277,7 +277,7 @@ function deepLinkView() {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
-      updateIPCSource();
+      updateCountrySource();
     }
   }
   //deep link to specific layer in global view
@@ -314,6 +314,11 @@ function createEvents() {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
+
+      //set default layer  
+      var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
+      selected.prop('checked', true);
+      onLayerSelected(selected);
     }
     else {
       resetMap();
@@ -321,7 +326,7 @@ function createEvents() {
     }
 
     //update ipc source
-    updateIPCSource();
+    updateCountrySource();
   });
 
   //map legend radio events
@@ -392,11 +397,13 @@ function selectCountry(features) {
 }
 
 
-function updateIPCSource() {
-  let country = (currentCountry.code=='') ? '' : `+${(currentCountry.code).toLowerCase()}`
-  let sourceTag = `#affected+food+ipc+phase+type${country}`;
-
-  updateSource($('.map-legend .ipc-source'), sourceTag);
+function updateCountrySource() {
+  let country = (currentCountry.code=='') ? 'regional' : (currentCountry.code).toLowerCase();
+  $('.map-legend .indicator').each(function(layer) {
+    let div = $(this).find('.source-container');
+    let indicator = $(this).find('input').val() + '+' + country;
+    updateSource(div, indicator);
+  });
 }
 
 function zoomToRegion() {
@@ -429,6 +436,11 @@ function resetMap() {
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   $('.map-legend .indicator.country-only').hide();
+
+  //set default layer  
+  var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
+  selected.prop('checked', true);
+  onLayerSelected(selected);
 
   //zoom to region
   zoomToRegion()

@@ -108,7 +108,7 @@ function createMapLegend(scale) {
 
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type');
-  createSource($('.map-legend .chirps-source'), '#climate+rainfall+anomaly');
+  createSource($('.map-legend .rainfall-source'), '#climate+rainfall+anomaly');
   createSource($('.map-legend .priority-source'), '#priority');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind');
   createSource($('.map-legend .population-source'), '#population');
@@ -153,6 +153,10 @@ function updateMapLegend(scale) {
   //hide no data key for rainfall layer
   if (currentIndicator.id=='#climate+rainfall+anomaly') $('.no-data-key').hide();
   else $('.no-data-key').show();
+
+  //hide idp source for kenya
+  if (currentCountry.code=='KEN') $('.idp-source').hide();
+  else $('.idp-source').show();
 
   //set legend title
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
