@@ -27,7 +27,7 @@ function createMapTooltip(country_code, country_name, point) {
 
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
-                      {label: 'People in Need', indicator: '#inneed'},
+                      {label: 'People Affected', indicator: '#inneed'},
                       {label: 'People Targeted', indicator: '#targeted'}];
     content += '<div class="table-display">';
     tableArray.forEach(function(row) {
@@ -67,7 +67,7 @@ function createCountryMapTooltip(name, pcode, point) {
 
     if ('currentIndicator.id'=='#priority' || isNaN(val)) {
       let indicator;
-      if (currentIndicator.id=='#priority') indicator = 'Operational Priority';
+      if (currentIndicator.id=='#priority') indicator = 'Operational Priority Level';
       else indicator = currentIndicator.name
       content += `${indicator}:<div class="stat">${val}</div>`;
     }
@@ -81,7 +81,7 @@ function createCountryMapTooltip(name, pcode, point) {
     
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
-                      {label: 'People in Need', indicator: '#inneed'},
+                      {label: 'People Affected', indicator: '#inneed'},
                       {label: 'People Targeted', indicator: '#targeted'}];
 
     //show ipc phase for KEN only
