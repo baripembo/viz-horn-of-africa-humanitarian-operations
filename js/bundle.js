@@ -587,13 +587,13 @@ function getLegendScale() {
   //set scale
   var scale;
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
-    scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – -10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
+    scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
   // else if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
   //   scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
   // }
   else if (currentIndicator.id=='#priority') {
-    scale = d3.scaleOrdinal().domain(['Low', 'Medium', 'High']).range(priorityColorRange);
+    scale = d3.scaleOrdinal().domain(['Operational Priority 3', 'Operational Priority 2', 'Operational Priority 1']).range(priorityColorRange);
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
@@ -1284,7 +1284,7 @@ function createMapTooltip(country_code, country_name, point) {
 
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
-                      {label: 'People in Need', indicator: '#inneed'},
+                      {label: 'People Affected', indicator: '#inneed'},
                       {label: 'People Targeted', indicator: '#targeted'}];
     content += '<div class="table-display">';
     tableArray.forEach(function(row) {
@@ -1324,7 +1324,7 @@ function createCountryMapTooltip(name, pcode, point) {
 
     if ('currentIndicator.id'=='#priority' || isNaN(val)) {
       let indicator;
-      if (currentIndicator.id=='#priority') indicator = 'Operational Priority';
+      if (currentIndicator.id=='#priority') indicator = 'Operational Priority Level';
       else indicator = currentIndicator.name
       content += `${indicator}:<div class="stat">${val}</div>`;
     }
@@ -1338,7 +1338,7 @@ function createCountryMapTooltip(name, pcode, point) {
     
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
-                      {label: 'People in Need', indicator: '#inneed'},
+                      {label: 'People Affected', indicator: '#inneed'},
                       {label: 'People Targeted', indicator: '#targeted'}];
 
     //show ipc phase for KEN only
@@ -1504,13 +1504,13 @@ $( document ).ready(function() {
 
         switch(+d['#priority']) {
           case 1:
-            d['#priority'] = 'High';
+            d['#priority'] = 'Operational Priority 1';
             break;
           case 2:
-            d['#priority'] = 'Medium';
+            d['#priority'] = 'Operational Priority 2';
             break;
           case 3:
-            d['#priority'] = 'Low';
+            d['#priority'] = 'Operational Priority 3';
             break;
           default:
             d['#priority'] = d['#priority'];
