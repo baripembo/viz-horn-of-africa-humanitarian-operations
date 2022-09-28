@@ -271,6 +271,19 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
+
+  //toggle special IPC layers for SOM
+  if (currentCountry.code=='SOM' && currentIndicator.id=='#affected+food+ipc+phase+type') {
+    map.setLayoutProperty(somIPCLayer, 'visibility', 'visible');
+    map.setLayoutProperty(somIPCBoundaryLayer, 'visibility', 'visible');
+    map.setLayoutProperty(somIPCLabelLayer, 'visibility', 'visible');
+  }
+  else {
+    map.setLayoutProperty(somIPCLayer, 'visibility', 'none');
+    map.setLayoutProperty(somIPCBoundaryLayer, 'visibility', 'none');
+    map.setLayoutProperty(somIPCLabelLayer, 'visibility', 'none');
+  }
+
   $('.map-legend .indicator.country-only').show();
 
   //update key figures
@@ -495,6 +508,7 @@ function createMapLegend(scale) {
 
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type+regional');
+  createSource($('.map-legend .ipc-phase-source'), '#affected+food+ipc+phase+type+regional');
   createSource($('.map-legend .rainfall-source'), '#climate+rainfall+anomaly+regional');
   createSource($('.map-legend .priority-source'), '#priority+regional');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind+regional');
@@ -589,9 +603,9 @@ function getLegendScale() {
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
-  // else if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-  //   scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
-  // }
+  else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+    scale = d3.scaleOrdinal().domain(['1-Minimal', '2 -Stressed', '3-Crisis', '4-Emergency', '5-Famine']).range(ipcPhaseColorRange);
+  }
   else if (currentIndicator.id=='#priority') {
     scale = d3.scaleOrdinal().domain(['Operational Priority 3', 'Operational Priority 2', 'Operational Priority 1']).range(priorityColorRange);
   }
@@ -709,6 +723,7 @@ const countryCodeList = {
 
 
 var map, mapFeatures, baseLayer, globalLayer, globalBoundaryLayer, globalLabelLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
+var somIPCLayer, somIPCBoundaryLayer, somIPCLabelLayer;
 var adm0SourceLayer = 'wrl_polbnda_1m_ungis';
 var adm1SourceLayer = 'hornafrica_polbnda_subnationa-2rkvd2';
 var hoveredStateId = null;
@@ -788,7 +803,7 @@ function displayMap() {
     'filter': ['==', 'ADM_LEVEL', 1],
     'source-layer': subnationalSource,
     'paint': {
-      'line-color': '#E0E0E0',
+      'line-color': '#F2F2F2',
       'line-opacity': 1
     }
   }, baseLayer);
@@ -814,7 +829,7 @@ function displayMap() {
       'text-radial-offset': 0.4
     },
     paint: {
-      'text-color': '#888',
+      'text-color': '#666',
       'text-halo-color': '#FFF',
       'text-halo-width': 1,
       'text-halo-blur': 1
@@ -868,7 +883,7 @@ function displayMap() {
       'text-radial-offset': 0.4
     },
     paint: {
-      'text-color': '#888',
+      'text-color': '#666',
       'text-halo-color': '#EEE',
       'text-halo-width': 1,
       'text-halo-blur': 1
@@ -894,7 +909,6 @@ function displayMap() {
   waterLayer = 'waterbodies-layer';
   map.setLayoutProperty(waterLayer, 'visibility', 'visible');
 
-
   mapFeatures = map.queryRenderedFeatures();
 
   //load raster layers
@@ -906,6 +920,9 @@ function displayMap() {
   //init global and country layers
   initGlobalLayer();
   initCountryLayer();
+
+  //load special IPC layers for SOM
+  loadSomaliaIPC();
 
   //zoom into region
   zoomToRegion();
@@ -974,6 +991,84 @@ function loadRasters() {
   });
 }
 
+
+function loadSomaliaIPC() {
+  map.addSource('somalia-ipc', {
+    type: 'geojson',
+    data: 'data/Somalia_Aug2022_Map_projected.geojson',
+    generateId: true 
+  });
+  map.addLayer({
+    id: 'somalia-ipc-layer',
+    type: 'fill',
+    source: 'somalia-ipc',
+    paint: {
+      'fill-color': [
+      'interpolate',
+      ['linear'],
+      ['get', 'overall_phase_P'],
+      1,
+      '#CDFACD',
+      2,
+      '#FAE61C',
+      3,
+      '#E67800',
+      4,
+      '#C80100',
+      5,
+      '#640100'
+      ]
+    }
+  }, baseLayer);
+  somIPCLayer = 'somalia-ipc-layer';
+  map.setLayoutProperty(somIPCLayer, 'visibility', 'none');
+
+  map.addLayer({
+    id: 'somalia-ipc-boundary-layer',
+    type: 'line',
+    source: 'somalia-ipc',
+    paint: {
+      'line-color': '#E0E0E0',
+    }
+  }, baseLayer);
+  somIPCBoundaryLayer = 'somalia-ipc-boundary-layer';
+  map.setLayoutProperty(somIPCBoundaryLayer, 'visibility', 'none');
+
+  map.addLayer({
+    id: 'somalia-ipc-label-layer',
+    type: 'symbol',
+    source: 'somalia-ipc',
+    layout: {
+      'text-field': ['get', 'area'],
+      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
+      'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+      'text-radial-offset': 0.4
+    },
+    paint: {
+      'text-color': '#666',
+      'text-halo-color': '#EEE',
+      'text-halo-width': 1,
+      'text-halo-blur': 1
+    }
+  }, baseLayer);
+  somIPCLabelLayer = 'somalia-ipc-label-layer';
+  map.setLayoutProperty(somIPCLabelLayer, 'visibility', 'none');
+
+  map.on('mouseenter', 'somalia-ipc-layer', onMouseEnter);
+  map.on('mouseleave', 'somalia-ipc-layer', onMouseLeave);
+  map.on('mousemove', 'somalia-ipc-layer', function(e) {
+    map.getCanvas().style.cursor = 'pointer';
+    let content = `<h2>${e.features[0].properties['area']}</h2>`;
+    content += `IPC Food Insecurity Phase Classification: ${e.features[0].properties['overall_phase_P']}`;
+    tooltip.setHTML(content);
+    tooltip
+      .addTo(map)
+      .setLngLat(e.lngLat);
+  });
+}
+
+
 function deepLinkView() {
   var location = window.location.search;
   //deep link to country view
@@ -1035,7 +1130,7 @@ function createEvents() {
       updateGlobalLayer(currentCountry.code);
     }
 
-    //update ipc source
+    //update country specific sources
     updateCountrySource();
   });
 
@@ -1284,8 +1379,8 @@ function createMapTooltip(country_code, country_name, point) {
 
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
-                      {label: 'People Affected', indicator: '#inneed'},
-                      {label: 'People Targeted', indicator: '#targeted'}];
+                      {label: 'People Affected', indicator: '#affected+total'},
+                      {label: 'People Targeted', indicator: '#targeted+total'}];
     content += '<div class="table-display">';
     tableArray.forEach(function(row) {
       if (row.indicator!=currentIndicator.id) {
@@ -1338,8 +1433,8 @@ function createCountryMapTooltip(name, pcode, point) {
     
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
-                      {label: 'People Affected', indicator: '#inneed'},
-                      {label: 'People Targeted', indicator: '#targeted'}];
+                      {label: 'People Affected', indicator: '#affected+total'},
+                      {label: 'People Targeted', indicator: '#targeted+total'}];
 
     //show ipc phase for KEN only
     if (currentCountry.code=='KEN') {
@@ -1398,7 +1493,7 @@ var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
 var priorityColorRange = ['#FFE699', '#FBBD00', '#FF0000'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
-//var ipcColorRange = ['#CDFACD', '#FAE61C', '#E67800', '#C80100', '#640100'];
+var ipcPhaseColorRange = ['#CDFACD', '#FAE61E', '#E67800', '#C80000', '#640000'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
