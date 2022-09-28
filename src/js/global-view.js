@@ -108,6 +108,7 @@ function createMapLegend(scale) {
 
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type+regional');
+  createSource($('.map-legend .ipc-phase-source'), '#affected+food+ipc+phase+type+regional');
   createSource($('.map-legend .rainfall-source'), '#climate+rainfall+anomaly+regional');
   createSource($('.map-legend .priority-source'), '#priority+regional');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind+regional');
@@ -202,9 +203,9 @@ function getLegendScale() {
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
-  // else if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-  //   scale = d3.scaleOrdinal().domain(['1 – Minimal', '2 – Stressed', '3 – Crisis', '4 – Emergency', '5 – Famine']).range(ipcColorRange);
-  // }
+  else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+    scale = d3.scaleOrdinal().domain(['1-Minimal', '2 -Stressed', '3-Crisis', '4-Emergency', '5-Famine']).range(ipcPhaseColorRange);
+  }
   else if (currentIndicator.id=='#priority') {
     scale = d3.scaleOrdinal().domain(['Operational Priority 3', 'Operational Priority 2', 'Operational Priority 1']).range(priorityColorRange);
   }

@@ -33,6 +33,19 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
+
+  //toggle special IPC layers for SOM
+  if (currentCountry.code=='SOM' && currentIndicator.id=='#affected+food+ipc+phase+type') {
+    map.setLayoutProperty(somIPCLayer, 'visibility', 'visible');
+    map.setLayoutProperty(somIPCBoundaryLayer, 'visibility', 'visible');
+    map.setLayoutProperty(somIPCLabelLayer, 'visibility', 'visible');
+  }
+  else {
+    map.setLayoutProperty(somIPCLayer, 'visibility', 'none');
+    map.setLayoutProperty(somIPCBoundaryLayer, 'visibility', 'none');
+    map.setLayoutProperty(somIPCLabelLayer, 'visibility', 'none');
+  }
+
   $('.map-legend .indicator.country-only').show();
 
   //update key figures
