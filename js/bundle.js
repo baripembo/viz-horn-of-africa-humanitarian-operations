@@ -323,20 +323,21 @@ function updateCountryLayer() {
     if (d['#country+code']==currentCountry.code) {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
-      boundaryColor = '#F2F2F2';
+      boundaryColor = '#D7D5D5';
       color = (val<0 || !isVal(val)) ? colorNoData : colorScale(val);
 
       //turn off choropleth for raster layers
-      if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
-        color = colorDefault;
-      }
       if (currentIndicator.id=='#climate+rainfall+anomaly') {
         boundaryColor = '#FFF';
+        color = colorDefault;
+      }
+      if (currentIndicator.id=='#population') {
+        color = colorDefault;
       }
     }
     else {
       color = colorDefault;
-      boundaryColor = '#E0E0E0';
+      boundaryColor = '#D7D5D5';
       layerOpacity = 0;
     }
     
@@ -346,7 +347,7 @@ function updateCountryLayer() {
   });
   //set expression defaults
   expression.push(colorDefault);
-  expressionBoundary.push('#E0E0E0');
+  expressionBoundary.push('#D7D5D5');
   expressionOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
@@ -464,14 +465,16 @@ function updateGlobalLayer() {
   adminone_data.forEach(function(d) {
     var val = d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
-    var boundaryColor = '#E0E0E0';
+    var boundaryColor = '#F2F2F2';
 
     //turn off choropleth for raster layers
-    if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
+    if (currentIndicator.id=='#population') {
+      boundaryColor = '#E0E0E0';
       color = colorDefault;
     }
     if (currentIndicator.id=='#climate+rainfall+anomaly') {
       boundaryColor = '#FFF';
+      color = colorDefault;
     }
 
     expression.push(d['#adm1+code'], color);
@@ -607,7 +610,7 @@ function getLegendScale() {
     scale = d3.scaleOrdinal().domain(['1-Minimal', '2 -Stressed', '3-Crisis', '4-Emergency', '5-Famine']).range(ipcPhaseColorRange);
   }
   else if (currentIndicator.id=='#priority') {
-    scale = d3.scaleOrdinal().domain(['Operational Priority 3', 'Operational Priority 2', 'Operational Priority 1']).range(priorityColorRange);
+    scale = d3.scaleOrdinal().domain(['Priority 3', 'Priority 2', 'Priority 1']).range(priorityColorRange);
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
@@ -1602,13 +1605,13 @@ $( document ).ready(function() {
 
         switch(+d['#priority']) {
           case 1:
-            d['#priority'] = 'Operational Priority 1';
+            d['#priority'] = 'Priority 1';
             break;
           case 2:
-            d['#priority'] = 'Operational Priority 2';
+            d['#priority'] = 'Priority 2';
             break;
           case 3:
-            d['#priority'] = 'Operational Priority 3';
+            d['#priority'] = 'Priority 3';
             break;
           default:
             d['#priority'] = d['#priority'];
