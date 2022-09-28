@@ -323,7 +323,7 @@ function updateCountryLayer() {
     if (d['#country+code']==currentCountry.code) {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
-      boundaryColor = '#E0E0E0';
+      boundaryColor = '#F2F2F2';
       color = (val<0 || !isVal(val)) ? colorNoData : colorScale(val);
 
       //turn off choropleth for raster layers
@@ -861,7 +861,7 @@ function displayMap() {
     'filter': ['==', 'ADM_LEVEL', 2],
     'source-layer': subnationalSource,
     'paint': {
-      'line-color': '#E0E0E0',
+      'line-color': '#F2F2F2',
       'line-opacity': 1
     }
   }, baseLayer);
