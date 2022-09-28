@@ -607,7 +607,7 @@ function getLegendScale() {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
   else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-    scale = d3.scaleOrdinal().domain(['1-Minimal', '2 -Stressed', '3-Crisis', '4-Emergency', '5-Famine']).range(ipcPhaseColorRange);
+    scale = d3.scaleOrdinal().domain(['1-Minimal', '2-Stressed', '3-Crisis', '4-Emergency', '5-Famine']).range(ipcPhaseColorRange);
   }
   else if (currentIndicator.id=='#priority') {
     scale = d3.scaleOrdinal().domain(['Priority 3', 'Priority 2', 'Priority 1']).range(priorityColorRange);
