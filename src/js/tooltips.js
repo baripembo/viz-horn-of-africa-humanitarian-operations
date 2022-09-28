@@ -28,7 +28,8 @@ function createMapTooltip(country_code, country_name, point) {
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
                       {label: 'People Affected', indicator: '#affected+total'},
-                      {label: 'People Targeted', indicator: '#targeted+total'}];
+                      {label: 'People Targeted', indicator: '#targeted+total'},
+                      {label: 'People Reached', indicator: '#reached+total'}];
     content += '<div class="table-display">';
     tableArray.forEach(function(row) {
       if (row.indicator!=currentIndicator.id) {
@@ -82,7 +83,8 @@ function createCountryMapTooltip(name, pcode, point) {
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
                       {label: 'People Affected', indicator: '#affected+total'},
-                      {label: 'People Targeted', indicator: '#targeted+total'}];
+                      {label: 'People Targeted', indicator: '#targeted+total'},
+                      {label: 'People Reached', indicator: '#reached+total'}];
 
     //show ipc phase for KEN only
     if (currentCountry.code=='KEN') {
