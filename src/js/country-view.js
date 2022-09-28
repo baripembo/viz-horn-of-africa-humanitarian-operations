@@ -85,20 +85,21 @@ function updateCountryLayer() {
     if (d['#country+code']==currentCountry.code) {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
-      boundaryColor = '#E0E0E0';
+      boundaryColor = '#D7D5D5';
       color = (val<0 || !isVal(val)) ? colorNoData : colorScale(val);
 
       //turn off choropleth for raster layers
-      if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
-        color = colorDefault;
-      }
       if (currentIndicator.id=='#climate+rainfall+anomaly') {
         boundaryColor = '#FFF';
+        color = colorDefault;
+      }
+      if (currentIndicator.id=='#population') {
+        color = colorDefault;
       }
     }
     else {
       color = colorDefault;
-      boundaryColor = '#E0E0E0';
+      boundaryColor = '#D7D5D5';
       layerOpacity = 0;
     }
     
@@ -108,7 +109,7 @@ function updateCountryLayer() {
   });
   //set expression defaults
   expression.push(colorDefault);
-  expressionBoundary.push('#E0E0E0');
+  expressionBoundary.push('#D7D5D5');
   expressionOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);

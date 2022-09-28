@@ -112,13 +112,13 @@ $( document ).ready(function() {
 
         switch(+d['#priority']) {
           case 1:
-            d['#priority'] = 'Operational Priority 1';
+            d['#priority'] = 'Priority 1';
             break;
           case 2:
-            d['#priority'] = 'Operational Priority 2';
+            d['#priority'] = 'Priority 2';
             break;
           case 3:
-            d['#priority'] = 'Operational Priority 3';
+            d['#priority'] = 'Priority 3';
             break;
           default:
             d['#priority'] = d['#priority'];
