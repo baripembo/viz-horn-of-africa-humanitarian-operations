@@ -1240,6 +1240,9 @@ function resetMap() {
   map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
+  map.setLayoutProperty(somIPCLayer, 'visibility', 'none');
+  map.setLayoutProperty(somIPCBoundaryLayer, 'visibility', 'none');
+  map.setLayoutProperty(somIPCLabelLayer, 'visibility', 'none');
   $('.map-legend .indicator.country-only').hide();
 
   //set default layer  
