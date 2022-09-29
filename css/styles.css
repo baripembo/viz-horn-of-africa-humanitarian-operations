@@ -1278,7 +1278,7 @@ a:visited {
   line-height: 12px;
   margin: 0;
   padding-bottom: 10px; }
-  .footnote.gender-data {
+  .footnote.footnote-indicator {
     margin-top: 10px; }
 
 .source + .footnote {
@@ -1397,15 +1397,8 @@ a:visited {
     .map-legend .legend-marker label {
       flex-direction: column;
       margin-top: 0; }
-  .map-legend .footnote {
-    margin-top: 15px; }
   .map-legend.population .legend-container {
     height: 130px; }
-  .map-legend.population .legend-marker.hostilities,
-  .map-legend.population .legend-marker.border-crossing {
-    display: flex; }
-  .map-legend.population .source-container.border-crossing {
-    display: block; }
   .map-legend .legendCells {
     display: block; }
   .map-legend .legendCells-events .legendCells {
@@ -1420,10 +1413,6 @@ a:visited {
     line-height: 14px; }
   .map-legend input {
     margin: 0 6px 0 0; }
-  .map-legend svg {
-    width: 190px; }
-    .map-legend svg.border-crossing-key, .map-legend svg.refugee-count-key, .map-legend svg.hostilities-key {
-      margin-top: 0; }
   .map-legend .toggle-icon:before {
     color: #000;
     content: '\e94b';

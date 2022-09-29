@@ -542,6 +542,9 @@ function createMapLegend(scale) {
     .attr('class', 'label')
     .text('No Data');
 
+  //rainfall disclaimer
+  createFootnote('.map-legend', '#climate+rainfall+anomaly', 'The seasonal rainfall anomaly describes how the current season compares to the historical 1981-2010 average. It is updated every 5 days using cumulative CHIRPS rainfall data for the two main seasons (March-April-May and October-November-December)');
+
   //boundaries disclaimer
   createFootnote('.map-legend', '', 'The boundaries and names shown and the designations used on this map do not imply official endorsement or acceptance by the United Nations.');
 
@@ -578,6 +581,10 @@ function updateMapLegend(scale) {
 
   var g = d3.select('.map-legend .scale');
   g.call(legend);
+
+  //show/hide footnotes
+  $('.footnote-indicator').hide();
+  $('.footnote-indicator[data-indicator="'+ currentIndicator.id +'"]').show();
 }
 
 
