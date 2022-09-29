@@ -1124,9 +1124,9 @@ function createEvents() {
       selectCountry(selectedFeatures);
 
       //set default layer  
-      var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
-      selected.prop('checked', true);
-      onLayerSelected(selected);
+      // var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
+      // selected.prop('checked', true);
+      // onLayerSelected(selected);
     }
     else {
       resetMap();
@@ -1499,7 +1499,7 @@ var percentFormat = d3.format('.1%');
 var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
-var priorityColorRange = ['#FFE699', '#FBBD00', '#FF0000'];
+var priorityColorRange = ['#F7DBD9', '#F5A09A', '#F2645A'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
 var ipcPhaseColorRange = ['#CDFACD', '#FAE61E', '#E67800', '#C80000', '#640000'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
