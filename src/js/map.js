@@ -397,9 +397,9 @@ function createEvents() {
       selectCountry(selectedFeatures);
 
       //set default layer  
-      var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
-      selected.prop('checked', true);
-      onLayerSelected(selected);
+      // var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
+      // selected.prop('checked', true);
+      // onLayerSelected(selected);
     }
     else {
       resetMap();
