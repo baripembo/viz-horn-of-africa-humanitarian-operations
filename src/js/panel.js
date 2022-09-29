@@ -76,12 +76,19 @@ function createSource(div, indicator) {
 
 function updateSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  var date = sourceObj['#date'];
-  var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
-  var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
-  div.find('.date').text(date);
-  div.find('.source-name').text(sourceName);
-  div.find('.dataURL').attr('href', sourceURL);
+  if (Object.keys(sourceObj).length<1) {
+    div.hide();
+  }
+  else {
+    div.show();
+
+    var date = sourceObj['#date'];
+    var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
+    var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
+    div.find('.date').text(date);
+    div.find('.source-name').text(sourceName);
+    div.find('.dataURL').attr('href', sourceURL);
+  }
 }
 
 function getSource(indicator) {

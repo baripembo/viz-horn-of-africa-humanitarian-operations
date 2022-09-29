@@ -160,10 +160,6 @@ function updateMapLegend(scale) {
   if (currentIndicator.id=='#climate+rainfall+anomaly') $('.no-data-key').hide();
   else $('.no-data-key').show();
 
-  //hide idp source for kenya
-  if (currentCountry.code=='KEN') $('.idp-source').hide();
-  else $('.idp-source').show();
-
   //set legend title
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
   $('.map-legend .legend-title').html(legendTitle);
