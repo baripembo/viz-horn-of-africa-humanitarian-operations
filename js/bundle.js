@@ -561,10 +561,6 @@ function updateMapLegend(scale) {
   if (currentIndicator.id=='#climate+rainfall+anomaly') $('.no-data-key').hide();
   else $('.no-data-key').show();
 
-  //hide idp source for kenya
-  if (currentCountry.code=='KEN') $('.idp-source').hide();
-  else $('.idp-source').show();
-
   //set legend title
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
   $('.map-legend .legend-title').html(legendTitle);
@@ -1346,12 +1342,19 @@ function createSource(div, indicator) {
 
 function updateSource(div, indicator) {
   var sourceObj = getSource(indicator);
-  var date = sourceObj['#date'];
-  var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
-  var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
-  div.find('.date').text(date);
-  div.find('.source-name').text(sourceName);
-  div.find('.dataURL').attr('href', sourceURL);
+  if (Object.keys(sourceObj).length<1) {
+    div.hide();
+  }
+  else {
+    div.show();
+
+    var date = sourceObj['#date'];
+    var sourceName = (sourceObj['#meta+source']==undefined) ? '' : sourceObj['#meta+source'];
+    var sourceURL = (sourceObj['#meta+url']==undefined) ? '#' : sourceObj['#meta+url'];
+    div.find('.date').text(date);
+    div.find('.source-name').text(sourceName);
+    div.find('.dataURL').attr('href', sourceURL);
+  }
 }
 
 function getSource(indicator) {
