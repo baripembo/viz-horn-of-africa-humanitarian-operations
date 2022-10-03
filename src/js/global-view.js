@@ -39,6 +39,12 @@ function initGlobalLayer() {
   adminone_data.forEach(function(d) {
     var val = d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
+
+    //turn off choropleth for ipc layer
+    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+      color = '#FFF';
+    }
+
     expression.push(d['#adm1+code'], color);
   });
 
@@ -75,6 +81,10 @@ function updateGlobalLayer() {
       boundaryColor = '#FFF';
       color = colorDefault;
     }
+    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+      boundaryColor = '#E0E0E0';
+      color = '#FFF';
+    }
 
     expression.push(d['#adm1+code'], color);
     expressionBoundary.push(d['#adm1+code'], boundaryColor);
@@ -100,6 +110,10 @@ function updateGlobalLayer() {
         map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#climate+rainfall+anomaly') ? 'visible' : 'none');
     }
   });
+
+  //toggle ipc layers
+  let isIPC = (currentIndicator.id=='#affected+food+ipc+phase+type') ? true : false;
+  toggleIPCLayers(isIPC);
 }
 
 

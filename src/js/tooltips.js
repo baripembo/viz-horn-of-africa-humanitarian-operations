@@ -3,7 +3,7 @@
 /*************************/
 function createMapTooltip(country_code, country_name, point) {
   var location = adminone_data.filter(c => c['#adm1+code'] == country_code);
-  if (location[0]!=undefined) {
+  if (location[0]!=undefined && currentIndicator.id!=='#affected+food+ipc+phase+type') {
     var val = location[0][currentIndicator.id];
 
     //format content for tooltip
@@ -14,11 +14,10 @@ function createMapTooltip(country_code, country_name, point) {
     //format content for display
     var content = `<h2>${country_name}, ${location[0]['#country+name']}</h2>`;
 
-    if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-      let ipcVal = (val=='No Data') ? val : shortenNumFormat(val);
-      content += `${currentIndicator.name}<div class="stat">${ipcVal}</div>`;
-    }
-    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
+    // if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+    //   content += `${currentIndicator.name}<div class="stat">${val}</div>`;
+    // }
+    if (currentIndicator.id=='#climate+rainfall+anomaly') {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
     }
     else {
@@ -54,7 +53,7 @@ function createCountryMapTooltip(name, pcode, point) {
       return c;
   });
 
-  if (location[0]!=undefined) {
+  if (location[0]!=undefined && currentIndicator.id!=='#affected+food+ipc+phase+type') {
     var val = location[0][currentIndicator.id];
     var label = currentIndicator.name;
 
@@ -79,16 +78,15 @@ function createCountryMapTooltip(name, pcode, point) {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}</div>`;
     }
 
-    
+    //set up supporting key figures    
     var tableArray = [{label: 'Population', indicator: '#population'},
-                      {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
                       {label: 'People Affected', indicator: '#affected+total'},
                       {label: 'People Targeted', indicator: '#targeted+total'},
                       {label: 'People Reached', indicator: '#reached+total'}];
 
     //show ipc phase for KEN only
-    if (currentCountry.code=='KEN') {
-      tableArray.splice(2, 0, {label: 'IPC Acute Food Insecurity Phase', indicator: '#affected+food+ipc+phase+type'});
+    if (currentCountry.code!=='SOM') {
+      tableArray.splice(1, 0, {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'});
     }
 
     content += '<div class="table-display">';
@@ -103,6 +101,10 @@ function createCountryMapTooltip(name, pcode, point) {
     content += '</div>';
 
     tooltip.setHTML(content);
+  }
+  else {
+    map.getCanvas().style.cursor = '';
+    tooltip.remove();
   }
 }
 

@@ -1,5 +1,5 @@
 var numFormat = d3.format(',');
-var shortenNumFormat = d3.format('.2s');
+var shortenNumFormat = d3.format('.3s');
 var percentFormat = d3.format('.1%');
 var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
@@ -137,29 +137,6 @@ $( document ).ready(function() {
     });
   }
 
-  function transformIPC(value) {
-    let phase;
-    switch(+value) {
-      case 1:
-        phase = '1-Minimal';
-        break;
-      case 2:
-        phase = '2-Stressed';
-        break;
-      case 3:
-        phase = '3-Crisis';
-        break;
-      case 4:
-        phase = '4-Emergency';
-        break;
-      case 5:
-        phase = '5-Famine';
-        break;
-      default:
-        phase = value;
-    }
-    return phase;
-  }
 
   function initView() {
     //check map loaded status
