@@ -10,7 +10,7 @@ function initCountryLayer() {
   map.on('mouseleave', subnationalLayer, onMouseLeave);
   map.on('mousemove', subnationalLayer, function(e) {
     var f = map.queryRenderedFeatures(e.point)[0];
-    if (f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name) {
+    if (f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name && currentIndicator.id!=='#affected+food+ipc+phase+type') {
       map.getCanvas().style.cursor = 'pointer';
       createCountryMapTooltip(f.properties.ADM_REF, f.properties.ADM_PCODE, e.point);
       tooltip

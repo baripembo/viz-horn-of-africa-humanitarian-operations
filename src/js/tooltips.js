@@ -53,7 +53,7 @@ function createCountryMapTooltip(name, pcode, point) {
       return c;
   });
 
-  if (location[0]!=undefined && currentIndicator.id!=='#affected+food+ipc+phase+type') {
+  if (location[0]!=undefined) {
     var val = location[0][currentIndicator.id];
     var label = currentIndicator.name;
 
@@ -101,10 +101,6 @@ function createCountryMapTooltip(name, pcode, point) {
     content += '</div>';
 
     tooltip.setHTML(content);
-  }
-  else {
-    map.getCanvas().style.cursor = '';
-    tooltip.remove();
   }
 }
 
