@@ -418,11 +418,6 @@ function createEvents() {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
-
-      //set default layer  
-      // var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
-      // selected.prop('checked', true);
-      // onLayerSelected(selected);
     }
     else {
       resetMap();
