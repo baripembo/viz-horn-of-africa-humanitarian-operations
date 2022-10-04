@@ -55,6 +55,13 @@ function formatValue(val, type) {
 }
 
 
+function formatDateRange(d) {
+  let date = d.split('-');
+  date = `${dateFormat(new Date(date[0]))}-${dateFormat(new Date(date[1]))}`;
+  return date;
+}
+
+
 function roundUp(x, limit) {
   return Math.ceil(x/limit)*limit;
 }
@@ -85,6 +92,30 @@ function createFootnote(target, indicator, text) {
 
 function isCountryView() {
   return currentCountry.code=='' ? false : true;
+}
+
+function transformIPC(value) {
+  let phase;
+  switch(+value) {
+    case 1:
+      phase = '1-Minimal';
+      break;
+    case 2:
+      phase = '2-Stressed';
+      break;
+    case 3:
+      phase = '3-Crisis';
+      break;
+    case 4:
+      phase = '4-Emergency';
+      break;
+    case 5:
+      phase = '5-Famine';
+      break;
+    default:
+      phase = value;
+  }
+  return phase;
 }
 
 //country codes and raster ids

@@ -1,12 +1,12 @@
 var numFormat = d3.format(',');
-var shortenNumFormat = d3.format('.2s');
+var shortenNumFormat = d3.format('.3s');
 var percentFormat = d3.format('.1%');
 var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
 var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
-var priorityColorRange = ['#FFE699', '#FBBD00', '#FF0000'];
+var priorityColorRange = ['#F7DBD9', '#F5A09A', '#F2645A'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
-var ipcColorRange = ['#CDFACD', '#FAE61C', '#E67800', '#C80100', '#640100'];
+var ipcPhaseColorRange = ['#CDFACD', '#FAE61E', '#E67800', '#C80000', '#640000'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
@@ -102,9 +102,9 @@ $( document ).ready(function() {
 
 
       //transform adm1 ipc data
-      adminone_data.forEach(function(d) {
-        d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
-      });
+      // adminone_data.forEach(function(d) {
+      //   d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
+      // });
 
       //transform adm2 ipc and priority data
       admintwo_data.forEach(function(d) {
@@ -112,13 +112,13 @@ $( document ).ready(function() {
 
         switch(+d['#priority']) {
           case 1:
-            d['#priority'] = 'High';
+            d['#priority'] = 'Priority 1';
             break;
           case 2:
-            d['#priority'] = 'Medium';
+            d['#priority'] = 'Priority 2';
             break;
           case 3:
-            d['#priority'] = 'Low';
+            d['#priority'] = 'Priority 3';
             break;
           default:
             d['#priority'] = d['#priority'];
@@ -137,29 +137,6 @@ $( document ).ready(function() {
     });
   }
 
-  function transformIPC(value) {
-    let phase;
-    switch(+value) {
-      case 1:
-        phase = '1 – Minimal';
-        break;
-      case 2:
-        phase = '2 – Stressed';
-        break;
-      case 3:
-        phase = '3 – Crisis';
-        break;
-      case 4:
-        phase = '4 – Emergency';
-        break;
-      case 5:
-        phase = '5 – Famine';
-        break;
-      default:
-        phase = value;
-    }
-    return phase;
-  }
 
   function initView() {
     //check map loaded status

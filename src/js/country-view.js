@@ -10,7 +10,7 @@ function initCountryLayer() {
   map.on('mouseleave', subnationalLayer, onMouseLeave);
   map.on('mousemove', subnationalLayer, function(e) {
     var f = map.queryRenderedFeatures(e.point)[0];
-    if (f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name) {
+    if (f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name && currentIndicator.id!=='#affected+food+ipc+phase+type') {
       map.getCanvas().style.cursor = 'pointer';
       createCountryMapTooltip(f.properties.ADM_REF, f.properties.ADM_PCODE, e.point);
       tooltip
@@ -33,6 +33,7 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
+
   $('.map-legend .indicator.country-only').show();
 
   //update key figures
@@ -72,20 +73,25 @@ function updateCountryLayer() {
     if (d['#country+code']==currentCountry.code) {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
-      boundaryColor = '#E0E0E0';
+      boundaryColor = '#D7D5D5';
       color = (val<0 || !isVal(val)) ? colorNoData : colorScale(val);
 
       //turn off choropleth for raster layers
-      if (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') {
-        color = colorDefault;
-      }
       if (currentIndicator.id=='#climate+rainfall+anomaly') {
         boundaryColor = '#FFF';
+        color = colorDefault;
+      }
+      if (currentIndicator.id=='#population') {
+        color = colorDefault;
+      }    
+      if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+        boundaryColor = '#E0E0E0';
+        color = '#FFF';
       }
     }
     else {
       color = colorDefault;
-      boundaryColor = '#E0E0E0';
+      boundaryColor = '#D7D5D5';
       layerOpacity = 0;
     }
     
@@ -95,7 +101,7 @@ function updateCountryLayer() {
   });
   //set expression defaults
   expression.push(colorDefault);
-  expressionBoundary.push('#E0E0E0');
+  expressionBoundary.push('#D7D5D5');
   expressionOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
@@ -126,6 +132,10 @@ function updateCountryLayer() {
     var id = currentCountry.code.toLowerCase();
     map.setLayoutProperty(id+'-chirps', 'visibility', 'visible');
   }
+
+  //set ipc layer properties
+  let isIPC = (currentIndicator.id=='#affected+food+ipc+phase+type') ? true : false;
+  toggleIPCLayers(isIPC, currentCountry.code);
 }
 
 function getCountryIndicatorMax() {
