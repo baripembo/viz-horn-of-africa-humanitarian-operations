@@ -14,7 +14,7 @@ function handleGlobalEvents(layer) {
       if (feature.sourceLayer==adm1SourceLayer)
         target = feature;
     });
-    if (target!=undefined) {
+    if (target!=undefined && currentIndicator.id!=='#affected+food+ipc+phase+type') {
       tooltip.setLngLat(e.lngLat);
       createMapTooltip(target.properties.ADM_PCODE, target.properties.ADM_REF, e.point);
     }
