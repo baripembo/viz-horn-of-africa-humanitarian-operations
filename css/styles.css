@@ -1588,6 +1588,8 @@ a:visited {
     font-size: 16px;
     margin-left: auto;
     padding-top: 3px; }
+  .download-link.eth, .download-link.ken, .download-link.som {
+    display: none; }
 
 .tab-menubar {
   background-color: #FFF;

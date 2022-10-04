@@ -265,6 +265,7 @@ function initCountryLayer() {
 
 
 function updateCountryLayer() {
+  //set map layers
   map.setLayoutProperty(globalLayer, 'visibility', 'none');
   map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(globalLabelLayer, 'visibility', 'none');
@@ -272,7 +273,12 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
 
+  //set map legend options
   $('.map-legend .indicator.country-only').show();
+
+  //set download links
+  $('.download-link').hide();
+  $(`.download-link.${currentCountry.code.toLowerCase()}`).show();
 
   //update key figures
   initKeyFigures();
@@ -1300,7 +1306,12 @@ function resetMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   toggleIPCLayers(true);
 
+  //reset map legend
   $('.map-legend .indicator.country-only').hide();
+
+  //reset download links
+  $('.download-link').hide();
+  $('.download-link.regional').show();
 
   //set default layer  
   var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity_phase"]');
