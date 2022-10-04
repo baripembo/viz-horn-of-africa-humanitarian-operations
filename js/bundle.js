@@ -1182,11 +1182,6 @@ function createEvents() {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
       selectCountry(selectedFeatures);
-
-      //set default layer  
-      // var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity"]');
-      // selected.prop('checked', true);
-      // onLayerSelected(selected);
     }
     else {
       resetMap();
@@ -1434,8 +1429,8 @@ function getSource(indicator) {
 /*************************/
 /*** TOOLTIP FUNCTIONS ***/
 /*************************/
-function createMapTooltip(country_code, country_name, point) {
-  var location = adminone_data.filter(c => c['#adm1+code'] == country_code);
+function createMapTooltip(p_code, p_name, point) {
+  var location = adminone_data.filter(c => c['#adm1+code'] == p_code);
   if (location[0]!=undefined && currentIndicator.id!=='#affected+food+ipc+phase+type') {
     var val = location[0][currentIndicator.id];
 
@@ -1445,12 +1440,12 @@ function createMapTooltip(country_code, country_name, point) {
     }
 
     //format content for display
-    var content = `<h2>${country_name}, ${location[0]['#country+name']}</h2>`;
+    var content = `<h2>${p_name}, ${location[0]['#country+name']}</h2>`;
 
-    // if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-    //   content += `${currentIndicator.name}<div class="stat">${val}</div>`;
-    // }
-    if (currentIndicator.id=='#climate+rainfall+anomaly') {
+    if (currentIndicator.id=='#population' && location[0]['#country+name']=='Ethiopia') {
+      //dont show population figures for ETH
+    }
+    else if (currentIndicator.id=='#climate+rainfall+anomaly') {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
     }
     else {
@@ -1462,6 +1457,12 @@ function createMapTooltip(country_code, country_name, point) {
                       {label: 'People Affected', indicator: '#affected+total'},
                       {label: 'People Targeted', indicator: '#targeted+total'},
                       {label: 'People Reached', indicator: '#reached+total'}];
+
+    //remove population figures for ETH only
+    if (location[0]['#country+name']=='Ethiopia') {
+      tableArray.splice(0, 1);
+    }
+
     content += '<div class="table-display">';
     tableArray.forEach(function(row) {
       if (row.indicator!=currentIndicator.id) {
@@ -1507,6 +1508,9 @@ function createCountryMapTooltip(name, pcode, point) {
     else if (currentIndicator.id=='#climate+rainfall+anomaly'){
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
     }
+    else if (currentIndicator.id=='#population' && currentCountry.code=='ETH') {
+      //dont show population figures for ETH
+    }
     else {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}</div>`;
     }
@@ -1517,9 +1521,14 @@ function createCountryMapTooltip(name, pcode, point) {
                       {label: 'People Targeted', indicator: '#targeted+total'},
                       {label: 'People Reached', indicator: '#reached+total'}];
 
-    //show ipc phase for KEN only
+    //show ipc pop for countries except for SOM
     if (currentCountry.code!=='SOM') {
       tableArray.splice(1, 0, {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'});
+    }
+
+    //remove population figures for ETH only
+    if (currentCountry.code=='ETH') {
+      tableArray.splice(0, 1);
     }
 
     content += '<div class="table-display">';
