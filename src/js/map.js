@@ -536,7 +536,12 @@ function resetMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   toggleIPCLayers(true);
 
+  //reset map legend
   $('.map-legend .indicator.country-only').hide();
+
+  //reset download links
+  $('.download-link').hide();
+  $('.download-link.regional').show();
 
   //set default layer  
   var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity_phase"]');

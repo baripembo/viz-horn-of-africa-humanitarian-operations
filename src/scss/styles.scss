@@ -583,6 +583,11 @@ a:visited {
 		margin-left: auto;
 		padding-top: 3px;
 	}
+	&.eth,
+	&.ken,
+	&.som {
+		display: none;
+	}
 }
 
 .tab-menubar {
