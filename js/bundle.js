@@ -1083,7 +1083,7 @@ function loadIPCLayer(country) {
         '#640100'
       ]
     }
-  }, baseLayer);
+  }, subnationalLabelLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-boundary-layer`,
@@ -1092,7 +1092,7 @@ function loadIPCLayer(country) {
     paint: {
       'line-color': '#E0E0E0',
     }
-  }, baseLayer);
+  }, subnationalLabelLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-label-layer`,
@@ -1111,7 +1111,7 @@ function loadIPCLayer(country) {
       'text-halo-width': 1,
       'text-halo-blur': 1
     }
-  }, baseLayer);
+  }, subnationalLabelLayer);
 
   map.on('mouseenter', `${country.iso}-ipc-layer`, onMouseEnter);
   map.on('mouseleave', `${country.iso}-ipc-layer`, onMouseLeave);
