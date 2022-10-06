@@ -294,6 +294,9 @@ function updateCountryLayer() {
     case '#population':
       clrRange = populationColorRange;
       break;
+    case '#affected+idps+ind':
+      clrRange = idpColorRange;
+      break;
     default:
       //
   }
@@ -619,6 +622,7 @@ function getLegendScale() {
     min = d3.min(adminone_data, d => +d[currentIndicator.id]);
     max = d3.max(adminone_data, d => +d[currentIndicator.id]);
   }
+  console.log(max)
 
   //set scale
   var scale;
@@ -633,6 +637,9 @@ function getLegendScale() {
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
+  }
+  else if (currentIndicator.id=='#affected+idps+ind') {
+    scale = d3.scaleQuantize().domain([0, max]).range(idpColorRange);
   }
   else {
     scale = d3.scaleQuantize().domain([0, max]).range(colorRange);
@@ -837,6 +844,24 @@ function displayMap() {
   }
 
   //add map layers
+
+  //water bodies
+  map.addSource('waterbodies', {
+    'url': 'mapbox://humdata.bo7vgo3j',
+    'type': 'vector'
+  });
+  map.addLayer({
+    'id': 'waterbodies-layer',
+    'type': 'fill',
+    'source': 'waterbodies',
+    'source-layer': 'hornafrica_waterbodies-8qylz8',
+    'paint': {
+      'fill-color': '#99daea'
+    }
+  }, baseLayer);
+  waterLayer = 'waterbodies-layer';
+  map.setLayoutProperty(waterLayer, 'visibility', 'visible');
+  
   //adm1 fills
   let subnationalSource = 'hornafrica_polbnda_subnationa-2rkvd2';
   let subnationalCentroidSource = 'hornafrica_polbndp_subnationa-a7lq5r';
@@ -955,22 +980,6 @@ function displayMap() {
   subnationalLabelLayer = 'subnational-labels';
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
 
-  //water bodies
-  map.addSource('waterbodies', {
-    'url': 'mapbox://humdata.bo7vgo3j',
-    'type': 'vector'
-  });
-  map.addLayer({
-    'id': 'waterbodies-layer',
-    'type': 'fill',
-    'source': 'waterbodies',
-    'source-layer': 'hornafrica_waterbodies-8qylz8',
-    'paint': {
-      'fill-color': '#99daea'
-    }
-  }, subnationalLabelLayer);
-  waterLayer = 'waterbodies-layer';
-  map.setLayoutProperty(waterLayer, 'visibility', 'visible');
 
   mapFeatures = map.queryRenderedFeatures();
 
@@ -1083,7 +1092,7 @@ function loadIPCLayer(country) {
         '#640100'
       ]
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-boundary-layer`,
@@ -1092,12 +1101,13 @@ function loadIPCLayer(country) {
     paint: {
       'line-color': '#E0E0E0',
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-label-layer`,
     type: 'symbol',
     source: `${country.iso}-ipc`,
+    filter: ["==", ["geometry-type"], "Polygon"],
     layout: {
       'text-field': ['get', 'area'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
@@ -1106,12 +1116,12 @@ function loadIPCLayer(country) {
       'text-radial-offset': 0.4
     },
     paint: {
-      'text-color': '#666',
-      'text-halo-color': '#EEE',
+      'text-color': '#333',
+      'text-halo-color': '#F2F2F2',
       'text-halo-width': 1,
       'text-halo-blur': 1
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
 
   map.on('mouseenter', `${country.iso}-ipc-layer`, onMouseEnter);
   map.on('mouseleave', `${country.iso}-ipc-layer`, onMouseLeave);
@@ -1595,6 +1605,7 @@ var colorRange = ['#F7DBD9', '#F6BDB9', '#F5A09A', '#F4827A', '#F2645A'];
 var priorityColorRange = ['#F7DBD9', '#F5A09A', '#F2645A'];
 var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32'];
 var ipcPhaseColorRange = ['#CDFACD', '#FAE61E', '#E67800', '#C80000', '#640000'];
+var idpColorRange = ['#D1E3EA','#BBD1E6','#ADBCE3','#B2B3E0','#A99BC6'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
