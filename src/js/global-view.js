@@ -216,6 +216,7 @@ function getLegendScale() {
     min = d3.min(adminone_data, d => +d[currentIndicator.id]);
     max = d3.max(adminone_data, d => +d[currentIndicator.id]);
   }
+  console.log(max)
 
   //set scale
   var scale;
@@ -230,6 +231,9 @@ function getLegendScale() {
   }
   else if (currentIndicator.id=='#population') {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
+  }
+  else if (currentIndicator.id=='#affected+idps+ind') {
+    scale = d3.scaleQuantize().domain([0, max]).range(idpColorRange);
   }
   else {
     scale = d3.scaleQuantize().domain([0, max]).range(colorRange);

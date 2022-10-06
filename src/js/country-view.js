@@ -56,6 +56,9 @@ function updateCountryLayer() {
     case '#population':
       clrRange = populationColorRange;
       break;
+    case '#affected+idps+ind':
+      clrRange = idpColorRange;
+      break;
     default:
       //
   }

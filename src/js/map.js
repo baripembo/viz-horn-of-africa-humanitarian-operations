@@ -67,6 +67,24 @@ function displayMap() {
   }
 
   //add map layers
+
+  //water bodies
+  map.addSource('waterbodies', {
+    'url': 'mapbox://humdata.bo7vgo3j',
+    'type': 'vector'
+  });
+  map.addLayer({
+    'id': 'waterbodies-layer',
+    'type': 'fill',
+    'source': 'waterbodies',
+    'source-layer': 'hornafrica_waterbodies-8qylz8',
+    'paint': {
+      'fill-color': '#99daea'
+    }
+  }, baseLayer);
+  waterLayer = 'waterbodies-layer';
+  map.setLayoutProperty(waterLayer, 'visibility', 'visible');
+  
   //adm1 fills
   let subnationalSource = 'hornafrica_polbnda_subnationa-2rkvd2';
   let subnationalCentroidSource = 'hornafrica_polbndp_subnationa-a7lq5r';
@@ -185,22 +203,6 @@ function displayMap() {
   subnationalLabelLayer = 'subnational-labels';
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
 
-  //water bodies
-  map.addSource('waterbodies', {
-    'url': 'mapbox://humdata.bo7vgo3j',
-    'type': 'vector'
-  });
-  map.addLayer({
-    'id': 'waterbodies-layer',
-    'type': 'fill',
-    'source': 'waterbodies',
-    'source-layer': 'hornafrica_waterbodies-8qylz8',
-    'paint': {
-      'fill-color': '#99daea'
-    }
-  }, subnationalLabelLayer);
-  waterLayer = 'waterbodies-layer';
-  map.setLayoutProperty(waterLayer, 'visibility', 'visible');
 
   mapFeatures = map.queryRenderedFeatures();
 
@@ -313,7 +315,7 @@ function loadIPCLayer(country) {
         '#640100'
       ]
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-boundary-layer`,
@@ -322,12 +324,13 @@ function loadIPCLayer(country) {
     paint: {
       'line-color': '#E0E0E0',
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-label-layer`,
     type: 'symbol',
     source: `${country.iso}-ipc`,
+    filter: ["==", ["geometry-type"], "Polygon"],
     layout: {
       'text-field': ['get', 'area'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
@@ -336,12 +339,12 @@ function loadIPCLayer(country) {
       'text-radial-offset': 0.4
     },
     paint: {
-      'text-color': '#666',
-      'text-halo-color': '#EEE',
+      'text-color': '#333',
+      'text-halo-color': '#F2F2F2',
       'text-halo-width': 1,
       'text-halo-blur': 1
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
 
   map.on('mouseenter', `${country.iso}-ipc-layer`, onMouseEnter);
   map.on('mouseleave', `${country.iso}-ipc-layer`, onMouseLeave);
