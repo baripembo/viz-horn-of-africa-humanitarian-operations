@@ -606,9 +606,11 @@ function updateMapLegend(scale) {
 function getLegendScale() {
   //get min/max
   let min, max;
+  let data = new Array(); //create copy of indicator data for quantile scales
   if (isCountryView()) {
     min =  d3.min(admintwo_data, function(d) { 
       if (d['#country+code']==currentCountry.code) {
+        data.push(+d[currentIndicator.id]);
         return +d[currentIndicator.id]; 
       }
     });
@@ -622,7 +624,6 @@ function getLegendScale() {
     min = d3.min(adminone_data, d => +d[currentIndicator.id]);
     max = d3.max(adminone_data, d => +d[currentIndicator.id]);
   }
-  console.log(max)
 
   //set scale
   var scale;
@@ -639,7 +640,8 @@ function getLegendScale() {
     scale = d3.scaleOrdinal().domain(['<1', '1 – 2', '2 – 5', '5 – 10', '10 – 25', '25 – 50', '>50']).range(populationColorRange);
   }
   else if (currentIndicator.id=='#affected+idps+ind') {
-    scale = d3.scaleQuantize().domain([0, max]).range(idpColorRange);
+    scale = d3.scaleQuantile().domain(data).range(idpColorRange);
+    scale.quantiles().map(x => Math.round(x));
   }
   else {
     scale = d3.scaleQuantize().domain([0, max]).range(colorRange);
@@ -688,7 +690,7 @@ function formatValue(val, type) {
       format = percentFormat;
       break;
     case 'short':
-      format = shortenNumFormat;
+      format = d3.format('.3s');
       break;
     default:
       format = d3.format('$.3s');
@@ -1597,7 +1599,7 @@ function setTooltipPosition(point) {
   }
 }
 var numFormat = d3.format(',');
-var shortenNumFormat = d3.format('.3s');
+var shortenNumFormat = d3.format('.2s');
 var percentFormat = d3.format('.1%');
 var dateFormat = d3.utcFormat("%b %d, %Y");
 var chartDateFormat = d3.utcFormat("%-m/%-d/%y");
