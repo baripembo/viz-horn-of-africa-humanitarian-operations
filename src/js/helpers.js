@@ -39,7 +39,7 @@ function formatValue(val, type) {
       format = percentFormat;
       break;
     case 'short':
-      format = shortenNumFormat;
+      format = d3.format('.3s');
       break;
     default:
       format = d3.format('$.3s');
