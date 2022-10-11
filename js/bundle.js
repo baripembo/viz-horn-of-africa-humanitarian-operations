@@ -303,7 +303,7 @@ function updateCountryLayer() {
 
   //update legend
   var colorScale = getLegendScale();
-  if (currentIndicator.id=='#affected+idps+ind' && currentCountry.code=='KEN') {
+  if ((currentIndicator.id=='#affected+idps+ind' && currentCountry.code=='KEN') || (currentIndicator.id=='#affected+food+ipc+phase+type' && currentCountry.code=='ETH')) {
     $('.legend-container').hide();
   }
   else {
@@ -781,10 +781,10 @@ var hoveredStateId = null;
 
 
 let ipcData = [
-  {
-    iso: 'eth',
-    data: 'Ethiopia_May_2021_merged.geojson'
-  },
+  // {
+  //   iso: 'eth',
+  //   data: 'Ethiopia_May_2021_merged.geojson'
+  // },
   {
     iso: 'ken',
     data: 'kenya_ipc.geojson'
@@ -1315,8 +1315,9 @@ function resetMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   toggleIPCLayers(true);
 
-  //reset map legend
+  //reset map legends
   $('.map-legend .indicator.country-only').hide();
+  $('.legend-container').show();
 
   //reset download links
   $('.download-link').hide();
