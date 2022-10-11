@@ -67,22 +67,19 @@ function updateGlobalLayer() {
   //data join
   var expression = ['match', ['get', 'ADM_PCODE']];
   var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
+  var boundaryColor = '#E0E0E0';
   adminone_data.forEach(function(d) {
     var val = d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
-    var boundaryColor = '#F2F2F2';
 
     //turn off choropleth for raster layers
     if (currentIndicator.id=='#population') {
-      boundaryColor = '#E0E0E0';
       color = colorDefault;
     }
     if (currentIndicator.id=='#climate+rainfall+anomaly') {
-      boundaryColor = '#FFF';
       color = colorDefault;
     }
     if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-      boundaryColor = '#E0E0E0';
       color = '#FFF';
     }
 
@@ -92,7 +89,7 @@ function updateGlobalLayer() {
 
   //default value for no data
   expression.push(colorDefault);
-  expressionBoundary.push('#E0E0E0');
+  expressionBoundary.push(boundaryColor);
   
   //update map and legend
   map.setPaintProperty(globalLayer, 'fill-color', expression);

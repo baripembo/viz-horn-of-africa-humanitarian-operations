@@ -87,7 +87,7 @@ function updateCountryLayer() {
 
       //turn off choropleth for raster layers
       if (currentIndicator.id=='#climate+rainfall+anomaly') {
-        boundaryColor = '#FFF';
+        boundaryColor = '#E0E0E0';
         color = colorDefault;
       }
       if (currentIndicator.id=='#population') {

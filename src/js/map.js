@@ -11,7 +11,7 @@ let ipcData = [
   },
   {
     iso: 'ken',
-    data: 'Kenya_July 2022.geojson'
+    data: 'kenya_ipc.geojson'
   },
   {
     iso: 'som',
@@ -84,7 +84,7 @@ function displayMap() {
   }, baseLayer);
   waterLayer = 'waterbodies-layer';
   map.setLayoutProperty(waterLayer, 'visibility', 'visible');
-  
+
   //adm1 fills
   let subnationalSource = 'hornafrica_polbnda_subnationa-2rkvd2';
   let subnationalCentroidSource = 'hornafrica_polbndp_subnationa-a7lq5r';
@@ -330,7 +330,7 @@ function loadIPCLayer(country) {
     id: `${country.iso}-ipc-label-layer`,
     type: 'symbol',
     source: `${country.iso}-ipc`,
-    filter: ["==", ["geometry-type"], "Polygon"],
+    filter: ['==', ['geometry-type'], 'Polygon'],
     layout: {
       'text-field': ['get', 'area'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
