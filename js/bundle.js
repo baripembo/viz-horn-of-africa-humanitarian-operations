@@ -1343,6 +1343,15 @@ function toggleIPCLayers(visible, currCountry) {
     map.setLayoutProperty(`${country.iso}-ipc-boundary-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-label-layer`, 'visibility', vis);
   });
+
+  if (visible) {
+    map.setLayoutProperty(globalLabelLayer, 'visibility', 'none');
+    map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
+  }
+  else {
+    map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
+    map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
+  }
 }
 
 /***********************/
