@@ -325,7 +325,7 @@ function updateCountryLayer() {
 
       //turn off choropleth for raster layers
       if (currentIndicator.id=='#climate+rainfall+anomaly') {
-        boundaryColor = '#FFF';
+        boundaryColor = '#E0E0E0';
         color = colorDefault;
       }
       if (currentIndicator.id=='#population') {
@@ -473,22 +473,19 @@ function updateGlobalLayer() {
   //data join
   var expression = ['match', ['get', 'ADM_PCODE']];
   var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
+  var boundaryColor = '#E0E0E0';
   adminone_data.forEach(function(d) {
     var val = d[currentIndicator.id];
     var color = (val==null) ? colorNoData : colorScale(val);
-    var boundaryColor = '#F2F2F2';
 
     //turn off choropleth for raster layers
     if (currentIndicator.id=='#population') {
-      boundaryColor = '#E0E0E0';
       color = colorDefault;
     }
     if (currentIndicator.id=='#climate+rainfall+anomaly') {
-      boundaryColor = '#FFF';
       color = colorDefault;
     }
     if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-      boundaryColor = '#E0E0E0';
       color = '#FFF';
     }
 
@@ -498,7 +495,7 @@ function updateGlobalLayer() {
 
   //default value for no data
   expression.push(colorDefault);
-  expressionBoundary.push('#E0E0E0');
+  expressionBoundary.push(boundaryColor);
   
   //update map and legend
   map.setPaintProperty(globalLayer, 'fill-color', expression);
@@ -790,7 +787,7 @@ let ipcData = [
   },
   {
     iso: 'ken',
-    data: 'Kenya_July 2022.geojson'
+    data: 'kenya_ipc.geojson'
   },
   {
     iso: 'som',
@@ -863,7 +860,7 @@ function displayMap() {
   }, baseLayer);
   waterLayer = 'waterbodies-layer';
   map.setLayoutProperty(waterLayer, 'visibility', 'visible');
-  
+
   //adm1 fills
   let subnationalSource = 'hornafrica_polbnda_subnationa-2rkvd2';
   let subnationalCentroidSource = 'hornafrica_polbndp_subnationa-a7lq5r';
@@ -1109,7 +1106,7 @@ function loadIPCLayer(country) {
     id: `${country.iso}-ipc-label-layer`,
     type: 'symbol',
     source: `${country.iso}-ipc`,
-    filter: ["==", ["geometry-type"], "Polygon"],
+    filter: ['==', ['geometry-type'], 'Polygon'],
     layout: {
       'text-field': ['get', 'area'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
