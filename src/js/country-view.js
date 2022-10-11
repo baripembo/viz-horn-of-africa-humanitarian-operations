@@ -65,7 +65,7 @@ function updateCountryLayer() {
 
   //update legend
   var colorScale = getLegendScale();
-  if (currentIndicator.id=='#affected+idps+ind' && currentCountry.code=='KEN') {
+  if ((currentIndicator.id=='#affected+idps+ind' && currentCountry.code=='KEN') || (currentIndicator.id=='#affected+food+ipc+phase+type' && currentCountry.code=='ETH')) {
     $('.legend-container').hide();
   }
   else {
