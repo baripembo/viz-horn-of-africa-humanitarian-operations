@@ -27,8 +27,7 @@ function createMapTooltip(p_code, p_name, point) {
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'},
                       {label: 'People Affected', indicator: '#affected+total'},
-                      {label: 'People Targeted', indicator: '#targeted+total'},
-                      {label: 'People Reached', indicator: '#reached+total'}];
+                      {label: 'People Targeted', indicator: '#targeted+total'}];//{label: 'People Reached', indicator: '#reached+total'}
 
     //remove population figures for ETH only
     if (location[0]['#country+name']=='Ethiopia') {
@@ -90,8 +89,7 @@ function createCountryMapTooltip(name, pcode, point) {
     //set up supporting key figures    
     var tableArray = [{label: 'Population', indicator: '#population'},
                       {label: 'People Affected', indicator: '#affected+total'},
-                      {label: 'People Targeted', indicator: '#targeted+total'},
-                      {label: 'People Reached', indicator: '#reached+total'}];
+                      {label: 'People Targeted', indicator: '#targeted+total'}];//{label: 'People Reached', indicator: '#reached+total'}
 
     //show ipc pop for countries except for SOM
     if (currentCountry.code!=='SOM') {
