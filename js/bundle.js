@@ -409,6 +409,7 @@ function onMouseLeave(e) {
 /****************************/
 function handleGlobalEvents(layer) {
   map.on('mouseenter', globalLayer, function(e) {
+    tooltip.remove();
     map.getCanvas().style.cursor = 'pointer';
     tooltip.addTo(map);
   });
@@ -423,6 +424,9 @@ function handleGlobalEvents(layer) {
     if (target!=undefined && currentIndicator.id!=='#affected+food+ipc+phase+type') {
       tooltip.setLngLat(e.lngLat);
       createMapTooltip(target.properties.ADM_PCODE, target.properties.ADM_REF, e.point);
+    }
+    else {
+      tooltip.remove();
     }
   });
      
