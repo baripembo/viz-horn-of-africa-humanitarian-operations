@@ -23,11 +23,13 @@ function initCountryLayer() {
         tooltip
           .addTo(map)
           .setLngLat(e.lngLat);
+      }    
+      else {
+        onMouseLeave(e);
       }
     }
     else {
-      map.getCanvas().style.cursor = '';
-      tooltip.remove();
+      onMouseLeave(e);
     }
   });    
 }
