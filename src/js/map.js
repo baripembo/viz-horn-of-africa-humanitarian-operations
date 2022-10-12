@@ -136,8 +136,7 @@ function displayMap() {
       'text-field': ['get', 'ADM_REF'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
-      'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-      'text-radial-offset': 0.4
+      'text-variable-anchor': ['top', 'bottom', 'left', 'right']
     },
     paint: {
       'text-color': '#666',
@@ -191,7 +190,6 @@ function displayMap() {
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
       'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-      'text-radial-offset': 0.4, 
       'text-padding': 8
     },
     paint: {

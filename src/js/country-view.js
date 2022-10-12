@@ -24,10 +24,10 @@ function initCountryLayer() {
           .addTo(map)
           .setLngLat(e.lngLat);
       }
-      else {
-        map.getCanvas().style.cursor = '';
-        tooltip.remove();
-      }
+    }
+    else {
+      map.getCanvas().style.cursor = '';
+      tooltip.remove();
     }
   });    
 }
