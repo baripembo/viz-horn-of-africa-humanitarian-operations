@@ -263,13 +263,11 @@ function initCountryLayer() {
           .setLngLat(e.lngLat);
       }    
       else {
-        map.getCanvas().style.cursor = '';
-        tooltip.remove();
+        onMouseLeave(e);
       }
     }
     else {
-      map.getCanvas().style.cursor = '';
-      tooltip.remove();
+      onMouseLeave(e);
     }
   });    
 }
@@ -1246,9 +1244,12 @@ function onLayerSelected(selected) {
   selectLayer(selected);
   
   if (currentCountry.code=='') {
+    map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
     updateGlobalLayer();
+
   }
   else {
+    map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
     var selectedFeatures = matchMapFeatures(currentCountry.code);
     selectCountry(selectedFeatures);
   }
@@ -1492,7 +1493,7 @@ function createMapTooltip(p_code, p_name, point) {
       //dont show population figures for ETH
     }
     else if (currentIndicator.id=='#climate+rainfall+anomaly') {
-      content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
+      content += `${currentIndicator.name}:<div class="stat">${parseFloat(val).toFixed(2)}mm</div>`;
     }
     else {
       content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}</div>`;
@@ -1541,7 +1542,7 @@ function createCountryMapTooltip(name, location, point) {
     content += `${indicator}:<div class="stat">${val}</div>`;
   }
   else if (currentIndicator.id=='#climate+rainfall+anomaly'){
-    content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
+    content += `${currentIndicator.name}:<div class="stat">${parseFloat(val).toFixed(2)}mm</div>`;
   }
   else if (currentIndicator.id=='#population' && currentCountry.code=='ETH') {
     //dont show population figures for ETH
