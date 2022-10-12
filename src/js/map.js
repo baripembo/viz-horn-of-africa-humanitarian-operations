@@ -191,7 +191,8 @@ function displayMap() {
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
       'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-      'text-radial-offset': 0.4
+      'text-radial-offset': 0.4, 
+      'text-padding': 8
     },
     paint: {
       'text-color': '#666',
@@ -567,7 +568,7 @@ function toggleIPCLayers(visible, currCountry) {
     map.setLayoutProperty(`${country.iso}-ipc-boundary-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-label-layer`, 'visibility', vis);
   });
-  
+
   //turn subnational labels off for ipc layer
   if (visible) {
     map.setLayoutProperty(globalLabelLayer, 'visibility', 'none');

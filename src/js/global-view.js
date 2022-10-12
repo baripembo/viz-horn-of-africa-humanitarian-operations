@@ -3,7 +3,6 @@
 /****************************/
 function handleGlobalEvents(layer) {
   map.on('mouseenter', globalLayer, function(e) {
-    tooltip.remove();
     map.getCanvas().style.cursor = 'pointer';
     tooltip.addTo(map);
   });

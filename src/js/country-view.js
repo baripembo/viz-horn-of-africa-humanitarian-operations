@@ -10,16 +10,24 @@ function initCountryLayer() {
   map.on('mouseleave', subnationalLayer, onMouseLeave);
   map.on('mousemove', subnationalLayer, function(e) {
     var f = map.queryRenderedFeatures(e.point)[0];
-    if (f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name && currentIndicator.id!=='#affected+food+ipc+phase+type') {
-      map.getCanvas().style.cursor = 'pointer';
-      createCountryMapTooltip(f.properties.ADM_REF, f.properties.ADM_PCODE, e.point);
-      tooltip
-        .addTo(map)
-        .setLngLat(e.lngLat);
-    }
-    else {
-      map.getCanvas().style.cursor = '';
-      tooltip.remove();
+    var location = admintwo_data.filter(function(c) {
+      if (c['#adm2+code']==f.properties.ADM_PCODE && c['#country+code']==currentCountry.code)
+        return c;
+    });
+
+    if (location[0]!=undefined) {
+      var val = location[0][currentIndicator.id];
+      if (val!==undefined && f.properties.ADM_PCODE!=undefined && f.properties.ADM0_REF==currentCountry.name && currentIndicator.id!=='#affected+food+ipc+phase+type') {
+        map.getCanvas().style.cursor = 'pointer';
+        createCountryMapTooltip(f.properties.ADM_REF, location[0]);
+        tooltip
+          .addTo(map)
+          .setLngLat(e.lngLat);
+      }
+      else {
+        map.getCanvas().style.cursor = '';
+        tooltip.remove();
+      }
     }
   });    
 }
@@ -77,11 +85,13 @@ function updateCountryLayer() {
   var expression = ['match', ['get', 'ADM_PCODE']];
   var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
   var expressionOpacity = ['match', ['get', 'ADM_PCODE']];
+  var expressionLabelOpacity = ['match', ['get', 'ADM_PCODE']];
   admintwo_data.forEach(function(d) {
-    var color, boundaryColor, layerOpacity;
+    var color, boundaryColor, layerOpacity, labelOpacity;
     if (d['#country+code']==currentCountry.code) {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
+      labelOpacity = (val==undefined) ? 0 : 1;
       boundaryColor = '#D7D5D5';
       color = (val<0 || !isVal(val)) ? colorNoData : colorScale(val);
 
@@ -102,22 +112,25 @@ function updateCountryLayer() {
       color = colorDefault;
       boundaryColor = '#D7D5D5';
       layerOpacity = 0;
+      labelOpacity = 0;
     }
     
     expression.push(d['#adm2+code'], color);
     expressionBoundary.push(d['#adm2+code'], boundaryColor);
     expressionOpacity.push(d['#adm2+code'], layerOpacity);
+    expressionLabelOpacity.push(d['#adm2+code'], labelOpacity);
   });
   //set expression defaults
   expression.push(colorDefault);
   expressionBoundary.push('#D7D5D5');
   expressionOpacity.push(0);
+  expressionLabelOpacity.push(0);
 
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
   map.setPaintProperty(subnationalLayer, 'fill-opacity', (currentIndicator.id=='#population' || currentIndicator.id=='#climate+rainfall+anomaly') ? 0 : 1);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-color', expressionBoundary);
   map.setPaintProperty(subnationalBoundaryLayer, 'line-opacity', expressionOpacity);
-  map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionOpacity);
+  map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionLabelOpacity);
 
   //hide all rasters
   var countryList = Object.keys(countryCodeList);

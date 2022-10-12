@@ -47,73 +47,62 @@ function createMapTooltip(p_code, p_name, point) {
     //set content for tooltip
     tooltip.setHTML(content);
 
-    setTooltipPosition(point);
+    //setTooltipPosition(point);
   }
 }
 
 
-function createCountryMapTooltip(name, pcode, point) {
-  var location = admintwo_data.filter(function(c) {
-    if (c['#adm2+code']==pcode && c['#country+code']==currentCountry.code)
-      return c;
-  });
+function createCountryMapTooltip(name, location, point) {
+  var val = location[currentIndicator.id];
+  var label = currentIndicator.name;
 
-  if (location[0]!=undefined) {
-    var val = location[0][currentIndicator.id];
-    var label = currentIndicator.name;
+  //format content for tooltip
+  let content = '';
+  content = `<h2>${name}</h2>`;
 
-    //format content for tooltip
-    if (!isVal(val)) {
-      val = 'No Data';
-    }
-
-    let content = '';
-    content = `<h2>${name}</h2>`;
-
-    if ('currentIndicator.id'=='#priority' || isNaN(val)) {
-      let indicator;
-      if (currentIndicator.id=='#priority') indicator = 'Operational Priority Level';
-      else indicator = currentIndicator.name
-      content += `${indicator}:<div class="stat">${val}</div>`;
-    }
-    else if (currentIndicator.id=='#climate+rainfall+anomaly'){
-      content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
-    }
-    else if (currentIndicator.id=='#population' && currentCountry.code=='ETH') {
-      //dont show population figures for ETH
-    }
-    else {
-      content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}</div>`;
-    }
-
-    //set up supporting key figures    
-    var tableArray = [{label: 'Population', indicator: '#population'},
-                      {label: 'People Affected', indicator: '#affected+total'},
-                      {label: 'People Targeted', indicator: '#targeted+total'}];//{label: 'People Reached', indicator: '#reached+total'}
-
-    //show ipc pop for countries except for SOM
-    if (currentCountry.code!=='SOM') {
-      tableArray.splice(1, 0, {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'});
-    }
-
-    //remove population figures for ETH only
-    if (currentCountry.code=='ETH') {
-      tableArray.splice(0, 1);
-    }
-
-    content += '<div class="table-display">';
-    tableArray.forEach(function(row) {
-      if (row.indicator!=currentIndicator.id) {
-        let value = location[0][row.indicator];
-        let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
-        if (row.indicator=='#affected+food+ipc+phase+type') shortVal = (value==undefined) ? 'No Data' : value;
-        content += `<div class="table-row"><div>${row.label}:</div><div>${shortVal}</div></div>`;
-      }
-    });
-    content += '</div>';
-
-    tooltip.setHTML(content);
+  if ('currentIndicator.id'=='#priority' || isNaN(val)) {
+    let indicator;
+    if (currentIndicator.id=='#priority') indicator = 'Operational Priority Level';
+    else indicator = currentIndicator.name
+    content += `${indicator}:<div class="stat">${val}</div>`;
   }
+  else if (currentIndicator.id=='#climate+rainfall+anomaly'){
+    content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}mm</div>`;
+  }
+  else if (currentIndicator.id=='#population' && currentCountry.code=='ETH') {
+    //dont show population figures for ETH
+  }
+  else {
+    content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}</div>`;
+  }
+
+  //set up supporting key figures    
+  var tableArray = [{label: 'Population', indicator: '#population'},
+                    {label: 'People Affected', indicator: '#affected+total'},
+                    {label: 'People Targeted', indicator: '#targeted+total'}];//{label: 'People Reached', indicator: '#reached+total'}
+
+  //show ipc pop for countries except for SOM
+  if (currentCountry.code=='KEN') {
+    tableArray.splice(1, 0, {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'});
+  }
+
+  //remove population figures for ETH only
+  if (currentCountry.code=='ETH') {
+    tableArray.splice(0, 1);
+  }
+
+  content += '<div class="table-display">';
+  tableArray.forEach(function(row) {
+    if (row.indicator!=currentIndicator.id) {
+      let value = location[row.indicator];
+      let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
+      if (row.indicator=='#affected+food+ipc+phase+type') shortVal = (value==undefined) ? 'No Data' : value;
+      content += `<div class="table-row"><div>${row.label}:</div><div>${shortVal}</div></div>`;
+    }
+  });
+  content += '</div>';
+
+  tooltip.setHTML(content);
 }
 
 
