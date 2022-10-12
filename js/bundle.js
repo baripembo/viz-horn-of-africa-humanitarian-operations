@@ -283,6 +283,30 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
 
+  //reset disabled inputs
+  disableInput('#affected+food+ipc+phase+type', false);
+  disableInput('#affected+idps+ind', false);
+
+  //disable empty layers
+  if (currentCountry.code=='ETH') {
+    disableInput('#affected+food+ipc+phase+type', true);
+    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+      //set fallback default layer  
+      var selected = $('.map-legend').find('input[value="#climate+rainfall+anomaly"]');
+      selected.prop('checked', true);
+      onLayerSelected(selected);
+    }
+  }
+  if (currentCountry.code=='KEN') {
+    disableInput('#affected+idps+ind', true);
+    if (currentIndicator.id=='#affected+idps+ind') {
+      //set fallback default layer  
+      var selected = $('.map-legend').find('input[value="#affected+food+ipc+phase+type"]');
+      selected.prop('checked', true);
+      onLayerSelected(selected);
+    }
+  }
+
   //set map legend options
   $('.map-legend .indicator.country-only').show();
 
@@ -293,12 +317,11 @@ function updateCountryLayer() {
   //update key figures
   initKeyFigures();
 
-  colorNoData = '#F9F9F9';
-
   //max
   var max = getCountryIndicatorMax();
 
   //color scale
+  colorNoData = '#F9F9F9';
   var clrRange = colorRange;
   switch(currentIndicator.id) {
     case '#population':
@@ -423,11 +446,7 @@ function onMouseLeave(e) {
 /*** GLOBAL MAP FUNCTIONS ***/
 /****************************/
 function handleGlobalEvents(layer) {
-  map.on('mouseenter', globalLayer, function(e) {
-    map.getCanvas().style.cursor = 'pointer';
-    tooltip.addTo(map);
-  });
-
+  map.on('mouseenter', globalLayer, onMouseEnter);
   map.on('mousemove', globalLayer, function(e) {
     var features = map.queryRenderedFeatures(e.point, { layers: [globalLayer] });
     var target;
@@ -443,11 +462,7 @@ function handleGlobalEvents(layer) {
       tooltip.remove();
     }
   });
-     
-  map.on('mouseleave', globalLayer, function() {
-    map.getCanvas().style.cursor = '';
-    tooltip.remove();
-  });
+  map.on('mouseleave', globalLayer, onMouseLeave);
 }
 
 
@@ -782,6 +797,12 @@ function transformIPC(value) {
       phase = value;
   }
   return phase;
+}
+
+function disableInput(indicator, isDisabled) {
+  let clr = (isDisabled) ? '#BBB' : '#000';
+  $(`input[value="${indicator}"]`).attr('disabled', isDisabled);
+  $(`input[value="${indicator}"]`).parent().css('color', clr);
 }
 
 //country codes and raster ids
@@ -1334,6 +1355,9 @@ function resetMap() {
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   toggleIPCLayers(true);
+
+  //reset disabled inputs
+  disableInput('#affected+food+ipc+phase+type', false);
 
   //reset map legends
   $('.map-legend .indicator.country-only').hide();
