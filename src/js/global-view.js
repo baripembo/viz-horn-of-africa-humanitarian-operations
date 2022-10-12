@@ -2,11 +2,7 @@
 /*** GLOBAL MAP FUNCTIONS ***/
 /****************************/
 function handleGlobalEvents(layer) {
-  map.on('mouseenter', globalLayer, function(e) {
-    map.getCanvas().style.cursor = 'pointer';
-    tooltip.addTo(map);
-  });
-
+  map.on('mouseenter', globalLayer, onMouseEnter);
   map.on('mousemove', globalLayer, function(e) {
     var features = map.queryRenderedFeatures(e.point, { layers: [globalLayer] });
     var target;
@@ -22,11 +18,7 @@ function handleGlobalEvents(layer) {
       tooltip.remove();
     }
   });
-     
-  map.on('mouseleave', globalLayer, function() {
-    map.getCanvas().style.cursor = '';
-    tooltip.remove();
-  });
+  map.on('mouseleave', globalLayer, onMouseLeave);
 }
 
 

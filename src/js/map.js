@@ -541,6 +541,9 @@ function resetMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   toggleIPCLayers(true);
 
+  //reset disabled inputs
+  disableInput('#affected+food+ipc+phase+type', false);
+
   //reset map legends
   $('.map-legend .indicator.country-only').hide();
   $('.legend-container').show();

@@ -118,6 +118,12 @@ function transformIPC(value) {
   return phase;
 }
 
+function disableInput(indicator, isDisabled) {
+  let clr = (isDisabled) ? '#BBB' : '#000';
+  $(`input[value="${indicator}"]`).attr('disabled', isDisabled);
+  $(`input[value="${indicator}"]`).parent().css('color', clr);
+}
+
 //country codes and raster ids
 const countryCodeList = {
   ETH: {pop: '1jx1mpm4', chirps: '9f35wnzq'},

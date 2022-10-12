@@ -45,6 +45,30 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
 
+  //reset disabled inputs
+  disableInput('#affected+food+ipc+phase+type', false);
+  disableInput('#affected+idps+ind', false);
+
+  //disable empty layers
+  if (currentCountry.code=='ETH') {
+    disableInput('#affected+food+ipc+phase+type', true);
+    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+      //set fallback default layer  
+      var selected = $('.map-legend').find('input[value="#climate+rainfall+anomaly"]');
+      selected.prop('checked', true);
+      onLayerSelected(selected);
+    }
+  }
+  if (currentCountry.code=='KEN') {
+    disableInput('#affected+idps+ind', true);
+    if (currentIndicator.id=='#affected+idps+ind') {
+      //set fallback default layer  
+      var selected = $('.map-legend').find('input[value="#affected+food+ipc+phase+type"]');
+      selected.prop('checked', true);
+      onLayerSelected(selected);
+    }
+  }
+
   //set map legend options
   $('.map-legend .indicator.country-only').show();
 
@@ -55,12 +79,11 @@ function updateCountryLayer() {
   //update key figures
   initKeyFigures();
 
-  colorNoData = '#F9F9F9';
-
   //max
   var max = getCountryIndicatorMax();
 
   //color scale
+  colorNoData = '#F9F9F9';
   var clrRange = colorRange;
   switch(currentIndicator.id) {
     case '#population':
