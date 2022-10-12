@@ -450,9 +450,12 @@ function onLayerSelected(selected) {
   selectLayer(selected);
   
   if (currentCountry.code=='') {
+    map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
     updateGlobalLayer();
+
   }
   else {
+    map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
     var selectedFeatures = matchMapFeatures(currentCountry.code);
     selectCountry(selectedFeatures);
   }
