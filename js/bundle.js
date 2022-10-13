@@ -1501,8 +1501,6 @@ $( document ).ready(function() {
       sourcesData = allData.sources_data;
       regionBoundaryData = data[1].features;
 
-      console.log(admintwo_data)
-
       //parse national data
       nationalData.forEach(function(item) {
         //keep global list of countries
