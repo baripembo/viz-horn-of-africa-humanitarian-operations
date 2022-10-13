@@ -1,114 +1,6 @@
 /****************************/
-/*** GLOBAL MAP FUNCTIONS ***/
+/*** LEGEND FUNCTIONS ***/
 /****************************/
-function handleGlobalEvents(layer) {
-  map.on('mouseenter', globalLayer, onMouseEnter);
-  map.on('mousemove', globalLayer, function(e) {
-    var features = map.queryRenderedFeatures(e.point, { layers: [globalLayer] });
-    var target;
-    features.forEach(function(feature) {
-      if (feature.sourceLayer==adm1SourceLayer)
-        target = feature;
-    });
-    if (target!=undefined && currentIndicator.id!=='#affected+food+ipc+phase+type') {
-      tooltip.setLngLat(e.lngLat);
-      createMapTooltip(target.properties.ADM_PCODE, target.properties.ADM_REF, e.point);
-    }
-    else {
-      tooltip.remove();
-    }
-  });
-  map.on('mouseleave', globalLayer, onMouseLeave);
-}
-
-
-function initGlobalLayer() {
-  initKeyFigures();
-
-  //color scale
-  colorScale = getLegendScale();
-  createMapLegend(colorScale);
-
-  //data join
-  var expression = ['match', ['get', 'ADM_PCODE']];
-  adminone_data.forEach(function(d) {
-    var val = d[currentIndicator.id];
-    var color = (val==null) ? colorNoData : colorScale(val);
-
-    //turn off choropleth for ipc layer
-    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-      color = '#FFF';
-    }
-
-    expression.push(d['#adm1+code'], color);
-  });
-
-  //default value for no data
-  expression.push(colorDefault);
-  
-  //set properties
-  map.setPaintProperty(globalLayer, 'fill-color', expression);
-
-  //define mouse events
-  handleGlobalEvents();
-}
-
-
-function updateGlobalLayer() {
-  //color scale
-  colorScale = getLegendScale();
-  updateMapLegend(colorScale)
-
-  //data join
-  var expression = ['match', ['get', 'ADM_PCODE']];
-  var expressionBoundary = ['match', ['get', 'ADM_PCODE']];
-  var boundaryColor = '#E0E0E0';
-  adminone_data.forEach(function(d) {
-    var val = d[currentIndicator.id];
-    var color = (val==null) ? colorNoData : colorScale(val);
-
-    //turn off choropleth for raster layers
-    if (currentIndicator.id=='#population') {
-      color = colorDefault;
-    }
-    if (currentIndicator.id=='#climate+rainfall+anomaly') {
-      color = colorDefault;
-    }
-    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-      color = '#FFF';
-    }
-
-    expression.push(d['#adm1+code'], color);
-    expressionBoundary.push(d['#adm1+code'], boundaryColor);
-  });
-
-  //default value for no data
-  expression.push(colorDefault);
-  expressionBoundary.push(boundaryColor);
-  
-  //update map and legend
-  map.setPaintProperty(globalLayer, 'fill-color', expression);
-  map.setPaintProperty(globalBoundaryLayer, 'line-color', expressionBoundary);
-
-  //toggle rasters
-  var countryList = Object.keys(countryCodeList);
-  countryList.forEach(function(country_code) {
-    if (currentCountry.code=='' || country_code==currentCountry.code) {
-      var id = country_code.toLowerCase();
-      if (map.getLayer(id+'-popdensity'))
-        map.setLayoutProperty(id+'-popdensity', 'visibility', (currentIndicator.id=='#population') ? 'visible' : 'none');
-
-      if (map.getLayer(id+'-chirps'))
-        map.setLayoutProperty(id+'-chirps', 'visibility', (currentIndicator.id=='#climate+rainfall+anomaly') ? 'visible' : 'none');
-    }
-  });
-
-  //toggle ipc layers
-  let isIPC = (currentIndicator.id=='#affected+food+ipc+phase+type') ? true : false;
-  toggleIPCLayers(isIPC);
-}
-
-
 function createMapLegend(scale) {
   //set legend title
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
@@ -193,23 +85,17 @@ function getLegendScale() {
   //get min/max
   let min, max;
   let data = new Array(); //create copy of indicator data for quantile scales
-  if (isCountryView()) {
-    min =  d3.min(admintwo_data, function(d) { 
-      if (d['#country+code']==currentCountry.code) {
-        data.push(+d[currentIndicator.id]);
-        return +d[currentIndicator.id]; 
-      }
-    });
-    max =  d3.max(admintwo_data, function(d) { 
-      if (d['#country+code']==currentCountry.code) {
-        return +d[currentIndicator.id]; 
-      }
-    });
-  }
-  else { //regional view
-    min = d3.min(adminone_data, d => +d[currentIndicator.id]);
-    max = d3.max(adminone_data, d => +d[currentIndicator.id]);
-  }
+  min =  d3.min(admintwo_data, function(d) { 
+    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+      data.push(+d[currentIndicator.id]);
+      return +d[currentIndicator.id]; 
+    }
+  });
+  max =  d3.max(admintwo_data, function(d) { 
+    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+      return +d[currentIndicator.id]; 
+    }
+  });
 
   //set scale
   var scale;

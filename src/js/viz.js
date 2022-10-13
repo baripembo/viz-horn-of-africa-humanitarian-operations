@@ -84,10 +84,12 @@ $( document ).ready(function() {
       var allData = data[0];
       regionalData = allData.regional_data[0];
       nationalData = allData.national_data;
-      adminone_data = allData.adminone_data;
+      //adminone_data = allData.adminone_data;
       admintwo_data = allData.admintwo_data;
       sourcesData = allData.sources_data;
       regionBoundaryData = data[1].features;
+
+      console.log(admintwo_data)
 
       //parse national data
       nationalData.forEach(function(item) {
