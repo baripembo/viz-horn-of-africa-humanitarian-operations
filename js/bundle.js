@@ -289,7 +289,7 @@ function initCountryLayer() {
       var val = location[0][currentIndicator.id];
       if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || currentCountry.code=='') && currentIndicator.id!=='#affected+food+ipc+phase+type') {
         map.getCanvas().style.cursor = 'pointer';
-        createCountryMapTooltip(f.properties.ADM_REF, location[0]);
+        createCountryMapTooltip(location[0]);
         tooltip
           .addTo(map)
           .setLngLat(e.lngLat);
@@ -1328,13 +1328,13 @@ function getSource(indicator) {
 /*************************/
 /*** TOOLTIP FUNCTIONS ***/
 /*************************/
-function createCountryMapTooltip(name, location, point) {
+function createCountryMapTooltip(location) {
   var val = location[currentIndicator.id];
   var label = currentIndicator.name;
 
   //format content for tooltip
   let content = '';
-  content = `<h2>${name}</h2>`;
+  content = `<h2>${location['#adm2+name']}, ${location['#country+name']}</h2>`;
 
   if ('currentIndicator.id'=='#priority' || isNaN(val)) {
     let indicator;
