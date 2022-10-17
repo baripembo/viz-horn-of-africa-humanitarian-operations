@@ -2,7 +2,7 @@
 /*** PANEL FUNCTIONS ***/
 /***********************/
 function initKeyFigures() {
-  var data = (currentCountry.code=='') ? regionalData : dataByCountry[currentCountry.code][0];
+  var data = (!isCountryView()) ? regionalData : dataByCountry[currentCountry.code][0];
 
   //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
@@ -20,7 +20,7 @@ function initKeyFigures() {
   ];
 
   impactFigures.forEach(function(fig) {
-    let tag = (currentCountry.code=='') ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
+    let tag = (!isCountryView()) ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
     createFigure(impactDiv, {className: fig.className, title: fig.title, stat: formatValue(data[fig.tag], 'short'), indicator: tag});
   });
 
@@ -36,7 +36,7 @@ function initKeyFigures() {
   ];
 
   fundingFigures.forEach(function(fig) {
-    let tag = (currentCountry.code=='') ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
+    let tag = (!isCountryView()) ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
     let statVal = fig.tag=='#value+funding+pct' ? formatValue(data[fig.tag], 'percent') : formatValue(data[fig.tag]);
     createFigure(fundingDiv, {className: fig.className, title: fig.title, stat: statVal, indicator: tag});
   });

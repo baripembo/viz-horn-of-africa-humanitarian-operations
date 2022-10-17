@@ -49,7 +49,7 @@ function initCountryLayer() {
 
     if (location[0]!=undefined) {
       var val = location[0][currentIndicator.id];
-      if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || currentCountry.code=='') && currentIndicator.id!=='#affected+food+ipc+phase+type') {
+      if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || !isCountryView()) && currentIndicator.id!=='#affected+food+ipc+phase+type') {
         map.getCanvas().style.cursor = 'pointer';
         createCountryMapTooltip(location[0]);
         tooltip
@@ -138,7 +138,7 @@ function updateCountryLayer() {
   var expressionLabelOpacity = ['match', ['get', 'ADM_PCODE']];
   admintwo_data.forEach(function(d) {
     var color, boundaryColor, layerOpacity, labelOpacity;
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+    if (d['#country+code']==currentCountry.code || !isCountryView()) {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
       labelOpacity = (val==undefined) ? 0 : 1;
@@ -186,11 +186,11 @@ function updateCountryLayer() {
     var id = country_code.toLowerCase();
 
     //pop rasters
-    var popVis = (currentIndicator.id=='#population' && (currentCountry.code.toLowerCase()==id || currentCountry.code=='')) ? 'visible' : 'none';
+    var popVis = (currentIndicator.id=='#population' && (currentCountry.code.toLowerCase()==id || !isCountryView())) ? 'visible' : 'none';
     map.setLayoutProperty(id+'-popdensity', 'visibility', popVis);
 
     //rainfall rasters
-    var rainVis = (currentIndicator.id=='#climate+rainfall+anomaly' && (currentCountry.code.toLowerCase()==id || currentCountry.code=='')) ? 'visible' : 'none';
+    var rainVis = (currentIndicator.id=='#climate+rainfall+anomaly' && (currentCountry.code.toLowerCase()==id || !isCountryView())) ? 'visible' : 'none';
     map.setLayoutProperty(id+'-chirps', 'visibility', rainVis);
   });
 

@@ -378,7 +378,7 @@ function createEvents() {
   d3.select('.country-select').on('change',function(e) {
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
-    vizTrack(`main ${currentCountry.code} view`, currentCountry.name);
+    vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
 
     if (isCountryView()) {
       //find matched features and zoom to country
@@ -396,6 +396,7 @@ function createEvents() {
   //map legend radio events
   $('input[type="radio"]').click(function(){
     var selected = $('input[name="countryIndicators"]:checked');
+    vizTrack(`main ${currentCountry.code} view`, selected.parent().text());
     onLayerSelected(selected);
   });
 }
@@ -404,7 +405,7 @@ function onLayerSelected(selected) {
   currentIndicator = {id: selected.val(), name: selected.parent().text()};
   selectLayer(selected);
   
-  if (currentCountry.code=='') {
+  if (!isCountryView()) {
     updateCountryLayer();
   }
   else {
@@ -415,8 +416,6 @@ function onLayerSelected(selected) {
 
 
 function selectLayer(layer) {
-  vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
-
   //reset any deep links
   let layerID = layer.attr('data-layer');
   let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
@@ -454,7 +453,7 @@ function selectCountry(features) {
 
 
 function updateCountrySource() {
-  let country = (currentCountry.code=='') ? 'regional' : (currentCountry.code).toLowerCase();
+  let country = (!isCountryView()) ? 'regional' : (currentCountry.code).toLowerCase();
   $('.map-legend .indicator').each(function(layer) {
     let div = $(this).find('.source-container');
     let indicator = $(this).find('input').val() + '+' + country;
@@ -512,7 +511,7 @@ function resetMap() {
 
 function toggleIPCLayers(visible) {
   ipcData.forEach(function(country) {
-    let vis = (visible && (currentCountry.code=='' || currentCountry.code.toLowerCase()==country.iso)) ? 'visible' : 'none';
+    let vis = (visible && (!isCountryView() || currentCountry.code.toLowerCase()==country.iso)) ? 'visible' : 'none';
     map.setLayoutProperty(`${country.iso}-ipc-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-boundary-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-label-layer`, 'visibility', vis);

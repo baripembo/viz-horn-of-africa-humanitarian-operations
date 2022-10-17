@@ -166,9 +166,9 @@ $( document ).ready(function() {
         .text(function(d) { return d[1][0]['#country+name']; })
         .attr('value', function (d) { return d[1][0]['#country+code']; });
     //insert default option    
-    $('.country-select').prepend('<option value="">All Countries</option>');
+    $('.country-select').prepend('<option value="Regional">All Countries</option>');
     $('.country-select').val($('.country-select option:first').val());
-    currentCountry = {code: '', name:''}
+    currentCountry = {code: 'Regional', name:'All Countries'}
 
     //create chart view country select
     // $('.trendseries-select').append($('<option value="All">All Clusters</option>')); 

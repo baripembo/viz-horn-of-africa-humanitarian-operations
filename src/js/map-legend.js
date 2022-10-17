@@ -86,13 +86,13 @@ function getLegendScale() {
   let min, max;
   let data = new Array(); //create copy of indicator data for quantile scales
   min =  d3.min(admintwo_data, function(d) { 
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+    if (d['#country+code']==currentCountry.code || !isCountryView()) {
       data.push(+d[currentIndicator.id]);
       return +d[currentIndicator.id]; 
     }
   });
   max =  d3.max(admintwo_data, function(d) { 
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+    if (d['#country+code']==currentCountry.code || !isCountryView()) {
       return +d[currentIndicator.id]; 
     }
   });

@@ -1,4 +1,5 @@
 function vizTrack(view, content) {
+  console.log('vizTrack', view, content)
   mpTrack(view, content);
   gaTrack('viz interaction hdx', 'switch viz', 'horn of africa data explorer', content);
 }
@@ -92,7 +93,7 @@ function createFootnote(target, indicator, text) {
 }
 
 function isCountryView() {
-  return currentCountry.code=='' ? false : true;
+  return currentCountry.code=='Regional' ? false : true;
 }
 
 function transformIPC(value) {
