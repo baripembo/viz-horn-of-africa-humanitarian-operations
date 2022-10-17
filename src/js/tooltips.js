@@ -1,13 +1,13 @@
 /*************************/
 /*** TOOLTIP FUNCTIONS ***/
 /*************************/
-function createCountryMapTooltip(name, location, point) {
+function createCountryMapTooltip(location) {
   var val = location[currentIndicator.id];
   var label = currentIndicator.name;
 
   //format content for tooltip
   let content = '';
-  content = `<h2>${name}</h2>`;
+  content = `<h2>${location['#adm2+name']}, ${location['#country+name']}</h2>`;
 
   if ('currentIndicator.id'=='#priority' || isNaN(val)) {
     let indicator;

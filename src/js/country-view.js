@@ -51,7 +51,7 @@ function initCountryLayer() {
       var val = location[0][currentIndicator.id];
       if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || currentCountry.code=='') && currentIndicator.id!=='#affected+food+ipc+phase+type') {
         map.getCanvas().style.cursor = 'pointer';
-        createCountryMapTooltip(f.properties.ADM_REF, location[0]);
+        createCountryMapTooltip(location[0]);
         tooltip
           .addTo(map)
           .setLngLat(e.lngLat);

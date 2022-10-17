@@ -15,7 +15,8 @@ function mpTrack(view, content) {
   });
 }
 
-function gaTrack(eventCategory, eventAction, eventLabel, type) {
+function gaTrack(eventCategory, eventAction, eventLabel) {
+  //google tag manager event
   dataLayer.push({
     'event': eventCategory,
     'label': eventAction,

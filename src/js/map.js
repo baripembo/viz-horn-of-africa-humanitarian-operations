@@ -413,7 +413,7 @@ function onLayerSelected(selected) {
 
 
 function selectLayer(layer) {
-  //vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
+  vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
 
   //reset any deep links
   let layerID = layer.attr('data-layer');
@@ -423,6 +423,8 @@ function selectLayer(layer) {
 
 
 function selectCountry(features) {
+  vizTrack(`main ${currentCountry.code} view`, currentCountry.name);
+
   let target = bbox.default(turfHelpers.featureCollection(features));
   let padding = 40;
   let mapPadding = (isMobile) ?

@@ -89,8 +89,6 @@ $( document ).ready(function() {
       sourcesData = allData.sources_data;
       regionBoundaryData = data[1].features;
 
-      console.log(admintwo_data)
-
       //parse national data
       nationalData.forEach(function(item) {
         //keep global list of countries
@@ -147,17 +145,17 @@ $( document ).ready(function() {
       deepLinkView();
 
     //create tab events
-    $('.tab-menubar .tab-button').on('click', function() {
-      $('.tab-button').removeClass('active');
-      $(this).addClass('active');
-      if ($(this).data('id')=='chart-view') {
-        $('#chart-view').show();
-      }
-      else {
-        $('#chart-view').hide();
-      }
-      //vizTrack($(this).data('id'), currentIndicator.name);
-    });
+    // $('.tab-menubar .tab-button').on('click', function() {
+    //   $('.tab-button').removeClass('active');
+    //   $(this).addClass('active');
+    //   if ($(this).data('id')=='chart-view') {
+    //     $('#chart-view').show();
+    //   }
+    //   else {
+    //     $('#chart-view').hide();
+    //   }
+    //   vizTrack($(this).data('id'), currentIndicator.name);
+    // });
 
     //create country dropdown
     $('.country-select').empty();
