@@ -465,7 +465,8 @@ function mpTrack(view, content) {
   });
 }
 
-function gaTrack(eventCategory, eventAction, eventLabel, type) {
+function gaTrack(eventCategory, eventAction, eventLabel) {
+  //google tag manager event
   dataLayer.push({
     'event': eventCategory,
     'label': eventAction,
@@ -1120,7 +1121,7 @@ function onLayerSelected(selected) {
 
 
 function selectLayer(layer) {
-  //vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
+  vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
 
   //reset any deep links
   let layerID = layer.attr('data-layer');
@@ -1130,6 +1131,8 @@ function selectLayer(layer) {
 
 
 function selectCountry(features) {
+  vizTrack(`main ${currentCountry.code} view`, currentCountry.name);
+
   let target = bbox.default(turfHelpers.featureCollection(features));
   let padding = 40;
   let mapPadding = (isMobile) ?
@@ -1557,17 +1560,17 @@ $( document ).ready(function() {
       deepLinkView();
 
     //create tab events
-    $('.tab-menubar .tab-button').on('click', function() {
-      $('.tab-button').removeClass('active');
-      $(this).addClass('active');
-      if ($(this).data('id')=='chart-view') {
-        $('#chart-view').show();
-      }
-      else {
-        $('#chart-view').hide();
-      }
-      //vizTrack($(this).data('id'), currentIndicator.name);
-    });
+    // $('.tab-menubar .tab-button').on('click', function() {
+    //   $('.tab-button').removeClass('active');
+    //   $(this).addClass('active');
+    //   if ($(this).data('id')=='chart-view') {
+    //     $('#chart-view').show();
+    //   }
+    //   else {
+    //     $('#chart-view').hide();
+    //   }
+    //   vizTrack($(this).data('id'), currentIndicator.name);
+    // });
 
     //create country dropdown
     $('.country-select').empty();
