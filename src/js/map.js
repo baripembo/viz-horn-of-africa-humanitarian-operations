@@ -378,6 +378,8 @@ function createEvents() {
   d3.select('.country-select').on('change',function(e) {
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
+    vizTrack(`main ${currentCountry.code} view`, currentCountry.name);
+
     if (isCountryView()) {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
@@ -423,8 +425,6 @@ function selectLayer(layer) {
 
 
 function selectCountry(features) {
-  vizTrack(`main ${currentCountry.code} view`, currentCountry.name);
-
   let target = bbox.default(turfHelpers.featureCollection(features));
   let padding = 40;
   let mapPadding = (isMobile) ?
