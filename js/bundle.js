@@ -449,6 +449,7 @@ function onMouseLeave(e) {
   tooltip.remove();
 }
 function vizTrack(view, content) {
+  console.log('vizTrack', view, content)
   mpTrack(view, content);
   gaTrack('viz interaction hdx', 'switch viz', 'horn of africa data explorer', content);
 }
@@ -1086,7 +1087,7 @@ function createEvents() {
   d3.select('.country-select').on('change',function(e) {
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
-    vizTrack(`main ${currentCountry.code} view`, currentCountry.name);
+    vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
 
     if (isCountryView()) {
       //find matched features and zoom to country
@@ -1104,12 +1105,13 @@ function createEvents() {
   //map legend radio events
   $('input[type="radio"]').click(function(){
     var selected = $('input[name="countryIndicators"]:checked');
+    currentIndicator = {id: selected.val(), name: selected.parent().text()};
+    vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
     onLayerSelected(selected);
   });
 }
 
 function onLayerSelected(selected) {
-  currentIndicator = {id: selected.val(), name: selected.parent().text()};
   selectLayer(selected);
   
   if (currentCountry.code=='') {
@@ -1123,8 +1125,6 @@ function onLayerSelected(selected) {
 
 
 function selectLayer(layer) {
-  vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
-
   //reset any deep links
   let layerID = layer.attr('data-layer');
   let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
