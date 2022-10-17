@@ -1,5 +1,4 @@
 function vizTrack(view, content) {
-  console.log('vizTrack', view, content)
   mpTrack(view, content);
   gaTrack('viz interaction hdx', 'switch viz', 'horn of africa data explorer', content);
 }
