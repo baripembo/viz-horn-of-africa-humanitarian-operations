@@ -287,7 +287,7 @@ function initCountryLayer() {
 
     if (location[0]!=undefined) {
       var val = location[0][currentIndicator.id];
-      if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || currentCountry.code=='') && currentIndicator.id!=='#affected+food+ipc+phase+type') {
+      if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || !isCountryView()) && currentIndicator.id!=='#affected+food+ipc+phase+type') {
         map.getCanvas().style.cursor = 'pointer';
         createCountryMapTooltip(location[0]);
         tooltip
@@ -376,7 +376,7 @@ function updateCountryLayer() {
   var expressionLabelOpacity = ['match', ['get', 'ADM_PCODE']];
   admintwo_data.forEach(function(d) {
     var color, boundaryColor, layerOpacity, labelOpacity;
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+    if (d['#country+code']==currentCountry.code || !isCountryView()) {
       var val = d[currentIndicator.id];
       layerOpacity = 1;
       labelOpacity = (val==undefined) ? 0 : 1;
@@ -424,11 +424,11 @@ function updateCountryLayer() {
     var id = country_code.toLowerCase();
 
     //pop rasters
-    var popVis = (currentIndicator.id=='#population' && (currentCountry.code.toLowerCase()==id || currentCountry.code=='')) ? 'visible' : 'none';
+    var popVis = (currentIndicator.id=='#population' && (currentCountry.code.toLowerCase()==id || !isCountryView())) ? 'visible' : 'none';
     map.setLayoutProperty(id+'-popdensity', 'visibility', popVis);
 
     //rainfall rasters
-    var rainVis = (currentIndicator.id=='#climate+rainfall+anomaly' && (currentCountry.code.toLowerCase()==id || currentCountry.code=='')) ? 'visible' : 'none';
+    var rainVis = (currentIndicator.id=='#climate+rainfall+anomaly' && (currentCountry.code.toLowerCase()==id || !isCountryView())) ? 'visible' : 'none';
     map.setLayoutProperty(id+'-chirps', 'visibility', rainVis);
   });
 
@@ -543,7 +543,7 @@ function createFootnote(target, indicator, text) {
 }
 
 function isCountryView() {
-  return currentCountry.code=='' ? false : true;
+  return currentCountry.code=='Regional' ? false : true;
 }
 
 function transformIPC(value) {
@@ -672,13 +672,13 @@ function getLegendScale() {
   let min, max;
   let data = new Array(); //create copy of indicator data for quantile scales
   min =  d3.min(admintwo_data, function(d) { 
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+    if (d['#country+code']==currentCountry.code || !isCountryView()) {
       data.push(+d[currentIndicator.id]);
       return +d[currentIndicator.id]; 
     }
   });
   max =  d3.max(admintwo_data, function(d) { 
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='') {
+    if (d['#country+code']==currentCountry.code || !isCountryView()) {
       return +d[currentIndicator.id]; 
     }
   });
@@ -1105,16 +1105,16 @@ function createEvents() {
   //map legend radio events
   $('input[type="radio"]').click(function(){
     var selected = $('input[name="countryIndicators"]:checked');
-    currentIndicator = {id: selected.val(), name: selected.parent().text()};
-    vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
+    vizTrack(`main ${currentCountry.code} view`, selected.parent().text());
     onLayerSelected(selected);
   });
 }
 
 function onLayerSelected(selected) {
+  currentIndicator = {id: selected.val(), name: selected.parent().text()};
   selectLayer(selected);
   
-  if (currentCountry.code=='') {
+  if (!isCountryView()) {
     updateCountryLayer();
   }
   else {
@@ -1162,7 +1162,7 @@ function selectCountry(features) {
 
 
 function updateCountrySource() {
-  let country = (currentCountry.code=='') ? 'regional' : (currentCountry.code).toLowerCase();
+  let country = (!isCountryView()) ? 'regional' : (currentCountry.code).toLowerCase();
   $('.map-legend .indicator').each(function(layer) {
     let div = $(this).find('.source-container');
     let indicator = $(this).find('input').val() + '+' + country;
@@ -1220,7 +1220,7 @@ function resetMap() {
 
 function toggleIPCLayers(visible) {
   ipcData.forEach(function(country) {
-    let vis = (visible && (currentCountry.code=='' || currentCountry.code.toLowerCase()==country.iso)) ? 'visible' : 'none';
+    let vis = (visible && (!isCountryView() || currentCountry.code.toLowerCase()==country.iso)) ? 'visible' : 'none';
     map.setLayoutProperty(`${country.iso}-ipc-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-boundary-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-label-layer`, 'visibility', vis);
@@ -1236,7 +1236,7 @@ function toggleIPCLayers(visible) {
 /*** PANEL FUNCTIONS ***/
 /***********************/
 function initKeyFigures() {
-  var data = (currentCountry.code=='') ? regionalData : dataByCountry[currentCountry.code][0];
+  var data = (!isCountryView()) ? regionalData : dataByCountry[currentCountry.code][0];
 
   //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
@@ -1254,7 +1254,7 @@ function initKeyFigures() {
   ];
 
   impactFigures.forEach(function(fig) {
-    let tag = (currentCountry.code=='') ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
+    let tag = (!isCountryView()) ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
     createFigure(impactDiv, {className: fig.className, title: fig.title, stat: formatValue(data[fig.tag], 'short'), indicator: tag});
   });
 
@@ -1270,7 +1270,7 @@ function initKeyFigures() {
   ];
 
   fundingFigures.forEach(function(fig) {
-    let tag = (currentCountry.code=='') ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
+    let tag = (!isCountryView()) ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
     let statVal = fig.tag=='#value+funding+pct' ? formatValue(data[fig.tag], 'percent') : formatValue(data[fig.tag]);
     createFigure(fundingDiv, {className: fig.className, title: fig.title, stat: statVal, indicator: tag});
   });
@@ -1581,9 +1581,9 @@ $( document ).ready(function() {
         .text(function(d) { return d[1][0]['#country+name']; })
         .attr('value', function (d) { return d[1][0]['#country+code']; });
     //insert default option    
-    $('.country-select').prepend('<option value="">All Countries</option>');
+    $('.country-select').prepend('<option value="Regional">All Countries</option>');
     $('.country-select').val($('.country-select option:first').val());
-    currentCountry = {code: '', name:''}
+    currentCountry = {code: 'Regional', name:'All Countries'}
 
     //create chart view country select
     // $('.trendseries-select').append($('<option value="All">All Clusters</option>')); 
