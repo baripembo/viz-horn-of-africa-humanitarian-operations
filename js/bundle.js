@@ -287,6 +287,8 @@ function initCountryLayer() {
   //set properties
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionLabelOpacity);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-opacity', expressionLabelOpacity);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-stroke-opacity', expressionLabelOpacity);
   map.setPaintProperty(subnationalMarkerLayer, 'circle-radius', expressionMarkers);
 
 
@@ -449,8 +451,8 @@ function updateCountryLayer() {
   map.setPaintProperty(subnationalBoundaryLayer, 'line-opacity', expressionOpacity);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionLabelOpacity);
   map.setPaintProperty(subnationalMarkerLayer, 'circle-radius', expressionMarkers);
-  map.setPaintProperty(subnationalMarkerLayer, 'circle-opacity', expressionOpacity==1 ? 0 : 0.8);
-  map.setPaintProperty(subnationalMarkerLayer, 'circle-stroke-opacity', expressionOpacity);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-opacity', expressionLabelOpacity);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-stroke-opacity', expressionLabelOpacity);
 
   //toggle raster layers
   var countryList = Object.keys(countryCodeList);
