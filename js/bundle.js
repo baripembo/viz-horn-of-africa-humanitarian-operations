@@ -1111,7 +1111,7 @@ function loadIPCLayer(country) {
     });
 
     p3Pop = prop['p3_plus_P_population'];
-    if (phase>0) content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
+    if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
 
     let tableArray = [{label: 'People Affected', indicator: '#affected+total'},
                       {label: 'People Targeted', indicator: '#targeted+total'}];
