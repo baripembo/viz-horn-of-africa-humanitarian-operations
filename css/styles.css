@@ -1383,20 +1383,13 @@ a:visited {
       height: 118px; }
     .map-legend .legend-container.priority {
       height: 48px; }
-  .map-legend .legend-marker {
-    display: flex;
-    padding-top: 8px; }
-    .map-legend .legend-marker .marker {
-      margin-right: 6px;
-      margin-top: 0; }
-      .map-legend .legend-marker .marker img {
-        height: 14px;
-        width: 14px; }
-    .map-legend .legend-marker .source {
+  .map-legend .bubble-scale {
+    margin: 5px 0 10px; }
+    .map-legend .bubble-scale .source.small {
+      margin-bottom: 5px;
       margin-left: 0; }
-    .map-legend .legend-marker label {
-      flex-direction: column;
-      margin-top: 0; }
+    .map-legend .bubble-scale .swatch {
+      fill: #999; }
   .map-legend.population .legend-container {
     height: 130px; }
   .map-legend .legendCells {
