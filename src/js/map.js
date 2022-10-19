@@ -1,4 +1,4 @@
-var map, mapFeatures, baseLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
+var map, mapFeatures, baseLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, subnationalMarkerLayer, tooltip;
 var adm0SourceLayer = 'wrl_polbnda_1m_ungis';
 var adm1SourceLayer = 'hornafrica_polbnda_subnationa-2rkvd2';
 var hoveredStateId = null;
@@ -7,7 +7,7 @@ var hoveredStateId = null;
 let ipcData = [
   {
     iso: 'eth',
-    data: 'ethiopia_adm3.geojson'
+    data: 'eth_food_security.geojson'
     //data: 'Ethiopia_May_2021_merged.geojson'
   },
   {
@@ -154,6 +154,24 @@ function displayMap() {
   subnationalLabelLayer = 'subnational-labels';
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
 
+  //markers
+  map.addLayer({
+    'id': 'subnational-markers',
+    'type': 'circle',
+    'source': 'country-centroids',
+    'filter': ['==', 'ADM_LEVEL', 2],
+    'source-layer': subnationalCentroidSource,
+    'paint': {
+      'circle-color': '#999',
+      'circle-opacity': 0.8,
+      'circle-stroke-color': '#999',
+      'circle-stroke-width': 1
+    }
+  }, baseLayer);
+  subnationalMarkerLayer = 'subnational-markers';
+  map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
+
+
 
   mapFeatures = map.queryRenderedFeatures();
 
@@ -248,31 +266,13 @@ function loadIPCLayer(country) {
     id: `${country.iso}-ipc-layer`,
     type: 'fill',
     source: `${country.iso}-ipc`,
-    // paint: {
-    //   'fill-color': [
-    //     'interpolate',
-    //     ['linear'],
-    //     ['get', 'overall_phase_P'],
-    //     1,
-    //     '#CDFACD',
-    //     2,
-    //     '#FAE61C',
-    //     3,
-    //     '#E67800',
-    //     4,
-    //     '#C80100',
-    //     5,
-    //     '#640100'
-    //   ]
-    // }
-  }, baseLayer);
-  map.setPaintProperty(
-    `${country.iso}-ipc-layer`,
-    'fill-color',
-    ['case', ['==', ['get', 'overall_phase_P'], null], '#FFF', [
-      'interpolate',
-      ['linear'],
-      ['get', 'overall_phase_P'],
+    paint: {
+      'fill-color': [
+        'interpolate',
+        ['linear'],
+        ['get', 'overall_phase_P'],
+        0,
+        '#FFF',
         1,
         '#CDFACD',
         2,
@@ -283,8 +283,9 @@ function loadIPCLayer(country) {
         '#C80100',
         5,
         '#640100'
-    ]]
-  );
+      ]
+    }
+  }, subnationalMarkerLayer);
 
 
   map.addLayer({
@@ -294,7 +295,7 @@ function loadIPCLayer(country) {
     paint: {
       'line-color': '#E0E0E0',
     }
-  }, baseLayer);
+  }, subnationalMarkerLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-label-layer`,
@@ -321,23 +322,25 @@ function loadIPCLayer(country) {
   map.on('mousemove', `${country.iso}-ipc-layer`, function(e) {
     map.getCanvas().style.cursor = 'pointer';
     let prop = e.features[0].properties;
-    let content = `<h2>${prop['area']}, ${prop['country']}</h2>`;
+    let content, location, p3Pop;
+
+    //format content
+    content = `<h2>${prop['area']}, ${prop['country']}</h2>`;
     let phase = transformIPC(prop['overall_phase_P']);
-    let p3Pop = prop['p3_plus_P_population'];
 
     //get adm2 data by area name
-    let location = admintwo_data.filter(function(c) {
+    location = admintwo_data.filter(function(c) {
       if (c['#adm2+name'].includes(prop['area'])) {
         return c;
       }
     });
 
-    console.log(prop)
+    p3Pop = prop['p3_plus_P_population'];
+    if (phase>0) content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
 
     let tableArray = [{label: 'People Affected', indicator: '#affected+total'},
                       {label: 'People Targeted', indicator: '#targeted+total'}];
 
-    content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
     content += '<div class="table-display">';
     if (p3Pop!==undefined) {
       content += `<div class="table-row"><div>Population in IPC Phase 3+:</div><div>${shortenNumFormat(p3Pop)}</div></div>`;
@@ -350,6 +353,7 @@ function loadIPCLayer(country) {
     });
     content += '</div>';
     
+    //set tooltip
     tooltip.setHTML(content);
     tooltip
       .addTo(map)
@@ -509,9 +513,6 @@ function resetMap() {
   //reset layers
   toggleIPCLayers(true);
 
-  //reset disabled inputs
-  disableInput('#affected+food+ipc+phase+type', false);
-
   //reset map legends
   $('.legend-container').show();
 
@@ -540,8 +541,15 @@ function toggleIPCLayers(visible) {
     map.setLayoutProperty(`${country.iso}-ipc-label-layer`, 'visibility', vis);
   });
 
-  //turn subnational labels off for ipc layer
+  //turn subnational labels off and ipc bubbles on for ipc layer
   if (visible) {
     map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
+    map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
+    if (currentCountry.code=='SOM') $('.bubble-scale').hide();
+    else $('.bubble-scale').show();
+  }
+  else {
+    map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
+    $('.bubble-scale').hide();
   }
 }

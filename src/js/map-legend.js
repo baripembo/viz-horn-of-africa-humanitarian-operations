@@ -39,6 +39,30 @@ function createMapLegend(scale) {
     .attr('class', 'label')
     .text('No Data');
 
+  //bubble scale
+  var bubbleLegend = d3.select('.map-legend .bubble-scale');
+  $('.bubble-scale').append('<h4>Population in IPC Phase 3+</h4>');
+  createSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+regional');
+
+  var markersvg = bubbleLegend.append('svg')
+    .attr('height', '55px')
+    .attr('class', 'ipcScale');
+  markersvg.append('g')
+    .attr("transform", "translate(5, 10)")
+    .attr('class', 'legendSize');
+
+  var legendSize = d3.legendSize()
+    .scale(markerScale)
+    .shape('circle')
+    .shapePadding(40)
+    .labelFormat(numFormat)
+    .labelOffset(15)
+    .cells(2)
+    .orient('horizontal');
+
+  markersvg.select('.legendSize')
+    .call(legendSize);
+
   //rainfall disclaimer
   createFootnote('.map-legend', '#climate+rainfall+anomaly', 'The seasonal rainfall anomaly describes how the current season compares to the historical 1981-2010 average. It is updated every 5 days using cumulative CHIRPS rainfall data for the two main seasons (March-April-May and October-November-December)');
 
@@ -54,10 +78,6 @@ function createMapLegend(scale) {
 
 
 function updateMapLegend(scale) {
-  //hide no data key for rainfall layer
-  if (currentIndicator.id=='#climate+rainfall+anomaly') $('.no-data-key').hide();
-  else $('.no-data-key').show();
-
   //set legend title
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
   $('.map-legend .legend-title').html(legendTitle);
@@ -74,6 +94,19 @@ function updateMapLegend(scale) {
 
   var g = d3.select('.map-legend .scale');
   g.call(legend);
+
+  //bubble scale
+  var maxIPC = d3.max(admintwo_data, function(d) { 
+    if (d['#country+code']==currentCountry.code || currentCountry.code=='Regional' && d['#country+code']!='SOM') {
+      return +d['#affected+food+ipc+p3plus+num'];
+    } 
+  })
+  markerScale.domain([2, maxIPC]);
+  d3.select('.ipcScale .cell:nth-child(2) .label').text(numFormat(maxIPC));
+
+  //hide no data key for rainfall layer
+  if (currentIndicator.id=='#climate+rainfall+anomaly') $('.no-data-key').hide();
+  else $('.no-data-key').show();
 
   //show/hide footnotes
   $('.footnote-indicator').hide();
