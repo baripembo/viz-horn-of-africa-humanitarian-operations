@@ -5,10 +5,11 @@ var hoveredStateId = null;
 
 
 let ipcData = [
-  // {
-  //   iso: 'eth',
-  //   data: 'Ethiopia_May_2021_merged.geojson'
-  // },
+  {
+    iso: 'eth',
+    data: 'ethiopia_adm3.geojson'
+    //data: 'Ethiopia_May_2021_merged.geojson'
+  },
   {
     iso: 'ken',
     data: 'kenya_ipc.geojson'
@@ -247,11 +248,31 @@ function loadIPCLayer(country) {
     id: `${country.iso}-ipc-layer`,
     type: 'fill',
     source: `${country.iso}-ipc`,
-    paint: {
-      'fill-color': [
-        'interpolate',
-        ['linear'],
-        ['get', 'overall_phase_P'],
+    // paint: {
+    //   'fill-color': [
+    //     'interpolate',
+    //     ['linear'],
+    //     ['get', 'overall_phase_P'],
+    //     1,
+    //     '#CDFACD',
+    //     2,
+    //     '#FAE61C',
+    //     3,
+    //     '#E67800',
+    //     4,
+    //     '#C80100',
+    //     5,
+    //     '#640100'
+    //   ]
+    // }
+  }, baseLayer);
+  map.setPaintProperty(
+    `${country.iso}-ipc-layer`,
+    'fill-color',
+    ['case', ['==', ['get', 'overall_phase_P'], null], '#FFF', [
+      'interpolate',
+      ['linear'],
+      ['get', 'overall_phase_P'],
         1,
         '#CDFACD',
         2,
@@ -262,9 +283,9 @@ function loadIPCLayer(country) {
         '#C80100',
         5,
         '#640100'
-      ]
-    }
-  }, baseLayer);
+    ]]
+  );
+
 
   map.addLayer({
     id: `${country.iso}-ipc-boundary-layer`,
@@ -310,6 +331,8 @@ function loadIPCLayer(country) {
         return c;
       }
     });
+
+    console.log(prop)
 
     let tableArray = [{label: 'People Affected', indicator: '#affected+total'},
                       {label: 'People Targeted', indicator: '#targeted+total'}];

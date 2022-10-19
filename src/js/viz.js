@@ -11,7 +11,7 @@ var idpColorRange = ['#D1E3EA','#BBD1E6','#ADBCE3','#B2B3E0','#A99BC6'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
-var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
+var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
 var countryTimeseriesChart = '';
 var mapLoaded = false;
 var dataLoaded = false;
@@ -74,7 +74,8 @@ $( document ).ready(function() {
     console.log('Loading data...')
     Promise.all([
       d3.json('https://raw.githubusercontent.com/OCHA-DAP/hdx-scraper-hornafrica-viz/main/all.json'),
-      d3.json('data/ocha-regions-bbox-hornafrica.geojson')
+      d3.json('data/ocha-regions-bbox-hornafrica.geojson'),
+      d3.json('data/eth_food_security.geojson')
     ]).then(function(data) {
       console.log('Data loaded');
       $('.loader span').text('Initializing map...');
@@ -88,6 +89,7 @@ $( document ).ready(function() {
       admintwo_data = allData.admintwo_data;
       sourcesData = allData.sources_data;
       regionBoundaryData = data[1].features;
+      ethData = data[2].features;
 
       //parse national data
       nationalData.forEach(function(item) {
@@ -124,6 +126,11 @@ $( document ).ready(function() {
           default:
             d['#priority'] = d['#priority'];
         }
+
+        ethData.forEach(function(feature) {
+          if (feature.properties.ADM3_PCODE == d['#adm2+code'])
+            d['#affected+food+ipc+p3plus+num'] = feature.properties.p3_plus_P_population;
+        })
       });
 
       //group national data by country -- drives country panel    
