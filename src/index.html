@@ -19,7 +19,7 @@
     <meta property="og:title" content="Horn of Africa Data Explorer">
     <meta property="og:type" content="website">
     <meta property="og:description" content="">
-    <meta property="og:image" content="https://data.humdata.org/visualization/horn-of-africa-humanitarian-operations/assets/preview_thumb.png" />
+    <meta property="og:image" content="https://data.humdata.org/visualization/horn-of-africa-humanitarian-operations/assets/preview-image.png" />
     <link rel='icon' type='image/png' href='https://data.humdata.org/images/icons/hdx.ico' />
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.css"/>
@@ -79,12 +79,12 @@
                 <div class="source-container rainfall-source"></div>
               </div>
 
-              <div class='indicator country-only'>
+              <div class='indicator'>
                 <label>Operational Priority Areas<input name='countryIndicators' type='radio' value='#priority' id='priority' data-legend='Operational Priority Level' data-layer='priority'></label>
                 <div class='source-container priority-source'></div>
               </div>
 
-              <div class='indicator country-only'>
+              <div class='indicator'>
                 <label>Internally Displaced People<input name='countryIndicators' type='radio' value='#affected+idps+ind' id='idp' data-legend='Internally Displaced People' data-layer='idps'></label>
                 <div class='source-container idp-source'></div>
               </div>
@@ -98,6 +98,7 @@
               <h4 class='indicator-title'>MAP LEGEND</h4>
               <h4 class='legend-title'></h4>
               <div class='legend-scale'></div>
+              <div class='bubble-scale'></div>
 
             </div>
             <div class='legend-gradient'></div>

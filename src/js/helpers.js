@@ -15,7 +15,8 @@ function mpTrack(view, content) {
   });
 }
 
-function gaTrack(eventCategory, eventAction, eventLabel, type) {
+function gaTrack(eventCategory, eventAction, eventLabel) {
+  //google tag manager event
   dataLayer.push({
     'event': eventCategory,
     'label': eventAction,
@@ -39,7 +40,7 @@ function formatValue(val, type) {
       format = percentFormat;
       break;
     case 'short':
-      format = shortenNumFormat;
+      format = d3.format('.3s');
       break;
     default:
       format = d3.format('$.3s');
@@ -91,7 +92,7 @@ function createFootnote(target, indicator, text) {
 }
 
 function isCountryView() {
-  return currentCountry.code=='' ? false : true;
+  return currentCountry.code=='Regional' ? false : true;
 }
 
 function transformIPC(value) {
@@ -116,6 +117,12 @@ function transformIPC(value) {
       phase = value;
   }
   return phase;
+}
+
+function disableInput(indicator, isDisabled) {
+  let clr = (isDisabled) ? '#BBB' : '#000';
+  $(`input[value="${indicator}"]`).attr('disabled', isDisabled);
+  $(`input[value="${indicator}"]`).parent().css('color', clr);
 }
 
 //country codes and raster ids

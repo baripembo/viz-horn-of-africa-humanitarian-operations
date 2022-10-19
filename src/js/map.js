@@ -1,4 +1,4 @@
-var map, mapFeatures, baseLayer, globalLayer, globalBoundaryLayer, globalLabelLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, tooltip;
+var map, mapFeatures, baseLayer, subnationalLayer, subnationalBoundaryLayer, subnationalLabelLayer, subnationalMarkerLayer, tooltip;
 var adm0SourceLayer = 'wrl_polbnda_1m_ungis';
 var adm1SourceLayer = 'hornafrica_polbnda_subnationa-2rkvd2';
 var hoveredStateId = null;
@@ -7,11 +7,12 @@ var hoveredStateId = null;
 let ipcData = [
   {
     iso: 'eth',
-    data: 'Ethiopia_May_2021_merged.geojson'
+    data: 'eth_food_security.geojson'
+    //data: 'Ethiopia_May_2021_merged.geojson'
   },
   {
     iso: 'ken',
-    data: 'Kenya_July 2022.geojson'
+    data: 'kenya_ipc.geojson'
   },
   {
     iso: 'som',
@@ -67,123 +68,6 @@ function displayMap() {
   }
 
   //add map layers
-  //adm1 fills
-  let subnationalSource = 'hornafrica_polbnda_subnationa-2rkvd2';
-  let subnationalCentroidSource = 'hornafrica_polbndp_subnationa-a7lq5r';
-  map.addSource('country-polygons', {
-    'url': 'mapbox://humdata.8j9ay0ba',
-    'type': 'vector'
-  });
-  map.addLayer({
-    'id': 'country-fills',
-    'type': 'fill',
-    'source': 'country-polygons',
-    'filter': ['==', 'ADM_LEVEL', 1],
-    'source-layer': subnationalSource,
-    'paint': {
-      'fill-color': '#F1F1EE',
-      'fill-opacity': 1
-    }
-  }, baseLayer);
-  globalLayer = 'country-fills';
-  map.setLayoutProperty(globalLayer, 'visibility', 'visible');
-
-  //adm1 boundaries
-  map.addLayer({
-    'id': 'country-boundaries',
-    'type': 'line',
-    'source': 'country-polygons',
-    'filter': ['==', 'ADM_LEVEL', 1],
-    'source-layer': subnationalSource,
-    'paint': {
-      'line-color': '#E0E0E0',
-      'line-opacity': 1
-    }
-  }, baseLayer);
-  globalBoundaryLayer = 'country-boundaries';
-  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
-
-  //adm1 centroids
-  map.addSource('country-centroids', {
-    'url': 'mapbox://humdata.cywtvjt9',
-    'type': 'vector'
-  });
-  map.addLayer({
-    'id': 'country-labels',
-    'type': 'symbol',
-    'source': 'country-centroids',
-    'filter': ['==', 'ADM_LEVEL', 1],
-    'source-layer': subnationalCentroidSource,
-    'layout': {
-      'text-field': ['get', 'ADM_REF'],
-      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
-      'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
-      'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-      'text-radial-offset': 0.4
-    },
-    paint: {
-      'text-color': '#666',
-      'text-halo-color': '#FFF',
-      'text-halo-width': 1,
-      'text-halo-blur': 1
-    }
-  }, baseLayer);
-  globalLabelLayer = 'country-labels';
-  map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
-
-  //adm2 fills
-  map.addLayer({
-    'id': 'subnational-fills',
-    'type': 'fill',
-    'source': 'country-polygons',
-    'filter': ['==', 'ADM_LEVEL', 2],
-    'source-layer': subnationalSource,
-    'paint': {
-      'fill-color': '#F1F1EE',
-      'fill-opacity': 1,
-    }
-  }, baseLayer);
-  subnationalLayer = 'subnational-fills';
-  map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
-
-  //adm2 boundaries
-  map.addLayer({
-    'id': 'subnational-boundaries',
-    'type': 'line',
-    'source': 'country-polygons',
-    'filter': ['==', 'ADM_LEVEL', 2],
-    'source-layer': subnationalSource,
-    'paint': {
-      'line-color': '#F2F2F2',
-      'line-opacity': 1
-    }
-  }, baseLayer);
-  subnationalBoundaryLayer = 'subnational-boundaries';
-  map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
-
-  //adm2 centroids
-  map.addLayer({
-    'id': 'subnational-labels',
-    'type': 'symbol',
-    'source': 'country-centroids',
-    'filter': ['==', 'ADM_LEVEL', 2],
-    'source-layer': subnationalCentroidSource,
-    'layout': {
-      'text-field': ['get', 'ADM_REF'],
-      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
-      'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
-      'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-      'text-radial-offset': 0.4
-    },
-    paint: {
-      'text-color': '#666',
-      'text-halo-color': '#EEE',
-      'text-halo-width': 1,
-      'text-halo-blur': 1
-    }
-  }, baseLayer);
-  subnationalLabelLayer = 'subnational-labels';
-  map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
 
   //water bodies
   map.addSource('waterbodies', {
@@ -198,9 +82,96 @@ function displayMap() {
     'paint': {
       'fill-color': '#99daea'
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
   waterLayer = 'waterbodies-layer';
   map.setLayoutProperty(waterLayer, 'visibility', 'visible');
+
+  //fills source
+  let subnationalSource = 'hornafrica_polbnda_subnationa-2rkvd2';
+  let subnationalCentroidSource = 'hornafrica_polbndp_subnationa-a7lq5r';
+  map.addSource('country-polygons', {
+    'url': 'mapbox://humdata.8j9ay0ba',
+    'type': 'vector'
+  });
+
+  //fills
+  map.addLayer({
+    'id': 'subnational-fills',
+    'type': 'fill',
+    'source': 'country-polygons',
+    'filter': ['==', 'ADM_LEVEL', 2],
+    'source-layer': subnationalSource,
+    'paint': {
+      'fill-color': '#F1F1EE',
+      'fill-opacity': 1,
+    }
+  }, baseLayer);
+  subnationalLayer = 'subnational-fills';
+  map.setLayoutProperty(subnationalLayer, 'visibility', 'visible');
+
+  //boundaries
+  map.addLayer({
+    'id': 'subnational-boundaries',
+    'type': 'line',
+    'source': 'country-polygons',
+    'filter': ['==', 'ADM_LEVEL', 2],
+    'source-layer': subnationalSource,
+    'paint': {
+      'line-color': '#E0E0E0',
+      'line-opacity': 1
+    }
+  }, baseLayer);
+  subnationalBoundaryLayer = 'subnational-boundaries';
+  map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'visible');
+
+  //centroids source
+  map.addSource('country-centroids', {
+    'url': 'mapbox://humdata.cywtvjt9',
+    'type': 'vector'
+  });
+
+  //centroids
+  map.addLayer({
+    'id': 'subnational-labels',
+    'type': 'symbol',
+    'source': 'country-centroids',
+    'filter': ['==', 'ADM_LEVEL', 2],
+    'source-layer': subnationalCentroidSource,
+    'layout': {
+      'text-field': ['get', 'ADM_REF'],
+      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
+      'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+      'text-padding': 8
+    },
+    paint: {
+      'text-color': '#666',
+      'text-halo-color': '#EEE',
+      'text-halo-width': 1,
+      'text-halo-blur': 1
+    }
+  }, baseLayer);
+  subnationalLabelLayer = 'subnational-labels';
+  map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
+
+  //markers
+  map.addLayer({
+    'id': 'subnational-markers',
+    'type': 'circle',
+    'source': 'country-centroids',
+    'filter': ['==', 'ADM_LEVEL', 2],
+    'source-layer': subnationalCentroidSource,
+    'paint': {
+      'circle-color': '#999',
+      'circle-opacity': 0.8,
+      'circle-stroke-color': '#999',
+      'circle-stroke-width': 1
+    }
+  }, baseLayer);
+  subnationalMarkerLayer = 'subnational-markers';
+  map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
+
+
 
   mapFeatures = map.queryRenderedFeatures();
 
@@ -210,8 +181,7 @@ function displayMap() {
   //init element events
   createEvents();
 
-  //init global and country layers
-  initGlobalLayer();
+  //init country layers
   initCountryLayer();
 
   //load special IPC layers
@@ -257,7 +227,7 @@ function loadRasters() {
             tiles: ['https://api.mapbox.com/v4/humdata.'+raster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
           }
         },
-        globalBoundaryLayer
+        subnationalBoundaryLayer
       );
       map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
     }
@@ -279,7 +249,7 @@ function loadRasters() {
             tiles: ['https://api.mapbox.com/v4/humdata.'+chirpsRaster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
           }
         },
-        globalBoundaryLayer
+        subnationalBoundaryLayer
       );
       map.setLayoutProperty(id+'-chirps', 'visibility', 'none');
     }
@@ -301,6 +271,8 @@ function loadIPCLayer(country) {
         'interpolate',
         ['linear'],
         ['get', 'overall_phase_P'],
+        0,
+        '#FFF',
         1,
         '#CDFACD',
         2,
@@ -313,7 +285,8 @@ function loadIPCLayer(country) {
         '#640100'
       ]
     }
-  }, subnationalLabelLayer);
+  }, subnationalMarkerLayer);
+
 
   map.addLayer({
     id: `${country.iso}-ipc-boundary-layer`,
@@ -322,12 +295,13 @@ function loadIPCLayer(country) {
     paint: {
       'line-color': '#E0E0E0',
     }
-  }, subnationalLabelLayer);
+  }, subnationalMarkerLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-label-layer`,
     type: 'symbol',
     source: `${country.iso}-ipc`,
+    filter: ['==', ['geometry-type'], 'Polygon'],
     layout: {
       'text-field': ['get', 'area'],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
@@ -336,28 +310,50 @@ function loadIPCLayer(country) {
       'text-radial-offset': 0.4
     },
     paint: {
-      'text-color': '#666',
-      'text-halo-color': '#EEE',
+      'text-color': '#333',
+      'text-halo-color': '#F2F2F2',
       'text-halo-width': 1,
       'text-halo-blur': 1
     }
-  }, subnationalLabelLayer);
+  }, baseLayer);
 
   map.on('mouseenter', `${country.iso}-ipc-layer`, onMouseEnter);
   map.on('mouseleave', `${country.iso}-ipc-layer`, onMouseLeave);
   map.on('mousemove', `${country.iso}-ipc-layer`, function(e) {
     map.getCanvas().style.cursor = 'pointer';
     let prop = e.features[0].properties;
-    let content = `<h2>${prop['area']}, ${prop['country']}</h2>`;
+    let content, location, p3Pop;
+
+    //format content
+    content = `<h2>${prop['area']}, ${prop['country']}</h2>`;
     let phase = transformIPC(prop['overall_phase_P']);
-    let p3Pop = prop['p3_plus_P_population'];
-    content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
+
+    //get adm2 data by area name
+    location = admintwo_data.filter(function(c) {
+      if (c['#adm2+name'].includes(prop['area'])) {
+        return c;
+      }
+    });
+
+    p3Pop = prop['p3_plus_P_population'];
+    if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
+
+    let tableArray = [{label: 'People Affected', indicator: '#affected+total'},
+                      {label: 'People Targeted', indicator: '#targeted+total'}];
+
+    content += '<div class="table-display">';
     if (p3Pop!==undefined) {
-      content += '<div class="table-display">';
       content += `<div class="table-row"><div>Population in IPC Phase 3+:</div><div>${shortenNumFormat(p3Pop)}</div></div>`;
-      content += '</div>';
     }
+
+    tableArray.forEach(function(row) {
+      let value = (location[0]!=undefined) ? location[0][row.indicator] : 0;
+      let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
+      content += `<div class="table-row"><div>${row.label}:</div><div>${shortVal}</div></div>`;
+    });
+    content += '</div>';
     
+    //set tooltip
     tooltip.setHTML(content);
     tooltip
       .addTo(map)
@@ -385,14 +381,9 @@ function deepLinkView() {
   //deep link to specific layer in global view
   if (location.indexOf('?layer=')>-1) {
     var layer = location.split('layer=')[1];
-    if (layer=='idps') {
-      window.history.replaceState(null, null, window.location.pathname);
-    }
-    else {
       var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
       selected.prop('checked', true);
       onLayerSelected(selected);
-    }
   }
 }
 
@@ -414,6 +405,8 @@ function createEvents() {
   d3.select('.country-select').on('change',function(e) {
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
+    vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
+
     if (isCountryView()) {
       //find matched features and zoom to country
       var selectedFeatures = matchMapFeatures(currentCountry.code);
@@ -421,7 +414,6 @@ function createEvents() {
     }
     else {
       resetMap();
-      updateGlobalLayer(currentCountry.code);
     }
 
     //update country specific sources
@@ -431,24 +423,17 @@ function createEvents() {
   //map legend radio events
   $('input[type="radio"]').click(function(){
     var selected = $('input[name="countryIndicators"]:checked');
+    vizTrack(`main ${currentCountry.code} view`, selected.parent().text());
     onLayerSelected(selected);
   });
-
-  //chart view trendseries select event
-  // d3.select('.trendseries-select').on('change',function(e) {
-  //   var selected = d3.select('.trendseries-select').node().value;
-  //   updateTimeseries(selected);
-  //   if (currentCountry.code!==undefined && selected!==undefined)
-  //     vizTrack(`chart ${currentCountry.code} view`, selected);
-  // });
 }
 
 function onLayerSelected(selected) {
   currentIndicator = {id: selected.val(), name: selected.parent().text()};
   selectLayer(selected);
   
-  if (currentCountry.code=='') {
-    updateGlobalLayer();
+  if (!isCountryView()) {
+    updateCountryLayer();
   }
   else {
     var selectedFeatures = matchMapFeatures(currentCountry.code);
@@ -458,8 +443,6 @@ function onLayerSelected(selected) {
 
 
 function selectLayer(layer) {
-  //vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
-
   //reset any deep links
   let layerID = layer.attr('data-layer');
   let location = (layerID==undefined) ? window.location.pathname : window.location.pathname+'?layer='+layerID;
@@ -497,7 +480,7 @@ function selectCountry(features) {
 
 
 function updateCountrySource() {
-  let country = (currentCountry.code=='') ? 'regional' : (currentCountry.code).toLowerCase();
+  let country = (!isCountryView()) ? 'regional' : (currentCountry.code).toLowerCase();
   $('.map-legend .indicator').each(function(layer) {
     let div = $(this).find('.source-container');
     let indicator = $(this).find('input').val() + '+' + country;
@@ -528,16 +511,10 @@ function zoomToRegion() {
 
 function resetMap() {
   //reset layers
-  map.setLayoutProperty(globalLayer, 'visibility', 'visible');
-  map.setLayoutProperty(globalBoundaryLayer, 'visibility', 'visible');
-  map.setLayoutProperty(globalLabelLayer, 'visibility', 'visible');
-  map.setLayoutProperty(subnationalLayer, 'visibility', 'none');
-  map.setLayoutProperty(subnationalBoundaryLayer, 'visibility', 'none');
-  map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
   toggleIPCLayers(true);
 
-  //reset map legend
-  $('.map-legend .indicator.country-only').hide();
+  //reset map legends
+  $('.legend-container').show();
 
   //reset download links
   $('.download-link').hide();
@@ -556,11 +533,23 @@ function resetMap() {
   window.history.replaceState(null, null, window.location.pathname);
 }
 
-function toggleIPCLayers(visible, currCountry) {
+function toggleIPCLayers(visible) {
   ipcData.forEach(function(country) {
-    let vis = (visible && (currCountry==undefined || currCountry.toLowerCase()==country.iso)) ? 'visible' : 'none';
+    let vis = (visible && (!isCountryView() || currentCountry.code.toLowerCase()==country.iso)) ? 'visible' : 'none';
     map.setLayoutProperty(`${country.iso}-ipc-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-boundary-layer`, 'visibility', vis);
     map.setLayoutProperty(`${country.iso}-ipc-label-layer`, 'visibility', vis);
   });
+
+  //turn subnational labels off and ipc bubbles on for ipc layer
+  if (visible) {
+    map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
+    map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
+    if (currentCountry.code=='SOM') $('.bubble-scale').hide();
+    else $('.bubble-scale').show();
+  }
+  else {
+    map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
+    $('.bubble-scale').hide();
+  }
 }

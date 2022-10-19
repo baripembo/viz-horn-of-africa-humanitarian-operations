@@ -313,23 +313,14 @@ a:visited {
 			height: 48px;
 		}
 	}
-	.legend-marker {
-		display: flex;
-		padding-top: 8px;
-		.marker {
-			margin-right: 6px; 
-			margin-top: 0;
-			img {
-				height: 14px;
-				width: 14px;
-			}
-		}
-		.source {
+	.bubble-scale {
+		margin: 5px 0 10px;
+		.source.small {
+			margin-bottom: 5px;
 			margin-left: 0;
 		}
-		label {
-			flex-direction: column;
-			margin-top: 0;
+		.swatch {
+			fill: #999;
 		}
 	}
 	&.population {
