@@ -367,7 +367,7 @@ function updateCountryLayer() {
   initKeyFigures();
 
   //update log scale for circle markers
-  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']==currentCountry.code) return +d['#affected+food+ipc+p3plus+num']; })
+  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']=='ETH') return +d['#affected+food+ipc+p3plus+num']; })
   markerScale.domain([2, maxIPC]);
 
   //color scale
@@ -718,7 +718,7 @@ function updateMapLegend(scale) {
 
   //bubble scale
   var maxIPC = d3.max(admintwo_data, function(d) { 
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='Regional' && d['#country+code']!='SOM') {
+    if (d['#country+code']==currentCountry.code || currentCountry.code=='Regional' && d['#country+code']!='SOM' && d['#country+code']!='KEN') {
       return +d['#affected+food+ipc+p3plus+num'];
     } 
   })
@@ -1322,8 +1322,8 @@ function toggleIPCLayers(visible) {
   if (visible) {
     map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
-    if (currentCountry.code=='ETH') $('.bubble-scale').show();
-    else $('.bubble-scale').hide();
+    if (currentCountry.code=='KEN' || currentCountry.code=='SOM') $('.bubble-scale').hide();
+    else $('.bubble-scale').show();
   }
   else {
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
