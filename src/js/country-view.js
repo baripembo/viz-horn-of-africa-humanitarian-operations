@@ -129,7 +129,7 @@ function updateCountryLayer() {
   initKeyFigures();
 
   //update log scale for circle markers
-  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']==currentCountry.code) return +d['#affected+food+ipc+p3plus+num']; })
+  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']=='ETH') return +d['#affected+food+ipc+p3plus+num']; })
   markerScale.domain([2, maxIPC]);
 
   //color scale

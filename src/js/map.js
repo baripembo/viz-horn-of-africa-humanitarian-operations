@@ -545,8 +545,8 @@ function toggleIPCLayers(visible) {
   if (visible) {
     map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
-    if (currentCountry.code=='ETH') $('.bubble-scale').show();
-    else $('.bubble-scale').hide();
+    if (currentCountry.code=='KEN' || currentCountry.code=='SOM') $('.bubble-scale').hide();
+    else $('.bubble-scale').show();
   }
   else {
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
