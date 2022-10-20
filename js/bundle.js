@@ -1348,8 +1348,8 @@ function initKeyFigures() {
     {className: 'idp', title: 'Internally Displaced People due to Drought', tag: '#affected+idps'},
     {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', tag: '#affected+food+ipc+p3plus+num'},
     {className: 'water', title: 'Water Insecurity', tag: '#affected+water', tooltip: 'Number of people who cannot access enough water for drinking, cooking, cleaning'},
-    {className: 'sam', title: 'No. of children (<5yrs) with Severe Acute Malnutrition', tag: '#affected+sam'},
-    {className: 'gam', title: 'No. of children (<5yrs) with Global Acute Malnutrition', tag: '#affected+gam'}
+    {className: 'sam', title: 'No. of Children (<5yrs) with Severe Acute Malnutrition', tag: '#affected+sam'},
+    {className: 'gam', title: 'No. of Children (<5yrs) with Global Acute Malnutrition', tag: '#affected+gam'}
   ];
 
   impactFigures.forEach(function(fig) {
@@ -1393,7 +1393,7 @@ function createFigure(div, obj) {
     divInner.find('.title').on('mouseenter', function(e) {
       let pos = $(e.currentTarget).position();
       $('.panel-tooltip .tooltip-inner').html(obj.tooltip);
-      $('.panel-tooltip').css('opacity', 1);
+      $('.panel-tooltip').css('opacity', 0.9);
       $('.panel-tooltip').css('top', `${pos.top - $('.panel-tooltip').height() - 10}px`);
       $('.panel-tooltip').css('left', `${pos.left + $(this).width()/2 - $('.panel-tooltip').width()/2}px`);
     });
