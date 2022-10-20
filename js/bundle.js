@@ -1266,7 +1266,7 @@ function updateCountrySource() {
 }
 
 function zoomToRegion() {
-  var offset = 50;
+  var offset = 100;
   let mapPadding = (isMobile) ?
     {
         top: 0,
@@ -1276,9 +1276,9 @@ function zoomToRegion() {
     } :
     { 
       top: offset,
-      right: 0,
+      right: offset,
       bottom: offset,
-      left: $('.key-figure-panel').outerWidth() - offset,
+      left: $('.key-figure-panel').outerWidth(),
     };
   map.fitBounds(regionBoundaryData[0].bbox, {
     padding: {top: mapPadding.top, right: mapPadding.right, bottom: mapPadding.bottom, left: mapPadding.left},
