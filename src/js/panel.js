@@ -9,8 +9,8 @@ function initKeyFigures() {
   impactDiv.children().remove();
 
   let impactFigures = [
-    {className: 'pin', title: 'People Affected', tag: '#affected+total'},
-    {className: 'targeted', title: 'People Targeted', tag: '#targeted+total'},
+    {className: 'pin', title: 'People Affected', tag: '#affected+total', tooltip: 'im a tooltip'},
+    {className: 'targeted', title: 'People Targeted', tag: '#targeted+total', tooltip: 'im a tooltip 2'},
     {className: 'reached', title: 'People Reached', tag: '#reached+total'},
     {className: 'idp', title: 'Internally Displaced People', tag: '#affected+idps'},
     {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', tag: '#affected+food+ipc+p3plus+num'},
@@ -21,7 +21,9 @@ function initKeyFigures() {
 
   impactFigures.forEach(function(fig) {
     let tag = (!isCountryView()) ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
-    createFigure(impactDiv, {className: fig.className, title: fig.title, stat: formatValue(data[fig.tag], 'short'), indicator: tag});
+    fig.indicator = tag;
+    fig.stat = formatValue(data[fig.tag], 'short');
+    createFigure(impactDiv, fig);
   });
 
 
@@ -38,19 +40,28 @@ function initKeyFigures() {
   fundingFigures.forEach(function(fig) {
     let tag = (!isCountryView()) ? `${fig.tag}+regional` : `${fig.tag}+${(currentCountry.code).toLowerCase()}`;
     let statVal = fig.tag=='#value+funding+pct' ? formatValue(data[fig.tag], 'percent') : formatValue(data[fig.tag]);
-    createFigure(fundingDiv, {className: fig.className, title: fig.title, stat: statVal, indicator: tag});
+    fig.indicator = tag;
+    fig.stat = statVal;
+    createFigure(fundingDiv, fig);
   });
 }
 
 
 function createFigure(div, obj) {
-  div.append('<div class="figure '+ obj.className +'"><div class="figure-inner"></div></div>');
-  var divInner = $('.'+ obj.className +' .figure-inner');
-  if (obj.title != undefined) divInner.append('<h6 class="title">'+ obj.title +'</h6>');
-  divInner.append('<p class="stat">'+ obj.stat +'</p>');
+  div.append(`<div class="figure ${obj.className}"><div class="figure-inner"></div></div>`);
+  var divInner = $(`.${obj.className} .figure-inner`);
+  if (obj.title != undefined) divInner.append(`<h6 class="title">${obj.title}</h6>`);
+  divInner.append(`<p class="stat">${obj.stat}</p>`);
 
   if (obj.indicator!='')
     createSource(divInner, obj.indicator);
+
+  divInner.on('mouseenter', function(e) {
+    console.log(obj)
+  });
+  divInner.on('mouseout', function(e) {
+    
+  });
 }
 
 
