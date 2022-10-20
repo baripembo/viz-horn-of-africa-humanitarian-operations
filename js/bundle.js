@@ -243,7 +243,7 @@ function initCountryLayer() {
   initKeyFigures();
 
   //create log scale for circle markers
-  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']!='SOM') return +d['#affected+food+ipc+p3plus+num']; })
+  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']=='ETH') return +d['#affected+food+ipc+p3plus+num']; })
   markerScale = d3.scaleSqrt()
     .domain([1, maxIPC])
     .range([2, 15]);
@@ -267,7 +267,7 @@ function initCountryLayer() {
 
     //ipc markers (dont show for SOM)
     var ipcVal = d['#affected+food+ipc+p3plus+num'];
-    var markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM') ? 0 : markerScale(ipcVal);
+    var markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM' || d['#country+code']=='KEN') ? 0 : markerScale(ipcVal);
 
     //turn off choropleth for ipc layer
     if (currentIndicator.id=='#affected+food+ipc+phase+type') {
@@ -411,7 +411,7 @@ function updateCountryLayer() {
       
       //ipc markers 
       var ipcVal = d['#affected+food+ipc+p3plus+num'];
-      markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM') ? 0 : markerScale(ipcVal);
+      markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM' || d['#country+code']=='KEN') ? 0 : markerScale(ipcVal);
 
       //turn off choropleth for raster layers
       if (currentIndicator.id=='#climate+rainfall+anomaly') {
@@ -1322,8 +1322,8 @@ function toggleIPCLayers(visible) {
   if (visible) {
     map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
-    if (currentCountry.code=='SOM') $('.bubble-scale').hide();
-    else $('.bubble-scale').show();
+    if (currentCountry.code=='ETH') $('.bubble-scale').show();
+    else $('.bubble-scale').hide();
   }
   else {
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
@@ -1345,11 +1345,11 @@ function initKeyFigures() {
     {className: 'pin', title: 'People Affected', tag: '#affected+total'},
     {className: 'targeted', title: 'People Targeted', tag: '#targeted+total'},
     {className: 'reached', title: 'People Reached', tag: '#reached+total'},
-    {className: 'idp', title: 'Internally Displaced People', tag: '#affected+idps'},
+    {className: 'idp', title: 'Internally Displaced People due to Drought', tag: '#affected+idps'},
     {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', tag: '#affected+food+ipc+p3plus+num'},
     {className: 'water', title: 'Water Insecurity', tag: '#affected+water'},
-    {className: 'sam', title: 'Severe Acute Malnutrition', tag: '#affected+sam'},
-    {className: 'gam', title: 'Global Acute Malnutrition', tag: '#affected+gam'}
+    {className: 'sam', title: 'No. of children (<5yrs) with Severe Acute Malnutrition', tag: '#affected+sam'},
+    {className: 'gam', title: 'No. of children (<5yrs) with Global Acute Malnutrition', tag: '#affected+gam'}
   ];
 
   impactFigures.forEach(function(fig) {

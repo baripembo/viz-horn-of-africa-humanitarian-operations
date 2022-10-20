@@ -1579,7 +1579,7 @@ a:visited {
     width: 100%; }
   .download-link i {
     font-size: 16px;
-    margin-left: auto;
+    margin-left: 10px;
     padding-top: 3px; }
   .download-link.eth, .download-link.ken, .download-link.som {
     display: none; }
