@@ -489,7 +489,7 @@ function updateCountrySource() {
 }
 
 function zoomToRegion() {
-  var offset = 50;
+  var offset = 100;
   let mapPadding = (isMobile) ?
     {
         top: 0,
@@ -499,9 +499,9 @@ function zoomToRegion() {
     } :
     { 
       top: offset,
-      right: 0,
+      right: offset,
       bottom: offset,
-      left: $('.key-figure-panel').outerWidth() - offset,
+      left: $('.key-figure-panel').outerWidth(),
     };
   map.fitBounds(regionBoundaryData[0].bbox, {
     padding: {top: mapPadding.top, right: mapPadding.right, bottom: mapPadding.bottom, left: mapPadding.left},
@@ -545,7 +545,7 @@ function toggleIPCLayers(visible) {
   if (visible) {
     map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
-    if (currentCountry.code=='SOM') $('.bubble-scale').hide();
+    if (currentCountry.code=='KEN' || currentCountry.code=='SOM') $('.bubble-scale').hide();
     else $('.bubble-scale').show();
   }
   else {

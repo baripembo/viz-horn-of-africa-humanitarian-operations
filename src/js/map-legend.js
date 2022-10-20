@@ -97,7 +97,7 @@ function updateMapLegend(scale) {
 
   //bubble scale
   var maxIPC = d3.max(admintwo_data, function(d) { 
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='Regional' && d['#country+code']!='SOM') {
+    if (d['#country+code']==currentCountry.code || currentCountry.code=='Regional' && d['#country+code']!='SOM' && d['#country+code']!='KEN') {
       return +d['#affected+food+ipc+p3plus+num'];
     } 
   })

@@ -542,6 +542,7 @@ a:visited {
 			border-bottom: 1px solid #CCC;
 			padding-bottom: 15px;
 			.title {
+				cursor: default;
 				height: 30px;
 			}
 			.stat {
@@ -555,6 +556,38 @@ a:visited {
 			.figure-inner .title {
 				height: 56px;
 			}
+		}
+	}
+	.panel-tooltip {
+    display: block;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transition: opacity 0.2s ease-out;
+    z-index: 1070;
+    .tooltip-arrow {
+		  border-left: 7px solid transparent;
+		  border-right: 7px solid transparent;
+		  border-top: 7px solid #000;
+		  bottom: -7px;
+		  height: 0;
+		  position: absolute;
+		  left: 50%;
+		  margin-left: -4px;
+		  width: 0;
+		}
+		.tooltip-inner {
+	    background-color: #000;
+	    border-radius: 4px;
+	    color: #FFF;
+	    max-width: 200px;
+		  padding: 10px 15px;
+	    text-align: left;
 		}
 	}
 }
@@ -572,6 +605,7 @@ a:visited {
 	i {
 		font-size: 16px;
 		margin-left: auto;
+		padding-left: 10px;
 		padding-top: 3px;
 	}
 	&.eth,
