@@ -9,12 +9,12 @@ function initKeyFigures() {
   impactDiv.children().remove();
 
   let impactFigures = [
-    {className: 'pin', title: 'People Affected', tag: '#affected+total', tooltip: 'im a tooltip'},
-    {className: 'targeted', title: 'People Targeted', tag: '#targeted+total', tooltip: 'im a tooltip 2'},
+    {className: 'pin', title: 'People Affected', tag: '#affected+total'},
+    {className: 'targeted', title: 'People Targeted', tag: '#targeted+total'},
     {className: 'reached', title: 'People Reached', tag: '#reached+total'},
     {className: 'idp', title: 'Internally Displaced People', tag: '#affected+idps'},
     {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', tag: '#affected+food+ipc+p3plus+num'},
-    {className: 'water', title: 'Water Insecurity', tag: '#affected+water'},
+    {className: 'water', title: 'Water Insecurity', tag: '#affected+water', tooltip: 'Number of people who cannot access enough water for drinking, cooking, cleaning'},
     {className: 'sam', title: 'Severe Acute Malnutrition', tag: '#affected+sam'},
     {className: 'gam', title: 'Global Acute Malnutrition', tag: '#affected+gam'}
   ];
@@ -56,12 +56,18 @@ function createFigure(div, obj) {
   if (obj.indicator!='')
     createSource(divInner, obj.indicator);
 
-  divInner.on('mouseenter', function(e) {
-    console.log(obj)
-  });
-  divInner.on('mouseout', function(e) {
-    
-  });
+  if (obj.tooltip!=undefined) {
+    divInner.find('.title').on('mouseenter', function(e) {
+      let pos = $(e.currentTarget).position();
+      $('.panel-tooltip .tooltip-inner').html(obj.tooltip);
+      $('.panel-tooltip').css('opacity', 1);
+      $('.panel-tooltip').css('top', `${pos.top - $('.panel-tooltip').height() - 10}px`);
+      $('.panel-tooltip').css('left', `${pos.left + $(this).width()/2 - $('.panel-tooltip').width()/2}px`);
+    });
+    divInner.find('.title').on('mouseout', function(e) {
+      $('.panel-tooltip').css('opacity', 0);
+    });
+  }
 }
 
 
