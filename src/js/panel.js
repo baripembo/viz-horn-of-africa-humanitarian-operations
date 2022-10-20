@@ -12,11 +12,11 @@ function initKeyFigures() {
     {className: 'pin', title: 'People Affected', tag: '#affected+total'},
     {className: 'targeted', title: 'People Targeted', tag: '#targeted+total'},
     {className: 'reached', title: 'People Reached', tag: '#reached+total'},
-    {className: 'idp', title: 'Internally Displaced People', tag: '#affected+idps'},
+    {className: 'idp', title: 'Internally Displaced People due to Drought', tag: '#affected+idps'},
     {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', tag: '#affected+food+ipc+p3plus+num'},
     {className: 'water', title: 'Water Insecurity', tag: '#affected+water'},
-    {className: 'sam', title: 'Severe Acute Malnutrition', tag: '#affected+sam'},
-    {className: 'gam', title: 'Global Acute Malnutrition', tag: '#affected+gam'}
+    {className: 'sam', title: 'No. of children (<5yrs) with Severe Acute Malnutrition', tag: '#affected+sam'},
+    {className: 'gam', title: 'No. of children (<5yrs) with Global Acute Malnutrition', tag: '#affected+gam'}
   ];
 
   impactFigures.forEach(function(fig) {

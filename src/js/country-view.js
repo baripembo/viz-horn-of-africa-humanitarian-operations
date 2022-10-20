@@ -5,7 +5,7 @@ function initCountryLayer() {
   initKeyFigures();
 
   //create log scale for circle markers
-  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']!='SOM') return +d['#affected+food+ipc+p3plus+num']; })
+  var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']=='ETH') return +d['#affected+food+ipc+p3plus+num']; })
   markerScale = d3.scaleSqrt()
     .domain([1, maxIPC])
     .range([2, 15]);
@@ -29,7 +29,7 @@ function initCountryLayer() {
 
     //ipc markers (dont show for SOM)
     var ipcVal = d['#affected+food+ipc+p3plus+num'];
-    var markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM') ? 0 : markerScale(ipcVal);
+    var markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM' || d['#country+code']=='KEN') ? 0 : markerScale(ipcVal);
 
     //turn off choropleth for ipc layer
     if (currentIndicator.id=='#affected+food+ipc+phase+type') {
@@ -173,7 +173,7 @@ function updateCountryLayer() {
       
       //ipc markers 
       var ipcVal = d['#affected+food+ipc+p3plus+num'];
-      markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM') ? 0 : markerScale(ipcVal);
+      markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM' || d['#country+code']=='KEN') ? 0 : markerScale(ipcVal);
 
       //turn off choropleth for raster layers
       if (currentIndicator.id=='#climate+rainfall+anomaly') {
