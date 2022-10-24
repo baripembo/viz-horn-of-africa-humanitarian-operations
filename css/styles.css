@@ -1788,7 +1788,9 @@ a:visited {
 
 @media only screen and (max-width: 767px) {
   h3 {
-    font-size: 18px; }
+    font-size: 17px; }
+  h4 {
+    font-size: 11px; }
   h5 {
     font-size: 14px;
     line-height: 45px;
@@ -1847,12 +1849,13 @@ a:visited {
       width: 33%; }
       .key-figure-panel .figure .figure-inner .title {
         font-size: 12px;
-        line-height: 14px; }
+        line-height: 14px;
+        height: 32px; }
         .key-figure-panel .figure .figure-inner .title .small {
           font-size: 11px;
           line-height: 15px; }
-      .key-figure-panel .figure.idps .figure-inner .title {
-        height: 36px; }
+      .key-figure-panel .figure.sam .figure-inner .title, .key-figure-panel .figure.gam .figure-inner .title {
+        height: 48px; }
   .stat {
     font-size: 24px;
     margin: 5px 0;

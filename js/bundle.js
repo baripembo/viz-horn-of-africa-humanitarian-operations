@@ -246,7 +246,7 @@ function initCountryLayer() {
   var maxIPC = d3.max(admintwo_data, function(d) { if (d['#country+code']=='ETH') return +d['#affected+food+ipc+p3plus+num']; })
   markerScale = d3.scaleSqrt()
     .domain([1, maxIPC])
-    .range([2, 15]);
+    .range([2, (isMobile)? 8 : 15]);
 
 
   //color scale
