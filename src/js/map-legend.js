@@ -125,7 +125,7 @@ function updateMapLegend(scale) {
   d3.select('.ipcScale .cell:nth-child(2) .label').text(numFormat(maxIPC));
 
   //hide no data key for rainfall layer
-  if (currentIndicator.id=='#climate+rainfall+anomaly') $('.no-data-key').hide();
+  if (currentIndicator.id=='#climate+rainfall+anomaly' || currentIndicator.id=='#date+latest+acled') $('.no-data-key').hide();
   else $('.no-data-key').show();
 
   //show/hide footnotes
