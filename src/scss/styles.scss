@@ -333,6 +333,17 @@ a:visited {
 	}
 	.legendCells-events .legendCells {
 		display: none;
+	}	
+	&.acled {
+		.legend-container {
+			height: 78px;
+		}
+		.legendCells {
+			display: none;
+		}
+		.legendCells-events .legendCells {
+			display: block;
+		}
 	}
 	label {    
 		display: flex;

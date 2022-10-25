@@ -13,6 +13,7 @@ function createMapLegend(scale) {
   createSource($('.map-legend .priority-source'), '#priority+regional');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind+regional');
   createSource($('.map-legend .population-source'), '#population+regional');
+  createSource($('.map-legend .acled-source'), '#date+latest+acled+regional');
 
   var legend = d3.legendColor()
     .labelFormat(shortenNumFormat)
@@ -86,14 +87,33 @@ function updateMapLegend(scale) {
   var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
   $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
 
-  //update legend
-  var legend = d3.legendColor()
-    .labelFormat(shortenNumFormat)
-    .cells(colorRange.length)
-    .scale(scale);
 
-  var g = d3.select('.map-legend .scale');
-  g.call(legend);
+  //update legend
+  if (currentIndicator.id=='#date+latest+acled') {
+    if (d3.selectAll('.legendCells-events').empty()) {
+      var svg = d3.select('.map-legend .scale');
+      svg.append("g")
+        .attr("class", "legendCells-events")
+        .attr("transform", "translate(6,10)");
+
+      var legendOrdinal = d3.legendColor()
+        .shape("path", d3.symbol().type(d3.symbolCircle).size(90)())
+        .shapePadding(3)
+        .scale(scale);
+
+      svg.select(".legendCells-events")
+        .call(legendOrdinal);
+    }
+  }
+  else {
+    var legend = d3.legendColor()
+      .labelFormat(shortenNumFormat)
+      .cells(colorRange.length)
+      .scale(scale);
+
+    var g = d3.select('.map-legend .scale');
+    g.call(legend);
+  }
 
   //bubble scale
   var maxIPC = d3.max(admintwo_data, function(d) { 
@@ -131,6 +151,7 @@ function getLegendScale() {
   });
 
   //set scale
+  $('.map-legend').removeClass('acled');
   var scale;
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
@@ -147,6 +168,12 @@ function getLegendScale() {
   else if (currentIndicator.id=='#affected+idps+ind') {
     scale = d3.scaleQuantile().domain(data).range(idpColorRange);
     scale.quantiles().map(x => Math.round(x));
+  }
+  else if (currentIndicator.id=='#date+latest+acled') {
+    $('.map-legend').addClass('acled');
+    scale = d3.scaleOrdinal()
+      .domain(['Battles', 'Explosions/Remote violence', 'Riots', 'Violence against civilians'])
+      .range(eventColorRange);
   }
   else {
     scale = d3.scaleQuantize().domain([0, max]).range(colorRange);
