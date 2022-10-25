@@ -468,10 +468,13 @@ function updateCountryLayer() {
     map.setLayoutProperty(id+'-chirps', 'visibility', rainVis);
   });
 
-
   //set ipc layer properties
   let isIPC = (currentIndicator.id=='#affected+food+ipc+phase+type') ? true : false;
   toggleIPCLayers(isIPC);
+
+  //set acled layer properties
+  let isAcled = (currentIndicator.id=='#date+latest+acled') ? true : false;
+  toggleAcledLayer(isAcled);
 }
 
 
@@ -634,6 +637,7 @@ function createMapLegend(scale) {
   createSource($('.map-legend .priority-source'), '#priority+regional');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind+regional');
   createSource($('.map-legend .population-source'), '#population+regional');
+  createSource($('.map-legend .acled-source'), '#date+latest+acled+regional');
 
   var legend = d3.legendColor()
     .labelFormat(shortenNumFormat)
@@ -707,14 +711,33 @@ function updateMapLegend(scale) {
   var layerID = currentIndicator.id.replaceAll('+','-').replace('#','');
   $('.map-legend .legend-container').attr('class', 'legend-container '+ layerID);
 
-  //update legend
-  var legend = d3.legendColor()
-    .labelFormat(shortenNumFormat)
-    .cells(colorRange.length)
-    .scale(scale);
 
-  var g = d3.select('.map-legend .scale');
-  g.call(legend);
+  //update legend
+  if (currentIndicator.id=='#date+latest+acled') {
+    if (d3.selectAll('.legendCells-events').empty()) {
+      var svg = d3.select('.map-legend .scale');
+      svg.append("g")
+        .attr("class", "legendCells-events")
+        .attr("transform", "translate(6,10)");
+
+      var legendOrdinal = d3.legendColor()
+        .shape("path", d3.symbol().type(d3.symbolCircle).size(90)())
+        .shapePadding(3)
+        .scale(scale);
+
+      svg.select(".legendCells-events")
+        .call(legendOrdinal);
+    }
+  }
+  else {
+    var legend = d3.legendColor()
+      .labelFormat(shortenNumFormat)
+      .cells(colorRange.length)
+      .scale(scale);
+
+    var g = d3.select('.map-legend .scale');
+    g.call(legend);
+  }
 
   //bubble scale
   var maxIPC = d3.max(admintwo_data, function(d) { 
@@ -752,6 +775,7 @@ function getLegendScale() {
   });
 
   //set scale
+  $('.map-legend').removeClass('acled');
   var scale;
   if (currentIndicator.id=='#climate+rainfall+anomaly') {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
@@ -768,6 +792,12 @@ function getLegendScale() {
   else if (currentIndicator.id=='#affected+idps+ind') {
     scale = d3.scaleQuantile().domain(data).range(idpColorRange);
     scale.quantiles().map(x => Math.round(x));
+  }
+  else if (currentIndicator.id=='#date+latest+acled') {
+    $('.map-legend').addClass('acled');
+    scale = d3.scaleOrdinal()
+      .domain(['Battles', 'Explosions/Remote violence', 'Riots', 'Violence against civilians'])
+      .range(eventColorRange);
   }
   else {
     scale = d3.scaleQuantize().domain([0, max]).range(colorRange);
@@ -966,6 +996,9 @@ function displayMap() {
     loadIPCLayer(country);
   });
 
+  //load acled layer
+  initAcledLayer();
+
   //zoom into region
   zoomToRegion();
 
@@ -1137,6 +1170,97 @@ function loadIPCLayer(country) {
       .setLngLat(e.lngLat);
   });
 }
+
+function initAcledLayer() {
+  let maxCount = d3.max(acledData, function(d) { return +d['#affected+killed']; });
+  let dotScale = d3.scaleSqrt()
+    .domain([1, maxCount])
+    .range([4, 16]);
+
+  //get unique event types
+  let acledEvents = [...new Set(acledData.map(d => d['#event+type']))];
+  
+  //build expression for event dot circles
+  let eventTypeColorScale = ['match', ['get', 'event_type']];
+  for (const [index, event] of acledEvents.sort().entries()) {
+    eventTypeColorScale.push(event);
+    eventTypeColorScale.push(eventColorRange[index]);
+  }
+  eventTypeColorScale.push('#666');
+
+  let events = [];
+  for (let e of acledData) {
+    events.push({
+      'type': 'Feature',
+      'properties': {
+        'iso': e['#country+code'],
+        'adm1': e['#adm1+name'],
+        'adm3': e['#adm3+name'],
+        'event_type': e['#event+type'],
+        'date': e['#date+occurred'],
+        'fatalities': e['#affected+killed'],
+        'notes': e['#description'],
+        'iconSize': dotScale(e['#affected+killed'])
+      },
+      'geometry': { 
+        'type': 'Point', 
+        'coordinates': e['#coords']
+      } 
+    })
+  }
+  let eventsGeoJson = {
+    'type': 'FeatureCollection',
+    'features': events
+  };
+
+  map.addSource('acled', {
+    type: 'geojson',
+    data: eventsGeoJson,
+    generateId: true
+  });
+
+  //add acled layer per country
+  let countries = ['eth', 'ken', 'som'];
+  countries.forEach(function(country) {
+    map.addLayer({
+      id: `acled-dots-${country}`,
+      type: 'circle',
+      source: 'acled',
+      filter: ['==', 'iso', country.toUpperCase()],
+      paint: {
+        'circle-color': eventTypeColorScale,
+        'circle-stroke-color': eventTypeColorScale,
+        'circle-opacity': 0.5,
+        'circle-radius': ['get', 'iconSize'],
+        'circle-stroke-width': 1,
+      }
+    }, baseLayer);
+    map.setLayoutProperty(`acled-dots-${country}`, 'visibility', 'none');
+
+    //mouse events
+    map.on('mouseenter', `acled-dots-${country}`, onMouseEnter);
+    map.on('mouseleave', `acled-dots-${country}`, onMouseLeave);
+    map.on('mousemove', `acled-dots-${country}`, function(e) {
+      map.getCanvas().style.cursor = 'pointer';
+      let prop = e.features[0].properties;
+      let date = new Date(prop.date);
+      let content = `<span class='small'>${moment(date).format('MMM D, YYYY')}</span>`;
+      content += `<h2>${prop.event_type}</h2>`;
+      content += `<p>${prop.notes}</p>`;
+      content += `<p>Fatalities: ${prop.fatalities}</p>`;
+      tooltip.setHTML(content);
+      tooltip
+        .addTo(map)
+        .setLngLat(e.lngLat);
+    });
+  });
+
+  //var zipCodeFilter = ["==", ['get', 'ZipCode'], Number(zipcode_val)];
+  //var boroughFilter = ['match', ['get', 'Borough'], borough_val, true, false];
+  //var combinedFilter = ["all", zipCodeFilter, boroughFilter];
+  //map.setFilter('parcels_fill', combinedFilter);
+}
+
 
 
 function deepLinkView() {
@@ -1329,6 +1453,13 @@ function toggleIPCLayers(visible) {
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
     $('.bubble-scale').hide();
   }
+}
+
+function toggleAcledLayer(visible) {
+  ['eth','ken','som'].forEach(function(country) {
+    let vis = (visible && (!isCountryView() || currentCountry.code.toLowerCase()==country)) ? 'visible' : 'none';
+    map.setLayoutProperty(`acled-dots-${country}`, 'visibility', vis);
+  });
 }
 
 /***********************/
@@ -1540,9 +1671,11 @@ var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D
 var ipcPhaseColorRange = ['#CDFACD', '#FAE61E', '#E67800', '#C80000', '#640000'];
 var idpColorRange = ['#D1E3EA','#BBD1E6','#ADBCE3','#B2B3E0','#A99BC6'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
+var eventColorRange = ['#EEB598','#CE7C7F','#60A2A4','#91C4B7'];
+var eventCategories = ['Battles', 'Explosions/Remote violence', 'Riots', 'Violence against civilians'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
-var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
+var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, fatalityData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
 var countryTimeseriesChart = '';
 var mapLoaded = false;
 var dataLoaded = false;
@@ -1622,6 +1755,9 @@ $( document ).ready(function() {
       regionBoundaryData = data[1].features;
       ethData = data[2].features;
 
+      //clean acled data
+      acledCoords(allData.fatalities_data);
+
       //parse national data
       nationalData.forEach(function(item) {
         //keep global list of countries
@@ -1676,6 +1812,46 @@ $( document ).ready(function() {
     });
   }
 
+  function acledCoords(d) {
+    //process acled data
+    let data = [];
+    d.forEach(function(event) {
+      if (eventCategories.includes(event['#event+type'])) {
+        let iso = '';
+        if (event['#adm2+code'].includes('ET'))
+          iso = 'ETH';
+        else if (event['#adm2+code'].includes('KE'))
+          iso = 'KEN';
+        else
+          iso = 'SOM';
+        event['#country+code'] = iso;
+        event['#coords'] = [+event['#geo+lon'], +event['#geo+lat']];
+        data.push(event);
+      }
+    });
+
+    //group by coords
+    let coordGroups = d3.nest()
+      .key(function(d) { return d['#coords']; })
+      .entries(data);
+
+    //nudge dots with duplicate coords
+    acledData = [];
+    coordGroups.forEach(function(coords) {
+      if (coords.values.length>1)
+        coords.values.forEach(function(c) {
+          let origCoord = turf.point(c['#coords']);
+          let bearing = randomNumber(-180, 180); //randomly scatter around origin
+          let distance = randomNumber(2, 8); //randomly scatter by 2-8km from origin
+          let newCoord = turf.destination(origCoord, distance, bearing);
+          c['#coords'] = newCoord.geometry.coordinates;
+          acledData.push(c);
+        });
+      else {
+        acledData.push(coords.values[0]);
+      }
+    });
+  }
 
   function initView() {
     //check map loaded status

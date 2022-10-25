@@ -1396,6 +1396,12 @@ a:visited {
     display: block; }
   .map-legend .legendCells-events .legendCells {
     display: none; }
+  .map-legend.acled .legend-container {
+    height: 78px; }
+  .map-legend.acled .legendCells {
+    display: none; }
+  .map-legend.acled .legendCells-events .legendCells {
+    display: block; }
   .map-legend label {
     display: flex;
     flex-direction: row-reverse;
