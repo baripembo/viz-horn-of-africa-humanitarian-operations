@@ -230,10 +230,13 @@ function updateCountryLayer() {
     map.setLayoutProperty(id+'-chirps', 'visibility', rainVis);
   });
 
-
   //set ipc layer properties
   let isIPC = (currentIndicator.id=='#affected+food+ipc+phase+type') ? true : false;
   toggleIPCLayers(isIPC);
+
+  //set acled layer properties
+  let isAcled = (currentIndicator.id=='#date+latest+acled') ? true : false;
+  toggleAcledLayer(isAcled);
 }
 
 

@@ -189,6 +189,9 @@ function displayMap() {
     loadIPCLayer(country);
   });
 
+  //load acled layer
+  initAcledLayer();
+
   //zoom into region
   zoomToRegion();
 
@@ -360,6 +363,97 @@ function loadIPCLayer(country) {
       .setLngLat(e.lngLat);
   });
 }
+
+function initAcledLayer() {
+  let maxCount = d3.max(acledData, function(d) { return +d['#affected+killed']; });
+  let dotScale = d3.scaleSqrt()
+    .domain([1, maxCount])
+    .range([4, 16]);
+
+  //get unique event types
+  let acledEvents = [...new Set(acledData.map(d => d['#event+type']))];
+  
+  //build expression for event dot circles
+  let eventTypeColorScale = ['match', ['get', 'event_type']];
+  for (const [index, event] of acledEvents.sort().entries()) {
+    eventTypeColorScale.push(event);
+    eventTypeColorScale.push(eventColorRange[index]);
+  }
+  eventTypeColorScale.push('#666');
+
+  let events = [];
+  for (let e of acledData) {
+    events.push({
+      'type': 'Feature',
+      'properties': {
+        'iso': e['#country+code'],
+        'adm1': e['#adm1+name'],
+        'adm3': e['#adm3+name'],
+        'event_type': e['#event+type'],
+        'date': e['#date+occurred'],
+        'fatalities': e['#affected+killed'],
+        'notes': e['#description'],
+        'iconSize': dotScale(e['#affected+killed'])
+      },
+      'geometry': { 
+        'type': 'Point', 
+        'coordinates': e['#coords']
+      } 
+    })
+  }
+  let eventsGeoJson = {
+    'type': 'FeatureCollection',
+    'features': events
+  };
+
+  map.addSource('acled', {
+    type: 'geojson',
+    data: eventsGeoJson,
+    generateId: true
+  });
+
+  //add acled layer per country
+  let countries = ['eth', 'ken', 'som'];
+  countries.forEach(function(country) {
+    map.addLayer({
+      id: `acled-dots-${country}`,
+      type: 'circle',
+      source: 'acled',
+      filter: ['==', 'iso', country.toUpperCase()],
+      paint: {
+        'circle-color': eventTypeColorScale,
+        'circle-stroke-color': eventTypeColorScale,
+        'circle-opacity': 0.5,
+        'circle-radius': ['get', 'iconSize'],
+        'circle-stroke-width': 1,
+      }
+    }, baseLayer);
+    map.setLayoutProperty(`acled-dots-${country}`, 'visibility', 'none');
+
+    //mouse events
+    map.on('mouseenter', `acled-dots-${country}`, onMouseEnter);
+    map.on('mouseleave', `acled-dots-${country}`, onMouseLeave);
+    map.on('mousemove', `acled-dots-${country}`, function(e) {
+      map.getCanvas().style.cursor = 'pointer';
+      let prop = e.features[0].properties;
+      let date = new Date(prop.date);
+      let content = `<span class='small'>${moment(date).format('MMM D, YYYY')}</span>`;
+      content += `<h2>${prop.event_type}</h2>`;
+      content += `<p>${prop.notes}</p>`;
+      content += `<p>Fatalities: ${prop.fatalities}</p>`;
+      tooltip.setHTML(content);
+      tooltip
+        .addTo(map)
+        .setLngLat(e.lngLat);
+    });
+  });
+
+  //var zipCodeFilter = ["==", ['get', 'ZipCode'], Number(zipcode_val)];
+  //var boroughFilter = ['match', ['get', 'Borough'], borough_val, true, false];
+  //var combinedFilter = ["all", zipCodeFilter, boroughFilter];
+  //map.setFilter('parcels_fill', combinedFilter);
+}
+
 
 
 function deepLinkView() {
@@ -552,4 +646,11 @@ function toggleIPCLayers(visible) {
     map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
     $('.bubble-scale').hide();
   }
+}
+
+function toggleAcledLayer(visible) {
+  ['eth','ken','som'].forEach(function(country) {
+    let vis = (visible && (!isCountryView() || currentCountry.code.toLowerCase()==country)) ? 'visible' : 'none';
+    map.setLayoutProperty(`acled-dots-${country}`, 'visibility', vis);
+  });
 }

@@ -9,9 +9,11 @@ var populationColorRange = ['#F7FCB9', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D
 var ipcPhaseColorRange = ['#CDFACD', '#FAE61E', '#E67800', '#C80000', '#640000'];
 var idpColorRange = ['#D1E3EA','#BBD1E6','#ADBCE3','#B2B3E0','#A99BC6'];
 var chirpsColorRange = ['#254061', '#1e6deb', '#3a95f5', '#78c6fa', '#b5ebfa', '#77eb73', '#fefefe', '#f0dcb9', '#ffe978', '#ffa200', '#ff3300', '#a31e1e', '#69191a'];
+var eventColorRange = ['#EEB598','#CE7C7F','#60A2A4','#91C4B7'];
+var eventCategories = ['Battles', 'Explosions/Remote violence', 'Riots', 'Violence against civilians'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
-var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
+var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, fatalityData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
 var countryTimeseriesChart = '';
 var mapLoaded = false;
 var dataLoaded = false;
@@ -91,6 +93,9 @@ $( document ).ready(function() {
       regionBoundaryData = data[1].features;
       ethData = data[2].features;
 
+      //clean acled data
+      acledCoords(allData.fatalities_data);
+
       //parse national data
       nationalData.forEach(function(item) {
         //keep global list of countries
@@ -145,6 +150,46 @@ $( document ).ready(function() {
     });
   }
 
+  function acledCoords(d) {
+    //process acled data
+    let data = [];
+    d.forEach(function(event) {
+      if (eventCategories.includes(event['#event+type'])) {
+        let iso = '';
+        if (event['#adm2+code'].includes('ET'))
+          iso = 'ETH';
+        else if (event['#adm2+code'].includes('KE'))
+          iso = 'KEN';
+        else
+          iso = 'SOM';
+        event['#country+code'] = iso;
+        event['#coords'] = [+event['#geo+lon'], +event['#geo+lat']];
+        data.push(event);
+      }
+    });
+
+    //group by coords
+    let coordGroups = d3.nest()
+      .key(function(d) { return d['#coords']; })
+      .entries(data);
+
+    //nudge dots with duplicate coords
+    acledData = [];
+    coordGroups.forEach(function(coords) {
+      if (coords.values.length>1)
+        coords.values.forEach(function(c) {
+          let origCoord = turf.point(c['#coords']);
+          let bearing = randomNumber(-180, 180); //randomly scatter around origin
+          let distance = randomNumber(2, 8); //randomly scatter by 2-8km from origin
+          let newCoord = turf.destination(origCoord, distance, bearing);
+          c['#coords'] = newCoord.geometry.coordinates;
+          acledData.push(c);
+        });
+      else {
+        acledData.push(coords.values[0]);
+      }
+    });
+  }
 
   function initView() {
     //check map loaded status
