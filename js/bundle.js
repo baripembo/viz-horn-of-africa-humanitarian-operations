@@ -1595,7 +1595,7 @@ function createCountryMapTooltip(location) {
   else if (currentIndicator.id=='#climate+rainfall+anomaly'){
     content += `${currentIndicator.name}:<div class="stat">${parseFloat(val).toFixed(2)}mm</div>`;
   }
-  else if (currentIndicator.id=='#population' && currentCountry.code=='ETH') {
+  else if (currentIndicator.id=='#population' && location['#country+code']=='ETH') {
     //dont show population figures for ETH
   }
   else {
