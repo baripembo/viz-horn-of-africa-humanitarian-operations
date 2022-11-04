@@ -13,7 +13,7 @@ function initKeyFigures() {
     {className: 'targeted', title: 'People Targeted', tag: '#targeted+total'},
     {className: 'reached', title: 'People Reached', tag: '#reached+total'},
     {className: 'idp', title: 'Internally Displaced People due to Drought', tag: '#affected+idps'},
-    {className: 'ipc', title: 'IPC 3+ Acute Food Insecurity', tag: '#affected+food+ipc+p3plus+num'},
+    {className: 'ipc', title: 'Population with Acute Food Insecurity [?]', tag: '#affected+food+ipc+p3plus+num', tooltip: 'For Kenya and Somalia, Population with Acute Food Insecurity refers to the population assessed to be in IPC phase 3 and above through an IPC or IPC compatible process. For Ethiopia, Population with Acute Food Insecurity refers to the population targeted for food assistance by the food security cluster in Ethiopia'},
     {className: 'water', title: 'Water Insecurity [?]', tag: '#affected+water', tooltip: 'Number of people who cannot access enough water for drinking, cooking, cleaning'},
     {className: 'sam', title: 'No. of Children (<5yrs) with Severe Acute Malnutrition', tag: '#affected+sam'},
     {className: 'gam', title: 'No. of Children (<5yrs) with Global Acute Malnutrition', tag: '#affected+gam'}

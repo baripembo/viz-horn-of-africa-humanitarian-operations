@@ -346,7 +346,7 @@ function loadIPCLayer(country) {
 
     content += '<div class="table-display">';
     if (p3Pop!==undefined) {
-      content += `<div class="table-row"><div>Population in IPC Phase 3+:</div><div>${shortenNumFormat(p3Pop)}</div></div>`;
+      content += `<div class="table-row"><div>Population with Acute Food Insecurity:</div><div>${shortenNumFormat(p3Pop)}</div></div>`;
     }
 
     tableArray.forEach(function(row) {
