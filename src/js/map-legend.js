@@ -42,7 +42,7 @@ function createMapLegend(scale) {
 
   //bubble scale
   var bubbleLegend = d3.select('.map-legend .bubble-scale');
-  $('.bubble-scale').append('<h4>Population in IPC Phase 3+</h4>');
+  $('.bubble-scale').append('<h4>Population with Acute Food Insecurity</h4>');
   createSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+regional');
 
   var markersvg = bubbleLegend.append('svg')
