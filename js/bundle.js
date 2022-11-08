@@ -859,6 +859,7 @@ function updateMapLegend(scale) {
   })
   markerScale.domain([2, maxIPC]);
   d3.select('.ipcScale .cell:nth-child(2) .label').text(numFormat(maxIPC));
+  updateSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+'+currentCountry.code.toLowerCase());
 
   //hide no data key for rainfall layer
   if (currentIndicator.id=='#climate+rainfall+anomaly' || currentIndicator.id=='#date+latest+acled') $('.no-data-key').hide();
