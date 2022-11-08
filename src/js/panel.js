@@ -86,7 +86,6 @@ function createSource(div, indicator) {
 }
 
 function updateSource(div, indicator) {
-  console.log('updateSource', indicator)
   var sourceObj = getSource(indicator);
   if (Object.keys(sourceObj).length<1) {
     div.hide();
