@@ -413,13 +413,13 @@ function initAcledLayer() {
   });
 
   //add acled layer per country
-  let countries = ['eth', 'ken', 'som'];
-  countries.forEach(function(country) {
+  globalCountryList.forEach(function(country) {
+    let iso = country.code.toLowerCase();
     map.addLayer({
-      id: `acled-dots-${country}`,
+      id: `acled-dots-${iso}`,
       type: 'circle',
       source: 'acled',
-      filter: ['==', 'iso', country.toUpperCase()],
+      filter: ['==', 'iso', iso.toUpperCase()],
       paint: {
         'circle-color': eventTypeColorScale,
         'circle-stroke-color': eventTypeColorScale,
@@ -428,12 +428,12 @@ function initAcledLayer() {
         'circle-stroke-width': 1,
       }
     }, baseLayer);
-    map.setLayoutProperty(`acled-dots-${country}`, 'visibility', 'none');
+    map.setLayoutProperty(`acled-dots-${iso}`, 'visibility', 'none');
 
     //mouse events
-    map.on('mouseenter', `acled-dots-${country}`, onMouseEnter);
-    map.on('mouseleave', `acled-dots-${country}`, onMouseLeave);
-    map.on('mousemove', `acled-dots-${country}`, function(e) {
+    map.on('mouseenter', `acled-dots-${iso}`, onMouseEnter);
+    map.on('mouseleave', `acled-dots-${iso}`, onMouseLeave);
+    map.on('mousemove', `acled-dots-${iso}`, function(e) {
       map.getCanvas().style.cursor = 'pointer';
       let prop = e.features[0].properties;
       let date = new Date(prop.date);
@@ -514,6 +514,14 @@ function createEvents() {
     updateCountrySource();
   });
 
+  //ranking select event
+  d3.selectAll('.ranking-select').on('change',function(e) {
+    var selected = d3.select(this).node().value;
+    if (selected!='') {
+      updateRanking(selected);
+    }
+  });
+
   //map legend radio events
   $('input[type="radio"]').click(function(){
     var selected = $('input[name="countryIndicators"]:checked');
@@ -555,7 +563,7 @@ function selectCountry(features) {
         bottom: 0
     } :
     { 
-      top: padding,//$('.tab-menubar').outerHeight() + padding
+      top: $('.tab-menubar').outerHeight() + padding,
       right: $('.map-legend').outerWidth(),
       bottom: padding,
       left: $('.key-figure-panel').outerWidth() + padding,
@@ -649,8 +657,8 @@ function toggleIPCLayers(visible) {
 }
 
 function toggleAcledLayer(visible) {
-  ['eth','ken','som'].forEach(function(country) {
-    let vis = (visible && (!isCountryView() || currentCountry.code.toLowerCase()==country)) ? 'visible' : 'none';
-    map.setLayoutProperty(`acled-dots-${country}`, 'visibility', vis);
+  globalCountryList.forEach(function(country) {
+    let vis = (visible && (!isCountryView() || currentCountry.code.toLowerCase()==country.code.toLowerCase())) ? 'visible' : 'none';
+    map.setLayoutProperty(`acled-dots-${country.code.toLowerCase()}`, 'visibility', vis);
   });
 }
