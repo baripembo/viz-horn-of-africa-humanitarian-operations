@@ -1512,7 +1512,7 @@ a:visited {
         margin-left: 30px; }
 
 .mapboxgl-ctrl-top-right {
-  top: 16px;
+  top: 56px;
   right: 16px; }
 
 .mapboxgl-ctrl-bottom-left {
@@ -1660,12 +1660,12 @@ a:visited {
     margin-bottom: 20px; }
     #chart-view .source-container .source {
       margin-left: 0; }
-  #chart-view .trendseries-title {
+  #chart-view .ranking-title {
     border-top: 1px solid #CCC;
     margin-top: 30px; }
-    #chart-view .trendseries-title h6 {
+    #chart-view .ranking-title h6 {
       margin-top: 25px; }
-    #chart-view .trendseries-title .num {
+    #chart-view .ranking-title .num {
       color: #000;
       font-family: 'Gotham-Light', sans-serif;
       font-size: 42px;
@@ -1676,7 +1676,7 @@ a:visited {
     fill-opacity: 1 !important; }
 
 .country-select,
-.trendseries-select {
+.ranking-select {
   background-color: #FFF;
   border-color: #FFF;
   border-radius: 8px;
@@ -1706,10 +1706,14 @@ a:visited {
 
 .c3-text {
   fill: #000 !important;
-  font-family: 'Source Sans Pro', sans-serif; }
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 12px; }
 
 .c3-axis .tick text {
-  fill: #000; }
+  fill: #888;
+  font-size: 12px !important;
+  font-family: 'Source Sans Pro', sans-serif;
+  text-transform: uppercase; }
 
 .c3-tooltip {
   font-family: 'Source Sans Pro', sans-serif; }
@@ -1722,29 +1726,29 @@ a:visited {
   stroke: #007CE1;
   stroke-width: 1px; }
 
-.trendseries-chart .c3-line {
+.ranking-chart .c3-line {
   stroke-width: 2; }
 
-.trendseries-chart .c3-grid line {
+.ranking-chart .c3-grid line {
   stroke: #F2F2F3;
   stroke-dasharray: 0; }
 
-.trendseries-chart .c3-axis .tick line,
-.trendseries-chart .c3-axis-y path.domain {
+.ranking-chart .c3-axis .tick line,
+.ranking-chart .c3-axis-y path.domain {
   display: none; }
 
-.trendseries-chart .c3-axis-x path.domain {
+.ranking-chart .c3-axis-x path.domain {
   stroke: #888; }
 
-.trendseries-chart .c3-axis text {
+.ranking-chart .c3-axis text {
   fill: #888; }
 
-.trendseries-chart table {
+.ranking-chart table {
   background-color: #FFF;
   border: 1px solid #E2E2E2;
   border-collapse: collapse;
   border-spacing: 0; }
-  .trendseries-chart table th {
+  .ranking-chart table th {
     background-color: #B3B3B3;
     border: 1px solid #B3B3B3;
     color: #FFF;
@@ -1753,15 +1757,15 @@ a:visited {
     font-weight: bold;
     margin: 0;
     padding: 6px 6px; }
-  .trendseries-chart table td {
+  .ranking-chart table td {
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 13px;
     font-weight: normal !important;
     padding: 4px 7px; }
-    .trendseries-chart table td:last-child {
+    .ranking-chart table td:last-child {
       border-left: 1px solid #E2E2E2;
       text-align: right; }
-  .trendseries-chart table tr:last-child {
+  .ranking-chart table tr:last-child {
     border-top: 1px solid #E2E2E2; }
 
 .mobile-message {
@@ -1821,9 +1825,9 @@ a:visited {
     padding: 15px 20px;
     position: absolute;
     top: 50%; }
-    #chart-view .trendseries-title h6 {
+    #chart-view .ranking-title h6 {
       font-size: 12px; }
-    #chart-view .trendseries-title .num {
+    #chart-view .ranking-title .num {
       font-size: 24px;
       padding: 0; }
   .content .map-legend {
