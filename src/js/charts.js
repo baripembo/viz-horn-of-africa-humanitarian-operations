@@ -53,11 +53,11 @@ function formatRankingData(data) {
   donors.sort((a, b) => (a.value < b.value) ? 1 : -1);
 
   //format for c3
-  let max = 10;
-  let donorsArray = donors.slice(0, max).map((d) => d.key);
+  let num = 10;
+  let donorsArray = donors.slice(0, num).map((d) => d.key);
   donorsArray.unshift('x');
 
-  let valueArray = donors.slice(0, max).map((d) => d.value);
+  let valueArray = donors.slice(0, num).map((d) => d.value);
   valueArray.unshift('values');
 
   return {donors: donorsArray, values: valueArray};
@@ -68,6 +68,8 @@ function createRanking(data, div) {
   const chartWidth = viewportWidth - $('.key-figure-panel').width() - 100;
   const chartHeight = 400;
   let colorArray = ['#F8B1AD'];
+  let valMax = data.values.slice(1, data.values.length);
+  let yMax = d3.max(valMax);
 
   var chart = c3.generate({
     size: {
@@ -110,12 +112,24 @@ function createRanking(data, div) {
         }
       },
       y: {
-        show: false
+        max: yMax,
+        padding: {top: 40, right: 0},
+        //show: false
+        tick: {
+          format: function(d) {
+            return formatValue(d);
+          }
+        }
       },
       rotated: true
     },
     legend: {
       show: false
+    },
+    grid: {
+      y: {
+        show: true
+      }
     },
     point: { show: false },
     tooltip: {
