@@ -1453,6 +1453,7 @@ function createEvents() {
     var selected = d3.select(this).node().value;
     if (selected!='') {
       updateRanking(selected);
+      vizTrack(`chart view`, selected);
     }
   });
 
