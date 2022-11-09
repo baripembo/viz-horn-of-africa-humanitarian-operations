@@ -488,7 +488,7 @@ a:visited {
 }
 
 .mapboxgl-ctrl-top-right {
-  top: 16px;//60
+  top: 56px;
   right: 16px;
 }
 
@@ -671,7 +671,7 @@ a:visited {
   		margin-left: 0;
   	}
   }
-  .trendseries-title {
+  .ranking-title {
   	border-top: 1px solid #CCC;
   	margin-top: 30px;
   	h6 {
@@ -692,7 +692,7 @@ a:visited {
 }
 
 .country-select,
-.trendseries-select { 
+.ranking-select { 
 	background-color: #FFF;
   border-color: #FFF;
 	border-radius: 8px;
@@ -729,11 +729,15 @@ a:visited {
 .c3-text {
 	fill: #000 !important;
 	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 12px;
 }
 
 .c3-axis {
 	.tick text {
-		fill: #000;
+		fill: #888;
+		font-size: 12px !important;
+		font-family: 'Source Sans Pro', sans-serif;
+		text-transform: uppercase;
 	}
 }
 
@@ -755,7 +759,7 @@ a:visited {
 }
 
 
-.trendseries-chart {
+.ranking-chart {
 	// .c3-target.c3-focused .c3-lines .c3-line {
 	// 	stroke: #007CE1 !important;
 	// }
@@ -881,7 +885,7 @@ a:visited {
 		padding: 15px 20px;
 		position: absolute;
     top: 50%;
-		.trendseries-title {
+		.ranking-title {
 			h6 {
 				font-size: 12px;
 			}

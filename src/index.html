@@ -54,20 +54,15 @@
         <div class='content-left'></div>
         <div class='content-right'>
 
-          <!-- <div class="tab-menubar">
+          <div class="tab-menubar">
             <div class="tab-button active" data-id="map-view">Map View</div>
-            <div class="tab-button" data-id="chart-view">Chart View</div>
-          </div> -->
+            <div class="tab-button" data-id="chart-view"><label class="label-small">NEW</label> Chart View</div>
+          </div>
           <div id='global-map'>
             <div class='map-legend'>
               <div class='toggle-icon'></div>
               <h4 class='collapsed-title'>MAP LEGEND</h4>
               <h4 class='indicator-title'>MAP DATA LAYER</h4>
-              
-<!--               <div class='indicator'>
-                <label>Acute Food Insecurity (population in IPC Phase 3+)<input checked='true' name='countryIndicators' type='radio' value='#affected+food+ipc+p3plus+num' id='ipc' data-legend='Population in IPC 3+ Acute Food Insecurity' data-layer='ipc_acute_food_insecurity'></label>
-                <div class="source-container ipc-source"></div>
-              </div>   --> 
 
               <div class='indicator'>
                 <label>Acute Food Insecurity IPC Phase Classification<input checked='true' name='countryIndicators' type='radio' value='#affected+food+ipc+phase+type' id='ipc-phase' data-legend='Acute Food Insecurity IPC Phase Classification' data-layer='ipc_acute_food_insecurity_phase'></label>
@@ -112,10 +107,10 @@
 
           <div id='chart-view'>
             <div class='source-container'></div>
-            <div class='trendseries-container'>
-              <select id='trendseriesSelect' class='trendseries-select'></select>
-              <div class='trendseries-title'></div>
-              <div class='trendseries-chart'></div>
+            <div class='ranking-container'>
+              <select id='rankingSelect' class='ranking-select'></select>
+              <div class='ranking-title'></div>
+              <div class='ranking-chart'></div>
             </div>
           </div>
 

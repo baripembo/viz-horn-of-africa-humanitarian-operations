@@ -13,8 +13,8 @@ var eventColorRange = ['#EEB598','#CE7C7F','#60A2A4','#91C4B7'];
 var eventCategories = ['Battles', 'Explosions/Remote violence', 'Riots', 'Violence against civilians'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
-var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, fatalityData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
-var countryTimeseriesChart = '';
+var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, fatalityData, donorData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
+var rankingChart = '';
 var mapLoaded = false;
 var dataLoaded = false;
 var viewInitialized = false;
@@ -60,7 +60,7 @@ $( document ).ready(function() {
     if (viewportHeight<696) {
       zoomLevel = 1.4;
     }
-    $('#chart-view').height(viewportHeight-30);//$('#chart-view').height(viewportHeight-$('.tab-menubar').outerHeight()-30);
+    $('#chart-view').height(viewportHeight-$('.tab-menubar').outerHeight()-30);
 
     //load static map -- will only work for screens smaller than 1280
     if (viewportWidth<=1280) {
@@ -92,8 +92,10 @@ $( document ).ready(function() {
       sourcesData = allData.sources_data;
       regionBoundaryData = data[1].features;
       ethData = data[2].features;
+      donorData = allData.planorgfunding_data;
 
       //clean acled data
+      fatalityData = allData.fatalities_data;
       acledCoords(allData.fatalities_data);
 
       //parse national data
@@ -107,7 +109,6 @@ $( document ).ready(function() {
           return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
         });
       });
-
 
       //transform adm1 ipc data
       // adminone_data.forEach(function(d) {
@@ -192,22 +193,25 @@ $( document ).ready(function() {
   }
 
   function initView() {
+    //load ranking data for chart view 
+    initRanking(donorData, '.ranking-chart');
+
     //check map loaded status
     if (mapLoaded==true && viewInitialized==false)
       deepLinkView();
 
     //create tab events
-    // $('.tab-menubar .tab-button').on('click', function() {
-    //   $('.tab-button').removeClass('active');
-    //   $(this).addClass('active');
-    //   if ($(this).data('id')=='chart-view') {
-    //     $('#chart-view').show();
-    //   }
-    //   else {
-    //     $('#chart-view').hide();
-    //   }
-    //   vizTrack($(this).data('id'), currentIndicator.name);
-    // });
+    $('.tab-menubar .tab-button').on('click', function() {
+      $('.tab-button').removeClass('active');
+      $(this).addClass('active');
+      if ($(this).data('id')=='chart-view') {
+        $('#chart-view').show();
+      }
+      else {
+        $('#chart-view').hide();
+      }
+      vizTrack($(this).data('id'), currentIndicator.name);
+    });
 
     //create country dropdown
     $('.country-select').empty();
@@ -223,16 +227,18 @@ $( document ).ready(function() {
     currentCountry = {code: 'Regional', name:'All Countries'}
 
     //create chart view country select
-    // $('.trendseries-select').append($('<option value="All">All Clusters</option>')); 
-    // var trendseriesSelect = d3.select('.trendseries-select')
-    //   .selectAll('option')
-    //   .data(subnationalData)
-    //   .enter().append('option')
-    //     .text(function(d) {
-    //       let name = (d['#adm1+code']=='UA80') ? d['#adm1+name'] + ' (city)' : d['#adm1+name'];
-    //       return name; 
-    //     })
-    //     .attr('value', function (d) { return d['#adm1+code']; });
+    //$('.ranking-select').append($('<option value="All">All Countries</option>')); 
+    var rankingSelect = d3.select('.ranking-select')
+      .selectAll('option')
+      .data(globalCountryList)
+      .enter().append('option')
+        .text(function(d) {
+          return d.name; 
+        })
+        .attr('value', function (d) { return d.code; });
+    //insert default option    
+    $('.ranking-select').prepend('<option value="Regional">All Countries</option>');
+    $('.ranking-select').val($('.ranking-select option:first').val());
 
     viewInitialized = true;
   }
