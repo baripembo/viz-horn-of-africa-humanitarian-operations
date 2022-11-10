@@ -413,8 +413,8 @@ function initCountryLayer() {
   //set properties
   map.setPaintProperty(subnationalLayer, 'fill-color', expression);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionLabelOpacity);
-  map.setPaintProperty(subnationalMarkerLayer, 'circle-opacity', expressionLabelOpacity==0 ? 0 : 0.8);
-  map.setPaintProperty(subnationalMarkerLayer, 'circle-stroke-opacity', expressionLabelOpacity);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-opacity', expressionLabelOpacity==0 ? 0 : 0.5);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-stroke-opacity', expressionLabelOpacity==0 ? 0 : 1);
   map.setPaintProperty(subnationalMarkerLayer, 'circle-radius', expressionMarkers);
 
 
@@ -577,8 +577,8 @@ function updateCountryLayer() {
   map.setPaintProperty(subnationalBoundaryLayer, 'line-opacity', expressionOpacity);
   map.setPaintProperty(subnationalLabelLayer, 'text-opacity', expressionLabelOpacity);
   map.setPaintProperty(subnationalMarkerLayer, 'circle-radius', expressionMarkers);
-  map.setPaintProperty(subnationalMarkerLayer, 'circle-opacity', expressionLabelOpacity==0 ? 0 : 0.8);
-  map.setPaintProperty(subnationalMarkerLayer, 'circle-stroke-opacity', expressionLabelOpacity);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-opacity', expressionLabelOpacity==0 ? 0 : 0.5);
+  map.setPaintProperty(subnationalMarkerLayer, 'circle-stroke-opacity', expressionLabelOpacity==0 ? 0 : 1);
 
   //toggle raster layers
   var countryList = Object.keys(countryCodeList);
@@ -1097,9 +1097,10 @@ function displayMap() {
     'source-layer': subnationalCentroidSource,
     'paint': {
       'circle-color': '#999',
-      'circle-opacity': 0.8,
+      'circle-opacity': 0.5,
       'circle-stroke-color': '#999',
-      'circle-stroke-width': 1
+      'circle-stroke-width': 1,
+      'circle-stroke-opacity': 1
     }
   }, baseLayer);
   subnationalMarkerLayer = 'subnational-markers';
@@ -1413,6 +1414,12 @@ function deepLinkView() {
       selected.prop('checked', true);
       onLayerSelected(selected);
   }
+  //deep link to tabbed view
+  if (location.indexOf('?tab=')>-1) {
+    let view = location.split('tab=')[1];
+    let selectedTab = $(`.tab-menubar .tab-button[data-id="${view}"]`);
+    selectedTab.click();
+  }
 }
 
 
@@ -1446,6 +1453,10 @@ function createEvents() {
 
     //update country specific sources
     updateCountrySource();
+
+    //reset tab view  
+    let selectedTab = $(`.tab-menubar .tab-button[data-id="map-view"]`);
+    selectedTab.click();
   });
 
   //ranking select event
@@ -2008,6 +2019,9 @@ $( document ).ready(function() {
       else {
         $('#chart-view').hide();
       }
+
+      let location = ($(this).data('id')==undefined) ? window.location.pathname : window.location.pathname + '?tab=' + $(this).data('id');
+      window.history.replaceState(null, null, location);
       vizTrack($(this).data('id'), currentIndicator.name);
     });
 
@@ -2025,7 +2039,6 @@ $( document ).ready(function() {
     currentCountry = {code: 'Regional', name:'All Countries'}
 
     //create chart view country select
-    //$('.ranking-select').append($('<option value="All">All Countries</option>')); 
     var rankingSelect = d3.select('.ranking-select')
       .selectAll('option')
       .data(globalCountryList)

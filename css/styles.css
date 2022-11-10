@@ -1389,7 +1389,11 @@ a:visited {
       margin-bottom: 5px;
       margin-left: 0; }
     .map-legend .bubble-scale .swatch {
-      fill: #999; }
+      fill: #999;
+      fill-opacity: 0.5;
+      stroke: #999;
+      stroke-opacity: 1;
+      stroke-width: 1px; }
   .map-legend.population .legend-container {
     height: 130px; }
   .map-legend .legendCells {
