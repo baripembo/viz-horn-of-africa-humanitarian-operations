@@ -163,9 +163,10 @@ function displayMap() {
     'source-layer': subnationalCentroidSource,
     'paint': {
       'circle-color': '#999',
-      'circle-opacity': 0.8,
+      'circle-opacity': 0.5,
       'circle-stroke-color': '#999',
-      'circle-stroke-width': 1
+      'circle-stroke-width': 1,
+      'circle-stroke-opacity': 1
     }
   }, baseLayer);
   subnationalMarkerLayer = 'subnational-markers';
@@ -479,6 +480,12 @@ function deepLinkView() {
       selected.prop('checked', true);
       onLayerSelected(selected);
   }
+  //deep link to tabbed view
+  if (location.indexOf('?tab=')>-1) {
+    let view = location.split('tab=')[1];
+    let selectedTab = $(`.tab-menubar .tab-button[data-id="${view}"]`);
+    selectedTab.click();
+  }
 }
 
 
@@ -512,6 +519,10 @@ function createEvents() {
 
     //update country specific sources
     updateCountrySource();
+
+    //reset tab view  
+    let selectedTab = $(`.tab-menubar .tab-button[data-id="map-view"]`);
+    selectedTab.click();
   });
 
   //ranking select event

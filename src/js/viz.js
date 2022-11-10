@@ -210,6 +210,9 @@ $( document ).ready(function() {
       else {
         $('#chart-view').hide();
       }
+
+      let location = ($(this).data('id')==undefined) ? window.location.pathname : window.location.pathname + '?tab=' + $(this).data('id');
+      window.history.replaceState(null, null, location);
       vizTrack($(this).data('id'), currentIndicator.name);
     });
 
@@ -227,7 +230,6 @@ $( document ).ready(function() {
     currentCountry = {code: 'Regional', name:'All Countries'}
 
     //create chart view country select
-    //$('.ranking-select').append($('<option value="All">All Countries</option>')); 
     var rankingSelect = d3.select('.ranking-select')
       .selectAll('option')
       .data(globalCountryList)
