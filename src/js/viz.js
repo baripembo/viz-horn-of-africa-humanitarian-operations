@@ -33,11 +33,6 @@ $( document ).ready(function() {
   var prod = (window.location.href.indexOf('ocha-dap')>-1 || window.location.href.indexOf('data.humdata.org')>-1) ? true : false;
   //console.log(prod);
 
-  var tooltip = d3.select('.tooltip');
-  var minWidth = 1000;
-  viewportWidth = (window.innerWidth<minWidth) ? minWidth : window.innerWidth;
-  viewportHeight = window.innerHeight;
-
 
   function init() {
     //detect mobile users
@@ -52,6 +47,11 @@ $( document ).ready(function() {
     });
 
     //set content sizes based on viewport
+    var minWidth = isMobile ? window.innerWidth : 1000;
+    viewportWidth = (window.innerWidth<minWidth) ? minWidth : window.innerWidth;
+    viewportHeight = window.innerHeight;
+
+    var tooltip = d3.select('.tooltip');
     $('.content').width(viewportWidth);
     $('.content').height(viewportHeight);
     $('.content-right').width(viewportWidth);

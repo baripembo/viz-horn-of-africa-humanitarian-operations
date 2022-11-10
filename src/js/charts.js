@@ -65,7 +65,7 @@ function formatRankingData(data) {
 
 
 function createRanking(data, div) {
-  const chartWidth = viewportWidth - $('.key-figure-panel').width() - 100;
+  const chartWidth = (isMobile) ? viewportWidth - 40 : viewportWidth - $('.key-figure-panel').width() - 100;
   const chartHeight = 400;
   let colorArray = ['#F8B1AD'];
   let valMax = data.values.slice(1, data.values.length);
@@ -77,10 +77,10 @@ function createRanking(data, div) {
       height: chartHeight
     },
     padding: {
-      bottom: (isMobile) ? 60 : 0,
+      bottom: 0,
       top: 10,
-      left: (isMobile) ? 300 : 300,
-      right: (isMobile) ? 200 : 200
+      left: (isMobile) ? 130 : 300,
+      right: (isMobile) ? 0 : 200
     },
     bindto: div,
     data: {
@@ -108,13 +108,13 @@ function createRanking(data, div) {
           outer: false,
           multiline: true,
           multilineMax: 2,
-          width: 225
+          width: (isMobile) ? 100 : 225
         }
       },
       y: {
+        show: isMobile ? false : true,
         max: yMax,
-        padding: {top: 40, right: 0},
-        //show: false
+        padding: {top: isMobile ? 60 : 40},
         tick: {
           format: function(d) {
             return formatValue(d);
@@ -128,7 +128,7 @@ function createRanking(data, div) {
     },
     grid: {
       y: {
-        show: true
+        show: isMobile ? false : true
       }
     },
     point: { show: false },
