@@ -321,6 +321,10 @@ a:visited {
 		}
 		.swatch {
 			fill: #999;
+			fill-opacity: 0.5;
+	    stroke: #999;
+	    stroke-opacity: 1;
+	    stroke-width: 1px;
 		}
 	}
 	&.population {
@@ -877,7 +881,7 @@ a:visited {
 	#global-map {
 		height: 45%;
 		position: absolute;
-    top: 55%;
+    top: 50%;
 	}
 	#chart-view {
 		height: 50%;
@@ -917,7 +921,7 @@ a:visited {
 	}
 	.key-figure-panel {
 		//box-shadow: 0px 15px 15px -16px #999;
-		height: 55%;
+		height: 50%;
     overflow-y: scroll;
     padding: 10px 0 0;
     width: 100%;
