@@ -546,6 +546,14 @@ function onLayerSelected(selected) {
   currentIndicator = {id: selected.val(), name: selected.parent().text()};
   selectLayer(selected);
   
+  //show nested options for rainfall layer
+  $('.nested').hide();
+  if (selected.val()=='#climate+rainfall+anomaly') {
+    console.log('am i here')
+    $('.nested label:nth-child(1) input').prop('checked', true);
+    selected.parent().parent().find('.nested').show();
+  }
+
   if (!isCountryView()) {
     updateCountryLayer();
   }
