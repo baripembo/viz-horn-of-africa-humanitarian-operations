@@ -647,7 +647,6 @@ function truncateString(str, num) {
   return str.slice(0, num) + '...';
 }
 
-
 function formatValue(val, type) {
   let format;
   switch(type) {
@@ -658,7 +657,7 @@ function formatValue(val, type) {
       format = d3.format('.3s');
       break;
     default:
-      format = d3.format('$.3s');
+      format = d3.formatPrefix('$.1f', val);//d3.format('$.3s');
   }
   let value;
   if (!isVal(val)) {
