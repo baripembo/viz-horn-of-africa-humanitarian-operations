@@ -535,8 +535,8 @@ function createEvents() {
   });
 
   //map legend radio events
-  $('input[type="radio"]').click(function(){
-    var selected = $('input[name="countryIndicators"]:checked');
+  $('input[name="countryIndicators"]').click(function(){
+    var selected = $(this);
     vizTrack(`main ${currentCountry.code} view`, selected.parent().text());
     onLayerSelected(selected);
   });
@@ -549,9 +549,8 @@ function onLayerSelected(selected) {
   //show nested options for rainfall layer
   $('.nested').hide();
   if (selected.val()=='#climate+rainfall+anomaly') {
-    console.log('am i here')
     $('.nested label:nth-child(1) input').prop('checked', true);
-    selected.parent().parent().find('.nested').show();
+    selected.closest('.indicator').find('.nested').show();
   }
 
   if (!isCountryView()) {
