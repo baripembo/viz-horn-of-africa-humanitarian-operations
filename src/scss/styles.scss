@@ -311,7 +311,8 @@ a:visited {
 				display: none;
 			}
 		}
-		&.climate-rainfall-anomaly {
+		&.climate-rainfall-anomaly-marmay,
+		&.climate-rainfall-anomaly-octdec {
 			height: 202px;
 		}
 		&.population {

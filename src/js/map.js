@@ -236,26 +236,48 @@ function loadRasters() {
       map.setLayoutProperty(id+'-popdensity', 'visibility', 'none');
     }
 
-    //chirps rasters
-    var chirpsRaster = countryCodeList[country_code].chirps;
-    if (chirpsRaster!='') {
-      map.addSource(id+'-chirps-tileset', {
+    //chirps mam rasters
+    var chirpsRasterMAM = countryCodeList[country_code].chirpsMAM;
+    if (chirpsRasterMAM!='') {
+      map.addSource(id+'-mam-chirps-tileset', {
         type: 'raster',
-        url: 'mapbox://humdata.'+chirpsRaster
+        url: 'mapbox://humdata.'+chirpsRasterMAM
       });
 
       map.addLayer(
         {
-          id: id+'-chirps',
+          id: id+'-mam-chirps',
           type: 'raster',
           source: {
             type: 'raster',
-            tiles: ['https://api.mapbox.com/v4/humdata.'+chirpsRaster+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
+            tiles: ['https://api.mapbox.com/v4/humdata.'+chirpsRasterMAM+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
           }
         },
         subnationalBoundaryLayer
       );
-      map.setLayoutProperty(id+'-chirps', 'visibility', 'none');
+      map.setLayoutProperty(id+'-mam-chirps', 'visibility', 'none');
+    }
+
+    //chirps ond rasters
+    var chirpsRasterOND = countryCodeList[country_code].chirpsOND;
+    if (chirpsRasterOND!='') {
+      map.addSource(id+'-ond-chirps-tileset', {
+        type: 'raster',
+        url: 'mapbox://humdata.'+chirpsRasterOND
+      });
+
+      map.addLayer(
+        {
+          id: id+'-ond-chirps',
+          type: 'raster',
+          source: {
+            type: 'raster',
+            tiles: ['https://api.mapbox.com/v4/humdata.'+chirpsRasterOND+'/{z}/{x}/{y}.png?access_token='+mapboxgl.accessToken],
+          }
+        },
+        subnationalBoundaryLayer
+      );
+      map.setLayoutProperty(id+'-ond-chirps', 'visibility', 'none');
     }
   });
 }
@@ -476,9 +498,14 @@ function deepLinkView() {
   //deep link to specific layer in global view
   if (location.indexOf('?layer=')>-1) {
     var layer = location.split('layer=')[1];
-      var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
-      selected.prop('checked', true);
-      onLayerSelected(selected);
+    var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
+    console.log(layer)
+    if (layer.includes('chirps')) {
+      $('.map-legend').find('input[id="rainfall"]').prop('checked', true);
+      $('.nested').show();
+    }
+    selected.prop('checked', true);
+    onLayerSelected(selected);
   }
   //deep link to tabbed view
   if (location.indexOf('?tab=')>-1) {
@@ -537,6 +564,22 @@ function createEvents() {
   //map legend radio events
   $('input[name="countryIndicators"]').click(function(){
     var selected = $(this);
+
+    //show nested options for rainfall layer
+    $('.nested').hide();
+    if (selected.val() == 'rainfall-select') {
+      selected.closest('.indicator').find('.nested label:nth-child(1) input').prop('checked', true);
+      selected.closest('.indicator').find('.nested').show();
+      selected = selected.closest('.indicator').find('.nested label:nth-child(1) input');
+    }
+
+    vizTrack(`main ${currentCountry.code} view`, selected.parent().text());
+    onLayerSelected(selected);
+  });
+
+  //special rainfall layer select
+  $('input[name="rainfallSelect"]').click(function(){
+    var selected = $(this);
     vizTrack(`main ${currentCountry.code} view`, selected.parent().text());
     onLayerSelected(selected);
   });
@@ -545,13 +588,6 @@ function createEvents() {
 function onLayerSelected(selected) {
   currentIndicator = {id: selected.val(), name: selected.parent().text()};
   selectLayer(selected);
-  
-  //show nested options for rainfall layer
-  $('.nested').hide();
-  if (selected.val()=='#climate+rainfall+anomaly') {
-    $('.nested label:nth-child(1) input').prop('checked', true);
-    selected.closest('.indicator').find('.nested').show();
-  }
 
   if (!isCountryView()) {
     updateCountryLayer();
@@ -607,6 +643,10 @@ function updateCountrySource() {
     let indicator = $(this).find('input').val() + '+' + country;
     updateSource(div, indicator);
   });
+
+  //update source for rainfall layers
+  updateSource($('.map-legend .rainfall-mam-source'), `#climate+rainfall+anomaly+marmay+${country}`);
+  updateSource($('.map-legend .rainfall-ond-source'), `#climate+rainfall+anomaly+octdec+${country}`);
 }
 
 function zoomToRegion() {
@@ -645,6 +685,9 @@ function resetMap() {
   var selected = $('.map-legend').find('input[data-layer="ipc_acute_food_insecurity_phase"]');
   selected.prop('checked', true);
   onLayerSelected(selected);
+
+  //reset nested rainfall layers
+  $('.nested').hide();
 
   //zoom to region
   zoomToRegion()
