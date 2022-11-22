@@ -1364,6 +1364,11 @@ a:visited {
     margin: 20px 0; }
   .map-legend label {
     margin-top: 10px; }
+  .map-legend .nested {
+    display: none;
+    margin-left: 20px; }
+    .map-legend .nested label {
+      margin-top: 5px; }
   .map-legend .legend-title {
     display: block;
     margin-top: 10px; }
@@ -1377,7 +1382,7 @@ a:visited {
       height: 20px; }
       .map-legend .legend-container.no-data .legendCells {
         display: none; }
-    .map-legend .legend-container.climate-rainfall-anomaly {
+    .map-legend .legend-container.climate-rainfall-anomaly-marmay, .map-legend .legend-container.climate-rainfall-anomaly-octdec {
       height: 202px; }
     .map-legend .legend-container.population {
       height: 118px; }

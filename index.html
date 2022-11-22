@@ -56,7 +56,7 @@
 
           <div class="tab-menubar">
             <div class="tab-button active" data-id="map-view">Map View</div>
-            <div class="tab-button" data-id="chart-view"><!-- <label class="label-small">NEW</label>  -->Chart View</div>
+            <div class="tab-button" data-id="chart-view"><label class="label-small">NEW</label> Chart View</div>
           </div>
           <div id='global-map'>
             <div class='map-legend'>
@@ -75,8 +75,14 @@
               </div>
 
               <div class='indicator'>
-                <label>Seasonal Rainfall Accumulation Anomaly<input name='countryIndicators' type='radio' value='#climate+rainfall+anomaly' id='rainfall' data-legend='Seasonal Rainfall Accumulation Anomaly (mm)' data-layer='chirps-rainfall'></label>
-                <div class="source-container rainfall-source"></div>
+                <label>Seasonal Rainfall Accumulation Anomaly<input name='countryIndicators' type='radio' value='rainfall-select' id='rainfall'></label>
+                <!-- <div class="source-container rainfall-source"></div> -->
+                <div class='nested'>
+                  <label>Mar - May Rainfall Accumulation Anomaly<input name='rainfallSelect' type='radio' value='#climate+rainfall+anomaly+marmay' id='rainfallMAM' data-legend='Mar - May Rainfall Accumulation Anomaly (mm)' data-layer='chirps-rainfall-marmay'></label>
+                <div class="source-container rainfall-mam-source"></div>
+                  <label>Oct - Dec Rainfall Accumulation Anomaly<input name='rainfallSelect' type='radio' value='#climate+rainfall+anomaly+octdec' id='rainfallOND' data-legend='Oct - Dec Rainfall Accumulation Anomaly (mm)' data-layer='chirps-rainfall-octdec'></label>
+                <div class="source-container rainfall-ond-source"></div>
+                </div>
               </div>
 
               <div class='indicator'>
