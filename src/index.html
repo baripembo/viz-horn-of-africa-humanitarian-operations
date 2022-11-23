@@ -75,8 +75,14 @@
               </div>
 
               <div class='indicator'>
-                <label>Seasonal Rainfall Accumulation Anomaly<input name='countryIndicators' type='radio' value='#climate+rainfall+anomaly' id='rainfall' data-legend='Seasonal Rainfall Accumulation Anomaly (mm)' data-layer='chirps-rainfall'></label>
-                <div class="source-container rainfall-source"></div>
+                <label>Seasonal Rainfall Accumulation Anomaly<input name='countryIndicators' type='radio' value='rainfall-select' id='rainfall' data-legend='Seasonal Rainfall Accumulation Anomaly (mm)'></label>
+                <!-- <div class="source-container rainfall-source"></div> -->
+                <div class='nested'>
+                  <label>March - April - May Rainfall Accumulation Anomaly<input name='rainfallSelect' type='radio' value='#climate+rainfall+anomaly+marmay' id='rainfallMAM' data-legend='March - April - May Rainfall Accumulation Anomaly (mm)' data-layer='chirps-rainfall-marmay'></label>
+                <div class="source-container rainfall-mam-source"></div>
+                  <label>October - November - December Rainfall Accumulation Anomaly<input name='rainfallSelect' type='radio' value='#climate+rainfall+anomaly+octdec' id='rainfallOND' data-legend='October - November - December Rainfall Accumulation Anomaly (mm)' data-layer='chirps-rainfall-octdec'></label>
+                <div class="source-container rainfall-ond-source"></div>
+                </div>
               </div>
 
               <div class='indicator'>

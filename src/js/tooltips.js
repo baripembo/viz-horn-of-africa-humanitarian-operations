@@ -15,7 +15,7 @@ function createCountryMapTooltip(location) {
     else indicator = currentIndicator.name
     content += `${indicator}:<div class="stat">${val}</div>`;
   }
-  else if (currentIndicator.id=='#climate+rainfall+anomaly'){
+  else if ((currentIndicator.id).includes('#climate+rainfall+anomaly')){
     content += `${currentIndicator.name}:<div class="stat">${parseFloat(val).toFixed(2)}mm</div>`;
   }
   else if (currentIndicator.id=='#population' && location['#country+code']=='ETH') {

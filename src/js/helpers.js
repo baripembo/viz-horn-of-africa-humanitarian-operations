@@ -126,8 +126,8 @@ function disableInput(indicator, isDisabled) {
 
 //country codes and raster ids
 const countryCodeList = {
-  ETH: {pop: '1jx1mpm4', chirps: '9f35wnzq'},
-  KEN: {pop: '1iwk6136', chirps: '0zdu5z45'},
-  SOM: {pop: 'd0xh6ux7', chirps: '1bl7k2zs'}
+  ETH: {pop: '1jx1mpm4', chirps: '9f35wnzq', chirpsMAM: 'adtgh6lr', chirpsOND: '9f35wnzq'},
+  KEN: {pop: '1iwk6136', chirps: '0zdu5z45', chirpsMAM: 'bdidwt0g', chirpsOND: '0zdu5z45'},
+  SOM: {pop: 'd0xh6ux7', chirps: '1bl7k2zs', chirpsMAM: '7xxd10pv', chirpsOND: '1bl7k2zs'}
 };
 
