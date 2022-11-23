@@ -83,7 +83,6 @@ function createMapLegend(scale) {
 function updateMapLegend(scale) {
   //set legend title
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
-  console.log('--',currentIndicator.id)
   $('.map-legend .legend-title').html(legendTitle);
 
   //set class to current indicator
