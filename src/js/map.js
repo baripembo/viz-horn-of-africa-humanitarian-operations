@@ -499,7 +499,6 @@ function deepLinkView() {
   if (location.indexOf('?layer=')>-1) {
     var layer = location.split('layer=')[1];
     var selected = $('.map-legend').find('input[data-layer="'+layer+'"]');
-    console.log(layer)
     if (layer.includes('chirps')) {
       $('.map-legend').find('input[id="rainfall"]').prop('checked', true);
       $('.nested').show();
