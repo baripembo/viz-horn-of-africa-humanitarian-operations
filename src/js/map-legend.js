@@ -9,7 +9,8 @@ function createMapLegend(scale) {
   //set data sources
   createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type+regional');
   createSource($('.map-legend .ipc-phase-source'), '#affected+food+ipc+phase+type+regional');
-  createSource($('.map-legend .rainfall-source'), '#climate+rainfall+anomaly+regional');
+  createSource($('.map-legend .rainfall-mam-source'), '#climate+rainfall+anomaly+marmay+regional');
+  createSource($('.map-legend .rainfall-ond-source'), '#climate+rainfall+anomaly+octdec+regional');
   createSource($('.map-legend .priority-source'), '#priority+regional');
   createSource($('.map-legend .idp-source'), '#affected+idps+ind+regional');
   createSource($('.map-legend .population-source'), '#population+regional');
@@ -65,7 +66,8 @@ function createMapLegend(scale) {
     .call(legendSize);
 
   //rainfall disclaimer
-  createFootnote('.map-legend', '#climate+rainfall+anomaly', 'The seasonal rainfall anomaly describes how the current season compares to the historical 1981-2010 average. It is updated every 5 days using cumulative CHIRPS rainfall data for the two main seasons (March-April-May and October-November-December)');
+  createFootnote('.map-legend', '#climate+rainfall+anomaly+marmay', 'The seasonal rainfall anomaly describes how the current season compares to the historical 1981-2010 average. It is updated every 5 days using cumulative CHIRPS rainfall data for the March-April-May season');
+  createFootnote('.map-legend', '#climate+rainfall+anomaly+octdec', 'The seasonal rainfall anomaly describes how the current season compares to the historical 1981-2010 average. It is updated every 5 days using cumulative CHIRPS rainfall data for the October-November-December season)');
 
   //boundaries disclaimer
   createFootnote('.map-legend', '', 'The boundaries and names shown and the designations used on this map do not imply official endorsement or acceptance by the United Nations.');
@@ -126,7 +128,7 @@ function updateMapLegend(scale) {
   updateSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+'+currentCountry.code.toLowerCase());
 
   //hide no data key for rainfall layer
-  if (currentIndicator.id=='#climate+rainfall+anomaly' || currentIndicator.id=='#date+latest+acled') $('.no-data-key').hide();
+  if ((currentIndicator.id).includes('#climate+rainfall+anomaly') || currentIndicator.id=='#date+latest+acled') $('.no-data-key').hide();
   else $('.no-data-key').show();
 
   //show/hide footnotes
@@ -141,6 +143,7 @@ function getLegendScale() {
   let data = new Array(); //create copy of indicator data for quantile scales
   min =  d3.min(admintwo_data, function(d) { 
     if (d['#country+code']==currentCountry.code || !isCountryView()) {
+      //if (isNaN(+d[currentIndicator.id])) d[currentIndicator.id] = 0;
       data.push(+d[currentIndicator.id]);
       return +d[currentIndicator.id]; 
     }
@@ -154,7 +157,7 @@ function getLegendScale() {
   //set scale
   $('.map-legend').removeClass('acled');
   var scale;
-  if (currentIndicator.id=='#climate+rainfall+anomaly') {
+  if ((currentIndicator.id).includes('#climate+rainfall+anomaly')) {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
   else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
@@ -169,6 +172,7 @@ function getLegendScale() {
   else if (currentIndicator.id=='#affected+idps+ind') {
     scale = d3.scaleQuantile().domain(data).range(idpColorRange);
     scale.quantiles().map(x => Math.round(x));
+    if (currentCountry.code=='KEN') scale = d3.scaleQuantize().domain([0, max]).range(idpColorRange);
   }
   else if (currentIndicator.id=='#date+latest+acled') {
     $('.map-legend').addClass('acled');

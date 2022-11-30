@@ -200,22 +200,6 @@ $( document ).ready(function() {
     if (mapLoaded==true && viewInitialized==false)
       deepLinkView();
 
-    //create tab events
-    $('.tab-menubar .tab-button').on('click', function() {
-      $('.tab-button').removeClass('active');
-      $(this).addClass('active');
-      if ($(this).data('id')=='chart-view') {
-        $('#chart-view').show();
-      }
-      else {
-        $('#chart-view').hide();
-      }
-
-      let location = ($(this).data('id')==undefined) ? window.location.pathname : window.location.pathname + '?tab=' + $(this).data('id');
-      window.history.replaceState(null, null, location);
-      vizTrack($(this).data('id'), currentIndicator.name);
-    });
-
     //create country dropdown
     $('.country-select').empty();
     var countrySelect = d3.select('.country-select')

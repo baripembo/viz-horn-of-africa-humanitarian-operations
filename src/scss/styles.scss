@@ -83,6 +83,7 @@ h6 {
   margin: 0;
 }
 
+
 label {
 	&.label-small {
 		background-color: #F2645A;
@@ -286,6 +287,13 @@ a:visited {
 	label {
 		margin-top: 10px;
 	}
+	.nested {
+		display: none;
+		margin-left: 20px;
+		label {
+			margin-top: 5px;
+		}
+	}
 	.legend-title {
 		display: block;
 		margin-top: 10px;
@@ -303,7 +311,8 @@ a:visited {
 				display: none;
 			}
 		}
-		&.climate-rainfall-anomaly {
+		&.climate-rainfall-anomaly-marmay,
+		&.climate-rainfall-anomaly-octdec {
 			height: 202px;
 		}
 		&.population {
