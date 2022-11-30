@@ -459,30 +459,6 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
 
-  //reset disabled inputs
-  //disableInput('#affected+food+ipc+phase+type', false);
-  disableInput('#affected+idps+ind', false);
-
-  //disable empty layers
-  // if (currentCountry.code=='ETH') {
-  //   disableInput('#affected+food+ipc+phase+type', true);
-  //   if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-  //     //set fallback default layer  
-  //     var selected = $('.map-legend').find('input[value="#climate+rainfall+anomaly"]');
-  //     selected.prop('checked', true);
-  //     onLayerSelected(selected);
-  //   }
-  // }
-  if (currentCountry.code=='KEN') {
-    disableInput('#affected+idps+ind', true);
-    if (currentIndicator.id=='#affected+idps+ind') {
-      //set fallback default layer  
-      var selected = $('.map-legend').find('input[value="#affected+food+ipc+phase+type"]');
-      selected.prop('checked', true);
-      onLayerSelected(selected);
-    }
-  }
-
   //set download links
   if (currentCountry.code!='') {
     $('.download-link').hide();
@@ -512,13 +488,7 @@ function updateCountryLayer() {
 
   //update legend
   var colorScale = getLegendScale();
-  if (currentIndicator.id=='#affected+idps+ind' && currentCountry.code=='KEN') {
-    $('.legend-container').hide();
-  }
-  else {
-    $('.legend-container').show();
-    updateMapLegend(colorScale);
-  }
+  updateMapLegend(colorScale);
 
   //data join
   var expression = ['match', ['get', 'ADM_PCODE']];
@@ -651,7 +621,6 @@ function truncateString(str, num) {
   return str.slice(0, num) + '...';
 }
 
-
 function formatValue(val, type) {
   let format;
   switch(type) {
@@ -662,7 +631,7 @@ function formatValue(val, type) {
       format = d3.format('.3s');
       break;
     default:
-      format = d3.format('$.3s');
+      format = d3.formatPrefix('$.1f', val);//d3.format('$.3s');
   }
   let value;
   if (!isVal(val)) {
@@ -837,7 +806,6 @@ function createMapLegend(scale) {
 function updateMapLegend(scale) {
   //set legend title
   let legendTitle = $('input[name="countryIndicators"]:checked').attr('data-legend');
-  console.log('--',currentIndicator.id)
   $('.map-legend .legend-title').html(legendTitle);
 
   //set class to current indicator
@@ -898,6 +866,7 @@ function getLegendScale() {
   let data = new Array(); //create copy of indicator data for quantile scales
   min =  d3.min(admintwo_data, function(d) { 
     if (d['#country+code']==currentCountry.code || !isCountryView()) {
+      //if (isNaN(+d[currentIndicator.id])) d[currentIndicator.id] = 0;
       data.push(+d[currentIndicator.id]);
       return +d[currentIndicator.id]; 
     }
@@ -926,6 +895,7 @@ function getLegendScale() {
   else if (currentIndicator.id=='#affected+idps+ind') {
     scale = d3.scaleQuantile().domain(data).range(idpColorRange);
     scale.quantiles().map(x => Math.round(x));
+    if (currentCountry.code=='KEN') scale = d3.scaleQuantize().domain([0, max]).range(idpColorRange);
   }
   else if (currentIndicator.id=='#date+latest+acled') {
     $('.map-legend').addClass('acled');
@@ -1469,8 +1439,28 @@ function matchMapFeatures(country_code) {
 
 
 function createEvents() {
+  //create tab events
+  $('.tab-menubar .tab-button').on('click', function() {
+    $('.tab-button').removeClass('active');
+    $(this).addClass('active');
+    if ($(this).data('id')=='chart-view') {
+      $('#chart-view').show();
+    }
+    else {
+      $('#chart-view').hide();
+    }
+
+    let location = ($(this).data('id')==undefined || $(this).data('id')=='map-view') ? window.location.pathname : window.location.pathname + '?tab=' + $(this).data('id');
+    window.history.replaceState(null, null, location);
+    vizTrack($(this).data('id'), currentIndicator.name);
+  });
+
   //country dropdown select event
   d3.select('.country-select').on('change',function(e) {
+    //reset tab view  
+    let selectedTab = $(`.tab-menubar .tab-button[data-id="map-view"]`);
+    selectedTab.click();
+
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
     vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
@@ -1486,10 +1476,6 @@ function createEvents() {
 
     //update country specific sources
     updateCountrySource();
-
-    //reset tab view  
-    let selectedTab = $(`.tab-menubar .tab-button[data-id="map-view"]`);
-    selectedTab.click();
   });
 
   //ranking select event
@@ -2064,22 +2050,6 @@ $( document ).ready(function() {
     //check map loaded status
     if (mapLoaded==true && viewInitialized==false)
       deepLinkView();
-
-    //create tab events
-    $('.tab-menubar .tab-button').on('click', function() {
-      $('.tab-button').removeClass('active');
-      $(this).addClass('active');
-      if ($(this).data('id')=='chart-view') {
-        $('#chart-view').show();
-      }
-      else {
-        $('#chart-view').hide();
-      }
-
-      let location = ($(this).data('id')==undefined) ? window.location.pathname : window.location.pathname + '?tab=' + $(this).data('id');
-      window.history.replaceState(null, null, location);
-      vizTrack($(this).data('id'), currentIndicator.name);
-    });
 
     //create country dropdown
     $('.country-select').empty();
