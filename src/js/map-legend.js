@@ -143,6 +143,7 @@ function getLegendScale() {
   let data = new Array(); //create copy of indicator data for quantile scales
   min =  d3.min(admintwo_data, function(d) { 
     if (d['#country+code']==currentCountry.code || !isCountryView()) {
+      //if (isNaN(+d[currentIndicator.id])) d[currentIndicator.id] = 0;
       data.push(+d[currentIndicator.id]);
       return +d[currentIndicator.id]; 
     }
@@ -171,6 +172,7 @@ function getLegendScale() {
   else if (currentIndicator.id=='#affected+idps+ind') {
     scale = d3.scaleQuantile().domain(data).range(idpColorRange);
     scale.quantiles().map(x => Math.round(x));
+    if (currentCountry.code=='KEN') scale = d3.scaleQuantize().domain([0, max]).range(idpColorRange);
   }
   else if (currentIndicator.id=='#date+latest+acled') {
     $('.map-legend').addClass('acled');

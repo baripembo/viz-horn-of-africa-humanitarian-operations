@@ -95,30 +95,6 @@ function updateCountryLayer() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
   map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
 
-  //reset disabled inputs
-  //disableInput('#affected+food+ipc+phase+type', false);
-  disableInput('#affected+idps+ind', false);
-
-  //disable empty layers
-  // if (currentCountry.code=='ETH') {
-  //   disableInput('#affected+food+ipc+phase+type', true);
-  //   if (currentIndicator.id=='#affected+food+ipc+phase+type') {
-  //     //set fallback default layer  
-  //     var selected = $('.map-legend').find('input[value="#climate+rainfall+anomaly"]');
-  //     selected.prop('checked', true);
-  //     onLayerSelected(selected);
-  //   }
-  // }
-  if (currentCountry.code=='KEN') {
-    disableInput('#affected+idps+ind', true);
-    if (currentIndicator.id=='#affected+idps+ind') {
-      //set fallback default layer  
-      var selected = $('.map-legend').find('input[value="#affected+food+ipc+phase+type"]');
-      selected.prop('checked', true);
-      onLayerSelected(selected);
-    }
-  }
-
   //set download links
   if (currentCountry.code!='') {
     $('.download-link').hide();
@@ -148,13 +124,7 @@ function updateCountryLayer() {
 
   //update legend
   var colorScale = getLegendScale();
-  if (currentIndicator.id=='#affected+idps+ind' && currentCountry.code=='KEN') {
-    $('.legend-container').hide();
-  }
-  else {
-    $('.legend-container').show();
-    updateMapLegend(colorScale);
-  }
+  updateMapLegend(colorScale);
 
   //data join
   var expression = ['match', ['get', 'ADM_PCODE']];

@@ -528,8 +528,28 @@ function matchMapFeatures(country_code) {
 
 
 function createEvents() {
+  //create tab events
+  $('.tab-menubar .tab-button').on('click', function() {
+    $('.tab-button').removeClass('active');
+    $(this).addClass('active');
+    if ($(this).data('id')=='chart-view') {
+      $('#chart-view').show();
+    }
+    else {
+      $('#chart-view').hide();
+    }
+
+    let location = ($(this).data('id')==undefined || $(this).data('id')=='map-view') ? window.location.pathname : window.location.pathname + '?tab=' + $(this).data('id');
+    window.history.replaceState(null, null, location);
+    vizTrack($(this).data('id'), currentIndicator.name);
+  });
+
   //country dropdown select event
   d3.select('.country-select').on('change',function(e) {
+    //reset tab view  
+    let selectedTab = $(`.tab-menubar .tab-button[data-id="map-view"]`);
+    selectedTab.click();
+
     currentCountry.code = d3.select('.country-select').node().value;
     currentCountry.name = d3.select('.country-select option:checked').text();
     vizTrack(`main ${currentCountry.code} view`, currentIndicator.name);
@@ -545,10 +565,6 @@ function createEvents() {
 
     //update country specific sources
     updateCountrySource();
-
-    //reset tab view  
-    let selectedTab = $(`.tab-menubar .tab-button[data-id="map-view"]`);
-    selectedTab.click();
   });
 
   //ranking select event
