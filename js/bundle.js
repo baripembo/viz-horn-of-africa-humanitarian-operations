@@ -1070,7 +1070,8 @@ function displayMap() {
     'id': 'subnational-markers',
     'type': 'circle',
     'source': 'country-centroids',
-    'filter': ['==', 'ADM_LEVEL', 2],
+    //'filter': ['==', 'ADM_LEVEL', 2],
+    'filter': ['all', ['==', 'ADM_LEVEL', 2], ['==', 'alpha_3', 'ETH']],
     'source-layer': subnationalCentroidSource,
     'paint': {
       'circle-color': '#999',
@@ -1656,6 +1657,7 @@ function toggleAcledLayer(visible) {
 /***********************/
 function initKeyFigures() {
   var data = (!isCountryView()) ? regionalData : dataByCountry[currentCountry.code][0];
+  console.log(data, regionalData);
 
   //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
