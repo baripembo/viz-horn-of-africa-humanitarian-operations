@@ -286,7 +286,7 @@ function loadRasters() {
 function loadIPCLayer(country) {
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
-    data: `data/${country.data}`,
+    data: `https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/${country.data}`,
     generateId: true 
   });
   map.addLayer({
