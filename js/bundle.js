@@ -1277,7 +1277,8 @@ function loadIPCLayer(country) {
     if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
 
     let tableArray = [{label: 'People Affected', indicator: '#affected+total'},
-                      {label: 'People Targeted', indicator: '#targeted+total'}];
+                      {label: 'People Targeted', indicator: '#targeted+total'},
+                      {label: 'People Reached', indicator: '#reached+total'}];
 
     content += '<div class="table-display">';
     if (p3Pop!==undefined) {
@@ -1796,7 +1797,8 @@ function createCountryMapTooltip(location) {
   //set up supporting key figures    
   var tableArray = [{label: 'Population', indicator: '#population'},
                     {label: 'People Affected', indicator: '#affected+total'},
-                    {label: 'People Targeted', indicator: '#targeted+total'}];//{label: 'People Reached', indicator: '#reached+total'}
+                    {label: 'People Targeted', indicator: '#targeted+total'},
+                    {label: 'People Reached', indicator: '#reached+total'}];
 
   //show ipc pop for countries except for SOM
   if (currentCountry.code=='KEN') {
