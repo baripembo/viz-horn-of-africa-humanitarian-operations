@@ -8,7 +8,6 @@ let ipcData = [
   {
     iso: 'eth',
     data: 'eth_food_security.geojson'
-    //data: 'Ethiopia_May_2021_merged.geojson'
   },
   {
     iso: 'ken',
