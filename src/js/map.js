@@ -7,16 +7,15 @@ var hoveredStateId = null;
 let ipcData = [
   {
     iso: 'eth',
-    data: 'eth_food_security.geojson'
-    //data: 'Ethiopia_May_2021_merged.geojson'
+    data: 'https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/eth_food_security.geojson'
   },
   {
     iso: 'ken',
-    data: 'kenya_ipc.geojson'
+    data: 'https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/kenya_ipc.geojson'
   },
   {
     iso: 'som',
-    data: 'Somalia_Aug2022_Map_projected.geojson'
+    data: 'https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/Somalia_Aug2022_Map_projected.geojson'
   }
 ];
 
@@ -286,7 +285,7 @@ function loadRasters() {
 function loadIPCLayer(country) {
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
-    data: `https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/${country.data}`,
+    data: country.data,
     generateId: true 
   });
   map.addLayer({
