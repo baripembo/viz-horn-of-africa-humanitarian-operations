@@ -3,7 +3,6 @@
 /***********************/
 function initKeyFigures() {
   var data = (!isCountryView()) ? regionalData : dataByCountry[currentCountry.code][0];
-  console.log(data, regionalData);
 
   //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
