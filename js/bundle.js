@@ -1194,7 +1194,6 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
-  console.log(country.data)
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
     data: country.data,
@@ -1658,7 +1657,6 @@ function toggleAcledLayer(visible) {
 /***********************/
 function initKeyFigures() {
   var data = (!isCountryView()) ? regionalData : dataByCountry[currentCountry.code][0];
-  console.log(data, regionalData);
 
   //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
@@ -1932,7 +1930,7 @@ $( document ).ready(function() {
     Promise.all([
       d3.json('https://raw.githubusercontent.com/OCHA-DAP/hdx-scraper-hornafrica-viz/main/all.json'),
       d3.json('data/ocha-regions-bbox-hornafrica.geojson'),
-      d3.json('data/eth_food_security.geojson')
+      d3.json('https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/eth_food_security.geojson')
     ]).then(function(data) {
       console.log('Data loaded');
       $('.loader span').text('Initializing map...');
