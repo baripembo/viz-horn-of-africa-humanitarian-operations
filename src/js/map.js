@@ -366,7 +366,8 @@ function loadIPCLayer(country) {
     if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
 
     let tableArray = [{label: 'People Affected', indicator: '#affected+total'},
-                      {label: 'People Targeted', indicator: '#targeted+total'}];
+                      {label: 'People Targeted', indicator: '#targeted+total'},
+                      {label: 'People Reached', indicator: '#reached+total'}];
 
     content += '<div class="table-display">';
     if (p3Pop!==undefined) {
