@@ -282,6 +282,7 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
+  console.log(country.data)
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
     data: country.data,
