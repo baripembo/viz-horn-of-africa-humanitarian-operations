@@ -112,12 +112,12 @@ $( document ).ready(function() {
 
       //transform adm1 ipc data
       // adminone_data.forEach(function(d) {
-      //   d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
+      //   d['#affected+food+ipc+p3plus+num'] = transformIPC(d['#affected+food+ipc+p3plus+num']);
       // });
 
       //transform adm2 ipc and priority data
       admintwo_data.forEach(function(d) {
-        d['#affected+food+ipc+phase+type'] = transformIPC(d['#affected+food+ipc+phase+type']);
+        //d['#affected+food+ipc+p3plus+num'] = transformIPC(d['#affected+food+ipc+p3plus+num']);
 
         switch(+d['#priority']) {
           case 1:

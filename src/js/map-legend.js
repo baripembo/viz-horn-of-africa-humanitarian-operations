@@ -7,8 +7,8 @@ function createMapLegend(scale) {
   $('.map-legend .legend-title').html(legendTitle);
 
   //set data sources
-  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+phase+type+regional');
-  createSource($('.map-legend .ipc-phase-source'), '#affected+food+ipc+phase+type+regional');
+  createSource($('.map-legend .ipc-source'), '#affected+food+ipc+p3plus+num+regional');
+  createSource($('.map-legend .ipc-phase-source'), '#affected+food+ipc+p3plus+num+regional');
   createSource($('.map-legend .rainfall-mam-source'), '#climate+rainfall+anomaly+marmay+regional');
   createSource($('.map-legend .rainfall-ond-source'), '#climate+rainfall+anomaly+octdec+regional');
   createSource($('.map-legend .priority-source'), '#priority+regional');
@@ -160,7 +160,7 @@ function getLegendScale() {
   if ((currentIndicator.id).includes('#climate+rainfall+anomaly')) {
     scale = d3.scaleOrdinal().domain(['>300', '200 – 300', '100 – 200', '50 – 100', '25 – 50', '10 – 25', '-10 – 10', '-25 – -10', '-50 – -25', '-100 – -50', '-200 – -100', '-200 – -100', '<-300']).range(chirpsColorRange);
   }
-  else if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+  else if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
     scale = d3.scaleOrdinal().domain(['1-Minimal', '2-Stressed', '3-Crisis', '4-Emergency', '5-Famine']).range(ipcPhaseColorRange);
   }
   else if (currentIndicator.id=='#priority') {

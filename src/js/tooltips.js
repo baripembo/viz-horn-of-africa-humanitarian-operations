@@ -45,7 +45,7 @@ function createCountryMapTooltip(location) {
     if (row.indicator!=currentIndicator.id) {
       let value = location[row.indicator];
       let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
-      if (row.indicator=='#affected+food+ipc+phase+type') shortVal = (value==undefined) ? 'No Data' : value;
+      if (row.indicator=='#affected+food+ipc+p3plus+num') shortVal = (value==undefined) ? 'No Data' : value;
       content += `<div class="table-row"><div>${row.label}:</div><div>${shortVal}</div></div>`;
     }
   });

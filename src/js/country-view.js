@@ -32,7 +32,7 @@ function initCountryLayer() {
     var markerSize = (!isVal(ipcVal) || d['#country+code']=='SOM' || d['#country+code']=='KEN') ? 0 : markerScale(ipcVal);
 
     //turn off choropleth for ipc layer
-    if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+    if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
       color = '#FFF';
     }
 
@@ -66,7 +66,7 @@ function initCountryLayer() {
 
     if (location[0]!=undefined) {
       var val = location[0][currentIndicator.id];
-      if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || !isCountryView()) && currentIndicator.id!=='#affected+food+ipc+phase+type') {
+      if (val!==undefined && f.properties.ADM_PCODE!=undefined && (f.properties.ADM0_REF==currentCountry.name || !isCountryView()) && currentIndicator.id!=='#affected+food+ipc+p3plus+num') {
         map.getCanvas().style.cursor = 'pointer';
         createCountryMapTooltip(location[0]);
         tooltip
@@ -152,7 +152,7 @@ function updateCountryLayer() {
       if (currentIndicator.id=='#population') {
         color = colorDefault;
       }    
-      if (currentIndicator.id=='#affected+food+ipc+phase+type') {
+      if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
         color = '#FFF';
       }
     }
@@ -205,7 +205,7 @@ function updateCountryLayer() {
   });
 
   //set ipc layer properties
-  let isIPC = (currentIndicator.id=='#affected+food+ipc+phase+type') ? true : false;
+  let isIPC = (currentIndicator.id=='#affected+food+ipc+p3plus+num') ? true : false;
   toggleIPCLayers(isIPC);
 
   //set acled layer properties
