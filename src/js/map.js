@@ -282,7 +282,7 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
-  let prop = (country.iso=='som') ? 'overall_phase_C' : 'overall_phase_P';
+  let phaseProp = (country.iso=='som') ? 'overall_phase_C' : 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
     data: `data/${country.data}`,
@@ -296,7 +296,7 @@ function loadIPCLayer(country) {
       'fill-color': [
         'interpolate',
         ['linear'],
-        ['get', prop],
+        ['get', phaseProp],
         0,
         '#FFF',
         1,
@@ -352,7 +352,7 @@ function loadIPCLayer(country) {
 
     //format content
     content = `<h2>${prop['area']}, ${prop['country']}</h2>`;
-    let phase = transformIPC(prop['overall_phase_P']);
+    let phase = transformIPC(prop[phaseProp]);
 
     //get adm2 data by area name
     location = admintwo_data.filter(function(c) {
@@ -361,7 +361,10 @@ function loadIPCLayer(country) {
       }
     });
 
-    p3Pop = prop['p3_plus_P_population'];
+    //get population in acute food insecurity
+    p3Pop = (country.iso=='som') ? prop['p3_plus_C_population'] : prop['p3_plus_P_population'];
+    if (p3Pop>=1000) p3Pop = shortenNumFormat(p3Pop);
+
     if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
 
     let tableArray = [{label: 'People Affected', indicator: '#affected+total'},
@@ -370,7 +373,7 @@ function loadIPCLayer(country) {
 
     content += '<div class="table-display">';
     if (p3Pop!==undefined) {
-      content += `<div class="table-row"><div>Population with Acute Food Insecurity:</div><div>${shortenNumFormat(p3Pop)}</div></div>`;
+      content += `<div class="table-row"><div>Population with Acute Food Insecurity:</div><div>${p3Pop}</div></div>`;
     }
 
     tableArray.forEach(function(row) {
