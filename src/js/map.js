@@ -283,7 +283,7 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
-  let phaseProp = (country.iso=='som') ? 'overall_phase_C' : 'overall_phase_P';
+  let phaseProp = 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
     data: `data/${country.data}`,

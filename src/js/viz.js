@@ -194,7 +194,7 @@ $( document ).ready(function() {
 
   function initView() {
     //load ranking data for chart view 
-    initRanking(donorData, '.ranking-chart');
+    if (donorData!=undefined) initRanking(donorData, '.ranking-chart');
 
     //check map loaded status
     if (mapLoaded==true && viewInitialized==false)
