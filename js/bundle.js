@@ -1212,7 +1212,7 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
-  let phaseProp = (country.iso=='som') ? 'overall_phase_C' : 'overall_phase_P';
+  let phaseProp = 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
     data: `data/${country.data}`,
@@ -2069,7 +2069,7 @@ $( document ).ready(function() {
 
   function initView() {
     //load ranking data for chart view 
-    initRanking(donorData, '.ranking-chart');
+    if (donorData!=undefined) initRanking(donorData, '.ranking-chart');
 
     //check map loaded status
     if (mapLoaded==true && viewInitialized==false)
