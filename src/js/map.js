@@ -175,7 +175,6 @@ function displayMap() {
 
 
   mapFeatures = map.queryRenderedFeatures();
-
   //load raster layers
   loadRasters();
 

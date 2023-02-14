@@ -24,7 +24,7 @@ var minZoom = 3.5;
 
 var globalCountryList = [];
 var currentIndicator = {};
-var currentCountry = {};
+var currentCountry = {code: 'Regional', name:'All Countries'};
 
 mapboxgl.baseApiUrl='https://data.humdata.org/mapbox';
 mapboxgl.accessToken = 'cacheToken';
@@ -211,7 +211,6 @@ $( document ).ready(function() {
     //insert default option    
     $('.country-select').prepend('<option value="Regional">All Countries</option>');
     $('.country-select').val($('.country-select option:first').val());
-    currentCountry = {code: 'Regional', name:'All Countries'}
 
     //create chart view country select
     var rankingSelect = d3.select('.ranking-select')
