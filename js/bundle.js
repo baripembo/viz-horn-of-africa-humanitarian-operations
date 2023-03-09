@@ -1678,7 +1678,6 @@ function toggleAcledLayer(visible) {
 /***********************/
 function initKeyFigures() {
   var data = (!isCountryView()) ? regionalData : dataByCountry[currentCountry.code][0];
-  console.log(currentCountry.code)
 
   //humanitarian impact figures
   var impactDiv = $('.key-figure-panel .impact .panel-inner');
