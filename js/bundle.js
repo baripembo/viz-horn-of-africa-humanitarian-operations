@@ -1972,6 +1972,7 @@ $( document ).ready(function() {
       fatalityData = allData.fatalities_data;
       acledCoords(allData.fatalities_data);
 
+
       //parse national data
       nationalData.forEach(function(item) {
         //keep global list of countries
@@ -2031,15 +2032,17 @@ $( document ).ready(function() {
     d.forEach(function(event) {
       if (eventCategories.includes(event['#event+type'])) {
         let iso = '';
-        if (event['#adm2+code'].includes('ET'))
-          iso = 'ETH';
-        else if (event['#adm2+code'].includes('KE'))
-          iso = 'KEN';
-        else
-          iso = 'SOM';
-        event['#country+code'] = iso;
-        event['#coords'] = [+event['#geo+lon'], +event['#geo+lat']];
-        data.push(event);
+        if (event['#adm2+code']!=undefined) {
+          if (event['#adm2+code'].includes('ET'))
+            iso = 'ETH';
+          else if (event['#adm2+code'].includes('KE'))
+            iso = 'KEN';
+          else
+            iso = 'SOM';
+          event['#country+code'] = iso;
+          event['#coords'] = [+event['#geo+lon'], +event['#geo+lat']];
+          data.push(event);
+        }
       }
     });
 
