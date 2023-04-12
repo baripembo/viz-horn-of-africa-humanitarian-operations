@@ -282,6 +282,7 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
+  //let phaseProp = (country.iso=='som') ? 'overall_phase_C' : 'overall_phase_P';
   let phaseProp = 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
@@ -464,7 +465,7 @@ function initAcledLayer() {
       map.getCanvas().style.cursor = 'pointer';
       let prop = e.features[0].properties;
       let date = new Date(prop.date);
-      let content = `<span class='small'>${moment(date).format('MMM D, YYYY')}</span>`;
+      let content = `<span class='small'>${format(date, 'MMM d, yyyy')}</span>`;
       content += `<h2>${prop.event_type}</h2>`;
       content += `<p>${prop.notes}</p>`;
       content += `<p>Fatalities: ${prop.fatalities}</p>`;
