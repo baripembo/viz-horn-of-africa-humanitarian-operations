@@ -1213,8 +1213,9 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
-  //let phaseProp = (country.iso=='som') ? 'overall_phase_C' : 'overall_phase_P';
-  let phaseProp = 'overall_phase_P';
+  let phaseProp = (country.iso=='som') ? 'overall_phase' : 'overall_phase_P';
+  let labelProp = (country.iso=='som') ? 'title' : 'area';
+  //let phaseProp = 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
     data: `data/${country.data}`,
@@ -1261,7 +1262,7 @@ function loadIPCLayer(country) {
     source: `${country.iso}-ipc`,
     filter: ['==', ['geometry-type'], 'Polygon'],
     layout: {
-      'text-field': ['get', 'area'],
+      'text-field': ['get', labelProp],//area
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': ['interpolate', ['linear'], ['zoom'], 0, 12, 4, 14],
       'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
@@ -1281,20 +1282,22 @@ function loadIPCLayer(country) {
     map.getCanvas().style.cursor = 'pointer';
     let prop = e.features[0].properties;
     let content, location, p3Pop;
+    let labelProp = (country.iso=='som') ? 'title' : 'area';
+    let countryName = (country.iso=='som') ? 'Somalia' : prop['country'];
 
     //format content
-    content = `<h2>${prop['area']}, ${prop['country']}</h2>`;
+    content = `<h2>${prop[labelProp]}, ${countryName}</h2>`;
     let phase = transformIPC(prop[phaseProp]);
 
     //get adm2 data by area name
     location = admintwo_data.filter(function(c) {
-      if (c['#adm2+name'].includes(prop['area'])) {
+      if (c['#adm2+name'].includes(prop[labelProp])) {
         return c;
       }
     });
 
     //get population in acute food insecurity
-    p3Pop = (country.iso=='som') ? prop['p3_plus_C_population'] : prop['p3_plus_P_population'];
+    p3Pop = (country.iso=='som') ? prop['phase3_worse_population'] : prop['p3_plus_P_population'];
     if (p3Pop>=1000) p3Pop = shortenNumFormat(p3Pop);
 
     if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
