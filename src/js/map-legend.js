@@ -42,28 +42,28 @@ function createMapLegend(scale) {
     .text('No Data');
 
   //bubble scale
-  var bubbleLegend = d3.select('.map-legend .bubble-scale');
-  $('.bubble-scale').append('<h4>Population with Acute Food Insecurity</h4>');
-  createSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+regional');
+  // var bubbleLegend = d3.select('.map-legend .bubble-scale');
+  // $('.bubble-scale').append('<h4>Population with Acute Food Insecurity</h4>');
+  // createSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+regional');
 
-  var markersvg = bubbleLegend.append('svg')
-    .attr('height', '55px')
-    .attr('class', 'ipcScale');
-  markersvg.append('g')
-    .attr("transform", "translate(5, 10)")
-    .attr('class', 'legendSize');
+  // var markersvg = bubbleLegend.append('svg')
+  //   .attr('height', '55px')
+  //   .attr('class', 'ipcScale');
+  // markersvg.append('g')
+  //   .attr("transform", "translate(5, 10)")
+  //   .attr('class', 'legendSize');
 
-  var legendSize = d3.legendSize()
-    .scale(markerScale)
-    .shape('circle')
-    .shapePadding(40)
-    .labelFormat(numFormat)
-    .labelOffset(15)
-    .cells(2)
-    .orient('horizontal');
+  // var legendSize = d3.legendSize()
+  //   .scale(markerScale)
+  //   .shape('circle')
+  //   .shapePadding(40)
+  //   .labelFormat(numFormat)
+  //   .labelOffset(15)
+  //   .cells(2)
+  //   .orient('horizontal');
 
-  markersvg.select('.legendSize')
-    .call(legendSize);
+  // markersvg.select('.legendSize')
+  //   .call(legendSize);
 
   //rainfall disclaimer
   createFootnote('.map-legend', '#climate+rainfall+anomaly+marmay', 'The seasonal rainfall anomaly describes how the current season compares to the historical 1981-2010 average. It is updated every 5 days using cumulative CHIRPS rainfall data for the March-April-May season');
@@ -118,14 +118,14 @@ function updateMapLegend(scale) {
   }
 
   //bubble scale
-  var maxIPC = d3.max(admintwo_data, function(d) { 
-    if (d['#country+code']==currentCountry.code || currentCountry.code=='Regional' && d['#country+code']!='SOM' && d['#country+code']!='KEN') {
-      return +d['#affected+food+ipc+p3plus+num'];
-    } 
-  })
-  markerScale.domain([2, maxIPC]);
-  d3.select('.ipcScale .cell:nth-child(2) .label').text(numFormat(maxIPC));
-  updateSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+'+currentCountry.code.toLowerCase());
+  // var maxIPC = d3.max(admintwo_data, function(d) { 
+  //   if (d['#country+code']==currentCountry.code || currentCountry.code=='Regional' && d['#country+code']!='SOM' && d['#country+code']!='KEN') {
+  //     return +d['#affected+food+ipc+p3plus+num'];
+  //   } 
+  // })
+  // markerScale.domain([2, maxIPC]);
+  // d3.select('.ipcScale .cell:nth-child(2) .label').text(numFormat(maxIPC));
+  // updateSource($('.bubble-scale'), '#affected+food+ipc+p3plus+num+'+currentCountry.code.toLowerCase());
 
   //hide no data key for rainfall layer
   if ((currentIndicator.id).includes('#climate+rainfall+anomaly') || currentIndicator.id=='#date+latest+acled') $('.no-data-key').hide();
