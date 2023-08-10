@@ -5,6 +5,8 @@ function createCountryMapTooltip(location) {
   var val = location[currentIndicator.id];
   var label = currentIndicator.name;
 
+  console.log('----', location)
+
   //format content for tooltip
   let content = '';
   content = `<h2>${location['#adm2+name']}, ${location['#country+name']}</h2>`;
