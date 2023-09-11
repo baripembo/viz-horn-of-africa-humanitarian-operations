@@ -1214,7 +1214,10 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
-  let phaseProp = (country.iso=='som') ? 'overall_phase' : 'overall_phase_P';
+  let phaseProp = 'overall_phase_P';
+  if (country.iso=='som') phaseProp = 'overall_phase';
+  if (country.iso=='ken') phaseProp = 'overall_phase_C';
+
   let labelProp = (country.iso=='som') ? 'title' : 'area';
   //let phaseProp = 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
@@ -1298,7 +1301,10 @@ function loadIPCLayer(country) {
     });
 
     //get population in acute food insecurity
-    p3Pop = (country.iso=='som') ? prop['phase3_worse_population'] : prop['p3_plus_P_population'];
+    p3Pop = prop['p3_plus_P_population'];
+    if (country.iso=='som') p3Pop = prop['phase3_worse_population'];
+    if (country.iso=='ken') p3Pop = prop['p3_plus_C_population'];
+    
     if (p3Pop>=1000) p3Pop = shortenNumFormat(p3Pop);
 
     if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
@@ -1822,7 +1828,7 @@ function createCountryMapTooltip(location) {
 
   //set up supporting key figures    
   var tableArray = [{label: 'Population', indicator: '#population'},
-                    {label: 'People Affected', indicator: '#affected+total'},
+                    {label: 'People Affecteddd', indicator: '#affected+total'},
                     {label: 'People Targeted', indicator: '#targeted+total'},
                     {label: 'People Reached', indicator: '#reached+total'}];
 
@@ -1894,7 +1900,7 @@ var eventColorRange = ['#EEB598','#CE7C7F','#60A2A4','#91C4B7'];
 var eventCategories = ['Battles', 'Explosions/Remote violence', 'Riots', 'Violence against civilians'];
 var colorDefault = '#F2F2EF';
 var colorNoData = '#FFF';
-var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, fatalityData, donorData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
+var regionBoundaryData, regionalData, nationalData, adminone_data, admintwo_data, ethData, kenData, fatalityData, donorData, dataByCountry, colorScale, viewportWidth, viewportHeight = '';
 var rankingChart = '';
 var mapLoaded = false;
 var dataLoaded = false;
@@ -1958,7 +1964,8 @@ $( document ).ready(function() {
     Promise.all([
       d3.json('https://raw.githubusercontent.com/OCHA-DAP/hdx-scraper-hornafrica-viz/main/all.json'),
       d3.json('data/ocha-regions-bbox-hornafrica.geojson'),
-      d3.json('https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/ethiopia_ipc.geojson')
+      d3.json('https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/ethiopia_ipc.geojson'),
+      d3.json('https://raw.githubusercontent.com/OCHA-DAP/viz-horn-of-africa-humanitarian-operations/v1/src/data/kenya_ipc.geojson')
     ]).then(function(data) {
       console.log('Data loaded');
       $('.loader span').text('Initializing map...');
@@ -1973,6 +1980,7 @@ $( document ).ready(function() {
       sourcesData = allData.sources_data;
       regionBoundaryData = data[1].features;
       ethData = data[2].features;
+      kenData = data[3].features;
       donorData = allData.planorgfunding_data;
 
       //clean acled data
@@ -1992,15 +2000,9 @@ $( document ).ready(function() {
         });
       });
 
-      //transform adm1 ipc data
-      // adminone_data.forEach(function(d) {
-      //   d['#affected+food+ipc+p3plus+num'] = transformIPC(d['#affected+food+ipc+p3plus+num']);
-      // });
 
       //transform adm2 ipc and priority data
       admintwo_data.forEach(function(d) {
-        //d['#affected+food+ipc+p3plus+num'] = transformIPC(d['#affected+food+ipc+p3plus+num']);
-
         switch(+d['#priority']) {
           case 1:
             d['#priority'] = 'Priority 1';
@@ -2015,10 +2017,21 @@ $( document ).ready(function() {
             d['#priority'] = d['#priority'];
         }
 
-        ethData.forEach(function(feature) {
-          if (feature.properties.ADM3_PCODE == d['#adm2+code'])
-            d['#affected+food+ipc+p3plus+num'] = feature.properties.p3_plus_P_population;
-        })
+
+        //copy over ipc 3+ values from ipc data to subnational data
+        if (d['#country+code']=='ETH') {
+          ethData.forEach(function(feature) {
+            if (feature.properties.ADM3_PCODE == d['#adm2+code'])
+              d['#affected+food+ipc+p3plus+num'] = feature.properties.p3_plus_P_population;
+          })
+        }
+
+        if (d['#country+code']=='KEN') {
+          kenData.forEach(function(feature) {
+            if (feature.properties.area == d['#adm2+name'])
+              d['#affected+food+ipc+p3plus+num'] = feature.properties.p3_plus_C_population;
+          })
+        }
       });
 
       //group national data by country -- drives country panel    
