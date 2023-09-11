@@ -112,7 +112,7 @@ $( document ).ready(function() {
           return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
         });
       });
-      
+
 
       //transform adm2 ipc and priority data
       admintwo_data.forEach(function(d) {
@@ -142,7 +142,7 @@ $( document ).ready(function() {
         if (d['#country+code']=='KEN') {
           kenData.forEach(function(feature) {
             if (feature.properties.area == d['#adm2+name'])
-              d['#affected+food+ipc+p3plus+num'] = feature.properties.p3_plus_P_population;
+              d['#affected+food+ipc+p3plus+num'] = feature.properties.p3_plus_C_population;
           })
         }
       });
