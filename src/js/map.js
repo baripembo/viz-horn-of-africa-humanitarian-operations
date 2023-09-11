@@ -282,7 +282,10 @@ function loadRasters() {
 }
 
 function loadIPCLayer(country) {
-  let phaseProp = (country.iso=='som') ? 'overall_phase' : 'overall_phase_P';
+  let phaseProp = 'overall_phase_P';
+  if (country.iso=='som') phaseProp = 'overall_phase';
+  if (country.iso=='ken') phaseProp = 'overall_phase_C';
+
   let labelProp = (country.iso=='som') ? 'title' : 'area';
   //let phaseProp = 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
@@ -366,7 +369,10 @@ function loadIPCLayer(country) {
     });
 
     //get population in acute food insecurity
-    p3Pop = (country.iso=='som') ? prop['phase3_worse_population'] : prop['p3_plus_P_population'];
+    p3Pop = prop['p3_plus_P_population'];
+    if (country.iso=='som') p3Pop = prop['phase3_worse_population'];
+    if (country.iso=='ken') p3Pop = prop['p3_plus_C_population'];
+    
     if (p3Pop>=1000) p3Pop = shortenNumFormat(p3Pop);
 
     if (phase!='0') content += `${currentIndicator.name}: <div class="stat">${phase}</div>`;
