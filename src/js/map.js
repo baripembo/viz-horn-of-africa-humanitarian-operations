@@ -5,10 +5,10 @@ var hoveredStateId = null;
 
 
 let ipcData = [
-  // {
-  //   iso: 'eth',
-  //   data: 'ethiopia_ipc.geojson'
-  // },
+  {
+    iso: 'eth',
+    data: 'ethiopia_ipc.geojson'
+  },
   {
     iso: 'ken',
     data: 'kenya_ipc.geojson'
@@ -154,23 +154,23 @@ function displayMap() {
   map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'visible');
 
   //markers
-  // map.addLayer({
-  //   'id': 'subnational-markers',
-  //   'type': 'circle',
-  //   'source': 'country-centroids',
-  //   //'filter': ['==', 'ADM_LEVEL', 2],
-  //   'filter': ['all', ['==', 'ADM_LEVEL', 2], ['==', 'alpha_3', 'ETH']],
-  //   'source-layer': subnationalCentroidSource,
-  //   'paint': {
-  //     'circle-color': '#999',
-  //     'circle-opacity': 0.5,
-  //     'circle-stroke-color': '#999',
-  //     'circle-stroke-width': 1,
-  //     'circle-stroke-opacity': 1
-  //   }
-  // }, baseLayer);
-  // subnationalMarkerLayer = 'subnational-markers';
-  // map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
+  map.addLayer({
+    'id': 'subnational-markers',
+    'type': 'circle',
+    'source': 'country-centroids',
+    //'filter': ['==', 'ADM_LEVEL', 2],
+    'filter': ['all', ['==', 'ADM_LEVEL', 2], ['==', 'alpha_3', 'ETH']],
+    'source-layer': subnationalCentroidSource,
+    'paint': {
+      'circle-color': '#999',
+      'circle-opacity': 0.5,
+      'circle-stroke-color': '#999',
+      'circle-stroke-width': 1,
+      'circle-stroke-opacity': 1
+    }
+  }, baseLayer);
+  subnationalMarkerLayer = 'subnational-markers';
+  map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
 
 
 
@@ -316,7 +316,7 @@ function loadIPCLayer(country) {
         '#640100'
       ]
     }
-  }, subnationalLabelLayer);
+  }, subnationalMarkerLayer);
 
 
   map.addLayer({
@@ -326,7 +326,7 @@ function loadIPCLayer(country) {
     paint: {
       'line-color': '#E0E0E0',
     }
-  }, subnationalLabelLayer);
+  }, subnationalMarkerLayer);
 
   map.addLayer({
     id: `${country.iso}-ipc-label-layer`,
@@ -737,13 +737,13 @@ function toggleIPCLayers(visible) {
   //turn subnational labels off and ipc bubbles on for ipc layer
   if (visible) {
     map.setLayoutProperty(subnationalLabelLayer, 'visibility', 'none');
-    //map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
-    // if (currentCountry.code=='KEN' || currentCountry.code=='SOM') $('.bubble-scale').hide();
-    // else $('.bubble-scale').show();
+    map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'visible');
+    if (currentCountry.code=='KEN' || currentCountry.code=='SOM') $('.bubble-scale').hide();
+    else $('.bubble-scale').show();
   }
   else {
-    // map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
-    // $('.bubble-scale').hide();
+    map.setLayoutProperty(subnationalMarkerLayer, 'visibility', 'none');
+    $('.bubble-scale').hide();
   }
 }
 
