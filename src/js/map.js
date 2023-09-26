@@ -354,8 +354,8 @@ function loadIPCLayer(country) {
     map.getCanvas().style.cursor = 'pointer';
     let prop = e.features[0].properties;
     let content, location, p3Pop;
-    let labelProp = (country.iso=='som') ? 'title' : 'area';
-    let countryName = (country.iso=='som') ? 'Somalia' : prop['country'];
+    let labelProp = 'area';
+    let countryName = prop['country'];
 
     //format content
     content = `<h2>${prop[labelProp]}, ${countryName}</h2>`;
@@ -370,7 +370,7 @@ function loadIPCLayer(country) {
 
     //get population in acute food insecurity
     p3Pop = prop['p3_plus_P_population'];
-    if (country.iso=='som') p3Pop = prop['phase3_worse_population'];
+    if (country.iso=='som') p3Pop = prop['p3_plus_C_population'];
     if (country.iso=='ken') p3Pop = prop['p3_plus_C_population'];
     
     if (p3Pop>=1000) p3Pop = shortenNumFormat(p3Pop);
