@@ -283,7 +283,7 @@ function loadRasters() {
 
 function loadIPCLayer(country) {
   let phaseProp = 'overall_phase_P';
-  if (country.iso=='som') phaseProp = 'overall_phase';
+  if (country.iso=='som') phaseProp = 'overall_phase_C';
   if (country.iso=='ken') phaseProp = 'overall_phase_C';
 
   let labelProp = (country.iso=='som') ? 'title' : 'area';
