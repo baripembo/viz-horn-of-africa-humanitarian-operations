@@ -1217,7 +1217,7 @@ function loadIPCLayer(country) {
   if (country.iso=='som') phaseProp = 'overall_phase_C';
   if (country.iso=='ken') phaseProp = 'overall_phase_C';
 
-  let labelProp = (country.iso=='som') ? 'title' : 'area';
+  let labelProp = 'area';
   //let phaseProp = 'overall_phase_P';
   map.addSource(`${country.iso}-ipc`, {
     type: 'geojson',
