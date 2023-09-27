@@ -1827,7 +1827,7 @@ function createCountryMapTooltip(location) {
 
   //set up supporting key figures    
   var tableArray = [{label: 'Population', indicator: '#population'},
-                    {label: 'People Affecteddd', indicator: '#affected+total'},
+                    {label: 'People Affected', indicator: '#affected+total'},
                     {label: 'People Targeted', indicator: '#targeted+total'},
                     {label: 'People Reached', indicator: '#reached+total'}];
 
