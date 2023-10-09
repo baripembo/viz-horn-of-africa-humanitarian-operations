@@ -1214,8 +1214,8 @@ function loadRasters() {
 
 function loadIPCLayer(country) {
   let phaseProp = 'overall_phase_P';
-  if (country.iso=='som') phaseProp = 'overall_phase_C';
-  if (country.iso=='ken') phaseProp = 'overall_phase_C';
+  if (country.iso=='som') phaseProp = 'overall_phase_P';
+  if (country.iso=='ken') phaseProp = 'overall_phase_P';
 
   let labelProp = 'area';
   //let phaseProp = 'overall_phase_P';
@@ -1301,8 +1301,8 @@ function loadIPCLayer(country) {
 
     //get population in acute food insecurity
     p3Pop = prop['p3_plus_P_population'];
-    if (country.iso=='som') p3Pop = prop['p3_plus_C_population'];
-    if (country.iso=='ken') p3Pop = prop['p3_plus_C_population'];
+    if (country.iso=='som') p3Pop = prop['p3_plus_P_population'];
+    if (country.iso=='ken') p3Pop = prop['p3_plus_P_population'];
     
     if (p3Pop>=1000) p3Pop = shortenNumFormat(p3Pop);
 
