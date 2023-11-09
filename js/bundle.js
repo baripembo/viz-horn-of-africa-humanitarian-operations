@@ -1935,7 +1935,7 @@ $( document ).ready(function() {
     //set content sizes based on viewport
     var minWidth = isMobile ? window.innerWidth : 1000;
     viewportWidth = (window.innerWidth<minWidth) ? minWidth : window.innerWidth;
-    viewportHeight = window.innerHeight;
+    viewportHeight = window.innerHeight - 60;
 
     var tooltip = d3.select('.tooltip');
     $('.content').width(viewportWidth);
