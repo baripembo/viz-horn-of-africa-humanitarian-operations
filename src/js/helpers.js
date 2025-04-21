@@ -1,6 +1,6 @@
 function vizTrack(view, content) {
   mpTrack(view, content);
-  gaTrack('viz interaction hdx', 'switch viz', 'ukr data explorer', content);
+  gaTrack('viz interaction hdx', 'switch viz', 'horn of africa data explorer', content);
 }
 
 function mpTrack(view, content) {
@@ -9,13 +9,14 @@ function mpTrack(view, content) {
     'page title': document.title,
     'embedded in': window.location.href,
     'action': 'switch viz',
-    'viz type': 'ukr data explorer',
+    'viz type': 'horn of africa data explorer',
     'current view': view,
     'content': content
   });
 }
 
-function gaTrack(eventCategory, eventAction, eventLabel, type) {
+function gaTrack(eventCategory, eventAction, eventLabel) {
+  //google tag manager event
   dataLayer.push({
     'event': eventCategory,
     'label': eventAction,
@@ -31,10 +32,19 @@ function truncateString(str, num) {
   return str.slice(0, num) + '...';
 }
 
-
-function formatValue(val) {
-  var format = d3.format('$.3s');
-  var value;
+function formatValue(val, type) {
+  let format;
+  switch(type) {
+    case 'percent':
+      format = percentFormat;
+      break;
+    case 'short':
+      format = d3.format('.3s');
+      break;
+    default:
+      format = d3.formatPrefix('$.1f', val);//d3.format('$.3s');
+  }
+  let value;
   if (!isVal(val)) {
     value = 'NA';
   }
@@ -42,6 +52,13 @@ function formatValue(val) {
     value = (isNaN(val) || val==0) ? val : format(val).replace(/G/, 'B');
   }
   return value;
+}
+
+
+function formatDateRange(d) {
+  let date = d.split('-');
+  date = `${dateFormat(new Date(date[0]))}-${dateFormat(new Date(date[1]))}`;
+  return date;
 }
 
 
@@ -73,29 +90,44 @@ function createFootnote(target, indicator, text) {
   });
 }
 
-
-function getCurvedLine(start, end) {
-  const radius = turf.rhumbDistance(start, end);
-  const midpoint = turf.midpoint(start, end);
-  const bearing = turf.rhumbBearing(start, end) - 89; // <-- not 90˚
-  const origin = turf.rhumbDestination(midpoint, radius, bearing);
-
-  const curvedLine = turf.lineArc(
-    origin,
-    turf.distance(origin, start),
-    turf.bearing(origin, end),
-    turf.bearing(origin, start),
-    { steps: 128 }
-  );
-
-  return { line: curvedLine, bearing: bearing };
+function isCountryView() {
+  return currentCountry.code=='Regional' ? false : true;
 }
 
+function transformIPC(value) {
+  let phase;
+  switch(+value) {
+    case 1:
+      phase = '1-Minimal';
+      break;
+    case 2:
+      phase = '2-Stressed';
+      break;
+    case 3:
+      phase = '3-Crisis';
+      break;
+    case 4:
+      phase = '4-Emergency';
+      break;
+    case 5:
+      phase = '5-Famine';
+      break;
+    default:
+      phase = value;
+  }
+  return phase;
+}
+
+function disableInput(indicator, isDisabled) {
+  let clr = (isDisabled) ? '#BBB' : '#000';
+  $(`input[value="${indicator}"]`).attr('disabled', isDisabled);
+  $(`input[value="${indicator}"]`).parent().css('color', clr);
+}
 
 //country codes and raster ids
 const countryCodeList = {
-  ETH: '8l382re2',
-  KEN: '2e1m7o07',
-  SOM: '3s7xeitz'
+  ETH: {pop: '1jx1mpm4', chirps: '9f35wnzq', chirpsMAM: 'adtgh6lr', chirpsOND: '9f35wnzq'},
+  KEN: {pop: '1iwk6136', chirps: '0zdu5z45', chirpsMAM: 'bdidwt0g', chirpsOND: '0zdu5z45'},
+  SOM: {pop: 'd0xh6ux7', chirps: '1bl7k2zs', chirpsMAM: '7xxd10pv', chirpsOND: '1bl7k2zs'}
 };
 

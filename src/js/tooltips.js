@@ -1,85 +1,58 @@
 /*************************/
 /*** TOOLTIP FUNCTIONS ***/
 /*************************/
-function createMapTooltip(country_code, country_name, point) {
-  var country = nationalData.filter(c => c['#country+code'] == country_code);
-  if (country[0]!=undefined) {
-    var val = country[0][currentIndicator.id];
+function createCountryMapTooltip(location) {
+  var val = location[currentIndicator.id];
+  var label = currentIndicator.name;
 
-    //format content for tooltip
-    if (isVal(val)) {
-      val = shortenNumFormat(val);
-    }
-    else {
-      val = 'No Data';
-    }
+  //format content for tooltip
+  let content = '';
+  content = `<h2>${location['#adm2+name']}, ${location['#country+name']}</h2>`;
 
-    //format content for display
-    var content = '<h2>'+ country_name +'</h2>';
-
-    //ipc layer
-    if (currentIndicator.id=='#affected+food+ipc+p3plus+num') {
-      var dateSpan = '';
-      if (country[0]['#date+ipc+start']!=undefined) {
-        var startDate = new Date(country[0]['#date+ipc+start']);
-        var endDate = new Date(country[0]['#date+ipc+end']);
-        startDate = (startDate.getFullYear()==endDate.getFullYear()) ? d3.utcFormat('%b')(startDate) : d3.utcFormat('%b %Y')(startDate);
-        var dateSpan = '<span class="subtext">('+ startDate +'-'+ d3.utcFormat('%b %Y')(endDate) +' - '+ country[0]['#date+ipc+period'] +')</span>';
-      }
-      var shortVal = (isNaN(val)) ? val : shortenNumFormat(val);
-      content += 'Total Population in IPC Phase 3+ '+ dateSpan +':<div class="stat">' + shortVal + '</div>';
-      if (val!='No Data') {
-        if (country[0]['#affected+food+ipc+analysed+num']!=undefined) content += '<span>('+ shortenNumFormat(country[0]['#affected+food+ipc+analysed+num']) +' of total country population analysed)</span>';
-        var tableArray = [{label: 'IPC Phase 3 (Critical)', value: country[0]['#affected+food+ipc+p3+num']},
-                          {label: 'IPC Phase 4 (Emergency)', value: country[0]['#affected+food+ipc+p4+num']},
-                          {label: 'IPC Phase 5 (Famine)', value: country[0]['#affected+food+ipc+p5+num']}];
-        content += '<div class="table-display">Breakdown:';
-        tableArray.forEach(function(row) {
-          if (row.value!=undefined) {
-            var shortRowVal = (row.value==0) ? 0 : shortenNumFormat(row.value);
-            content += '<div class="table-row"><div>'+ row.label +':</div><div>'+ shortRowVal +'</div></div>';
-          }
-        });
-        content += '</div>';
-      }
-    }
-    //all other layers
-    else {
-      content += currentIndicator.name + ':<div class="stat">' + val + '</div>';
-    }
-
-    //set content for tooltip
-    tooltip.setHTML(content);
-
-    setTooltipPosition(point);
+  if ('currentIndicator.id'=='#priority' || isNaN(val)) {
+    let indicator;
+    if (currentIndicator.id=='#priority') indicator = 'Operational Priority Level';
+    else indicator = currentIndicator.name
+    content += `${indicator}:<div class="stat">${val}</div>`;
   }
-}
+  else if ((currentIndicator.id).includes('#climate+rainfall+anomaly')){
+    content += `${currentIndicator.name}:<div class="stat">${parseFloat(val).toFixed(2)}mm</div>`;
+  }
+  else if (currentIndicator.id=='#population' && location['#country+code']=='ETH') {
+    //dont show population figures for ETH
+  }
+  else {
+    content += `${currentIndicator.name}:<div class="stat">${shortenNumFormat(val)}</div>`;
+  }
 
+  //set up supporting key figures    
+  var tableArray = [{label: 'Population', indicator: '#population'},
+                    {label: 'People Affected', indicator: '#affected+total'},
+                    {label: 'People Targeted', indicator: '#targeted+total'},
+                    {label: 'People Reached', indicator: '#reached+total'}];
 
-function createCountryMapTooltip(adm1_name, adm1_pcode, point) {
-  var adm1 = subnationalData.filter(function(c) {
-    if (c['#adm1+code']==adm1_pcode && c['#country+code']==currentCountry.code)
-      return c;
+  //show ipc pop for countries except for SOM
+  if (currentCountry.code=='KEN') {
+    tableArray.splice(1, 0, {label: 'Population in IPC Phase 3+', indicator: '#affected+food+ipc+p3plus+num'});
+  }
+
+  //remove population figures for ETH only
+  if (currentCountry.code=='ETH') {
+    tableArray.splice(0, 1);
+  }
+
+  content += '<div class="table-display">';
+  tableArray.forEach(function(row) {
+    if (row.indicator!=currentIndicator.id) {
+      let value = location[row.indicator];
+      let shortVal = (value==0 || isNaN(value)) ? 'No Data' : shortenNumFormat(value);
+      if (row.indicator=='#affected+food+ipc+p3plus+num') shortVal = (value==undefined) ? 'No Data' : shortenNumFormat(value);
+      content += `<div class="table-row"><div>${row.label}:</div><div>${shortVal}</div></div>`;
+    }
   });
+  content += '</div>';
 
-  if (adm1[0]!=undefined) {
-    var val = adm1[0][currentIndicator.id];
-    var label = currentIndicator.name;
-
-    //format content for tooltip
-    if (val!=undefined && val!='' && !isNaN(val)) {
-      val = shortenNumFormat(val);
-    }
-    else {
-      val = 'No Data';
-    }
-
-    let content = '';
-    content = `<h2>${adm1_name}</h2>${label}:<div class="stat">${val}</div>`;
-
-    tooltip.setHTML(content);
-    //if (!isMobile) setTooltipPosition(point)
-  }
+  tooltip.setHTML(content);
 }
 
 

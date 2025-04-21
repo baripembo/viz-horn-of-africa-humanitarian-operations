@@ -79,8 +79,10 @@ h6 {
   font-family: 'Gotham-Bold', sans-serif;
   font-size: 14px;
   font-weight: normal;
+  line-height: 16px;
   margin: 0;
 }
+
 
 label {
 	&.label-small {
@@ -114,7 +116,7 @@ label {
 }
 
 .table-display {
-	margin: 5px 0 0;
+	margin: 10px 0 0;
 	.table-row {
 		align-items: center;
 		display: flex;
@@ -182,7 +184,7 @@ a:visited {
   line-height: 12px;
   margin: 0;
   padding-bottom: 10px;
-  &.gender-data {
+  &.footnote-indicator {
   	margin-top: 10px;
   }
 }
@@ -215,6 +217,9 @@ a:visited {
 		right: 24px;
 		opacity: 1;
 		z-index: 3;
+		.indicator.country-only {
+			display: none;
+		}
 	}
 }
 
@@ -282,6 +287,13 @@ a:visited {
 	label {
 		margin-top: 10px;
 	}
+	.nested {
+		display: none;
+		margin-left: 20px;
+		label {
+			margin-top: 5px;
+		}
+	}
 	.legend-title {
 		display: block;
 		margin-top: 10px;
@@ -290,7 +302,7 @@ a:visited {
 		display: block;
 	}
 	.legend-container {
-		height: 92px;
+		height: 82px;
 		overflow: visible;
 		transform: translate(0px, 5px);
 		&.no-data {
@@ -299,39 +311,34 @@ a:visited {
 				display: none;
 			}
 		}
-	}
-	.legend-marker {
-		display: flex;
-		padding-top: 8px;
-		.marker {
-			margin-right: 6px; 
-			margin-top: 0;
-			img {
-				height: 14px;
-				width: 14px;
-			}
+		&.climate-rainfall-anomaly-marmay,
+		&.climate-rainfall-anomaly-octdec {
+			height: 202px;
 		}
-		.source {
+		&.population {
+			height: 118px;
+		}
+		&.priority {
+			height: 48px;
+		}
+	}
+	.bubble-scale {
+		margin: 5px 0 10px;
+		.source.small {
+			margin-bottom: 5px;
 			margin-left: 0;
 		}
-		label {
-			flex-direction: column;
-			margin-top: 0;
+		.swatch {
+			fill: #999;
+			fill-opacity: 0.5;
+	    stroke: #999;
+	    stroke-opacity: 1;
+	    stroke-width: 1px;
 		}
-	}
-	.footnote {
-		margin-top: 15px;
 	}
 	&.population {
 		.legend-container {
 			height: 130px;
-		}
-		.legend-marker.hostilities,
-		.legend-marker.border-crossing {
-			display: flex;
-		}
-		.source-container.border-crossing {
-			display: block;
 		}
 	}		
 	.legendCells {
@@ -339,6 +346,17 @@ a:visited {
 	}
 	.legendCells-events .legendCells {
 		display: none;
+	}	
+	&.acled {
+		.legend-container {
+			height: 78px;
+		}
+		.legendCells {
+			display: none;
+		}
+		.legendCells-events .legendCells {
+			display: block;
+		}
 	}
 	label {    
 		display: flex;
@@ -351,14 +369,6 @@ a:visited {
 	}
 	input {
 		margin: 0 6px 0 0;
-	}
-	svg {
-		width: 190px;
-		&.border-crossing-key,
-		&.refugee-count-key,
-		&.hostilities-key {
-			margin-top: 0;
-		}
 	}
 	.toggle-icon {
 		&:before {
@@ -385,6 +395,7 @@ a:visited {
 	}
 	.no-data-key {
 		height: 20px;
+		margin-top: 10px;
 		rect {
 			fill: #FFF;
 			stroke: #CCC;
@@ -412,6 +423,7 @@ a:visited {
 .legend-gradient {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
   bottom: 30px;
+  display: none;
   height: 25px;
   pointer-events: none;
 	position: fixed;
@@ -489,7 +501,7 @@ a:visited {
 }
 
 .mapboxgl-ctrl-top-right {
-  top: 60px;
+  top: 56px;
   right: 16px;
 }
 
@@ -554,7 +566,8 @@ a:visited {
 			border-bottom: 1px solid #CCC;
 			padding-bottom: 15px;
 			.title {
-				height: 36px;
+				cursor: default;
+				height: 30px;
 			}
 			.stat {
 				display: flex;
@@ -569,6 +582,38 @@ a:visited {
 			}
 		}
 	}
+	.panel-tooltip {
+    display: block;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transition: opacity 0.2s ease-out;
+    z-index: 1070;
+    .tooltip-arrow {
+		  border-left: 7px solid transparent;
+		  border-right: 7px solid transparent;
+		  border-top: 7px solid #000;
+		  bottom: -7px;
+		  height: 0;
+		  position: absolute;
+		  left: 50%;
+		  margin-left: -4px;
+		  width: 0;
+		}
+		.tooltip-inner {
+	    background-color: #000;
+	    border-radius: 4px;
+	    color: #FFF;
+	    max-width: 200px;
+		  padding: 10px 15px;
+	    text-align: left;
+		}
+	}
 }
 
 .download-link {
@@ -577,13 +622,20 @@ a:visited {
 	a {
 		display: flex;
 		line-height: 16px;
+		margin-bottom: 15px;
 		text-decoration: none;
 		width: 100%;
 	}
 	i {
 		font-size: 16px;
 		margin-left: auto;
+		padding-left: 10px;
 		padding-top: 3px;
+	}
+	&.eth,
+	&.ken,
+	&.som {
+		display: none;
 	}
 }
 
@@ -632,7 +684,7 @@ a:visited {
   		margin-left: 0;
   	}
   }
-  .trendseries-title {
+  .ranking-title {
   	border-top: 1px solid #CCC;
   	margin-top: 30px;
   	h6 {
@@ -653,7 +705,7 @@ a:visited {
 }
 
 .country-select,
-.trendseries-select { 
+.ranking-select { 
 	background-color: #FFF;
   border-color: #FFF;
 	border-radius: 8px;
@@ -665,7 +717,6 @@ a:visited {
 }
 
 .country-select {
-	margin: 20px 0 0;
 	width: 100%;
 }
 
@@ -691,11 +742,15 @@ a:visited {
 .c3-text {
 	fill: #000 !important;
 	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 12px;
 }
 
 .c3-axis {
 	.tick text {
-		fill: #000;
+		fill: #888;
+		font-size: 12px !important;
+		font-family: 'Source Sans Pro', sans-serif;
+		text-transform: uppercase;
 	}
 }
 
@@ -717,7 +772,7 @@ a:visited {
 }
 
 
-.trendseries-chart {
+.ranking-chart {
 	// .c3-target.c3-focused .c3-lines .c3-line {
 	// 	stroke: #007CE1 !important;
 	// }
@@ -807,7 +862,10 @@ a:visited {
 
 @media only screen and (max-width: 767px) {
 	h3 {
-		font-size: 18px;
+		font-size: 17px;
+	}
+	h4 {
+		font-size: 11px;
 	}
 	h5 {
 		font-size: 14px;
@@ -816,7 +874,7 @@ a:visited {
 		padding: 0 20px;
 	}
 	.mapboxgl-ctrl-top-right {
-    top: 50px;
+    //top: 50px;
     right: 0;
 	}
 	.content {
@@ -826,8 +884,11 @@ a:visited {
 		left: 0;
 		top: 50%;
 	}
+	.country-select {
+		height: 38px;
+	}
 	#global-map {
-		height: 50%;
+		height: 45%;
 		position: absolute;
     top: 50%;
 	}
@@ -837,7 +898,7 @@ a:visited {
 		padding: 15px 20px;
 		position: absolute;
     top: 50%;
-		.trendseries-title {
+		.ranking-title {
 			h6 {
 				font-size: 12px;
 			}
@@ -891,23 +952,24 @@ a:visited {
 				.title {
 					font-size: 12px;
 					line-height: 14px;
+					height: 32px;
 					.small {
 						font-size: 11px;
 						line-height: 15px;
 					}
 				}	
 			}
-			&.refugees,
-			&.idps {
+			&.sam,
+			&.gam {
 				.figure-inner .title {
-					height: 36px;
+					height: 48px;
 				}
 			}
 		}
 	}
 	.stat {
 		font-size: 24px;
-		margin: 20px 0 5px;
+		margin: 5px 0;
 		gap: 3px;
 	}
 }
